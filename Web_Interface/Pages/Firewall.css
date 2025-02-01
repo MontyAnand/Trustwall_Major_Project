@@ -1,0 +1,119 @@
+/* Background Gradient (Same as Antivirus) */
+.firewall-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    color: white;
+  }
+  
+  /* Title */
+  .firewall-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  /* Content Layout */
+  .firewall-content {
+    display: flex;
+    gap: 30px;
+    width: 80%;
+  }
+  
+  /* Manual Input Section (Left Side) */
+  .manual-input {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 250px;
+    color: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .manual-input h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .manual-input label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
+  .manual-input input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid gray;
+    border-radius: 5px;
+  }
+  
+  /* Allow/Block Checkbox */
+  .allow-block {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .allow-block input {
+    margin-right: 10px;
+  }
+  
+  /* Terminal Section (Right Side) */
+  .terminal {
+    flex: 1;
+    background: black;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .terminal h2 {
+    color: lightgray;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  /* Terminal Screen */
+  .terminal-screen {
+    background: #1e1e1e;
+    padding: 10px;
+    border-radius: 5px;
+    min-height: 80px;
+    font-family: monospace;
+    color: lightgreen;
+    overflow-y: auto;
+  }
+  
+  /* Terminal Input */
+  .terminal input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    background: black;
+    color: white;
+    border: 1px solid gray;
+    border-radius: 5px;
+  }
+  
+  /* Execute Button */
+  .terminal button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .terminal button:hover {
+    background: #219150;
+  }
+  
