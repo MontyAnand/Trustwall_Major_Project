@@ -23,6 +23,14 @@ namespace fs = std::filesystem;
 
 class Firewall {
     private:
+        char command[150];
+
+        void createTable ();
+        void createPortSets ();
+        void createIPSets ();
+        void createChains ();
+        void initialRules ();
+
     public:
 };
 
