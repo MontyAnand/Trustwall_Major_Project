@@ -8,7 +8,7 @@ const fs = require('fs');
 const net = require('net');
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 const scanFile = (filename)=>{
     const SERVER_IP = "127.0.0.1";  // Change if the server is on another machine
@@ -72,7 +72,7 @@ const getFilename = (req,res,next)=>{
     const socketID = req.body.socketID;
     const filename = req.file.filename;
     if(!socketID || !filename){
-        res.satus(400).send("Unable to scan the file!!!");
+        res.status(400).send("Unable to scan the file!!!");
         return;
     }
     socketFileMap.set(filename,socketID);
