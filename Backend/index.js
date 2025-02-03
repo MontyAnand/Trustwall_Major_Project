@@ -5,9 +5,48 @@ const {Server} = require('socket.io');
 const http = require('http');
 const cors = require('cors');
 const fs = require('fs');
+const net = require('net');
 
 const app = express();
 const port = 3000;
+
+const scanFile = (filename)=>{
+    const SERVER_IP = "127.0.0.1";  // Change if the server is on another machine
+    const SERVER_PORT = 8080;
+    const client = new net.Socket();
+    client.connect(SERVER_PORT, SERVER_IP, () => {
+        console.log("Connected to server");
+    
+        // Send a message to the server
+        client.write(filename);
+    });
+    
+    // Receive data from the server
+    client.on("data", (data) => {
+        console.log("Server:", data.toString());
+        const filepath = path.join('./uploads',filename);
+        fs.unlink(filepath, (err)=>{
+            if(err){
+                console.error(`Unable to delete file : ${err}`);
+            }
+            else{
+                console.log("Successfully deleted the file : ",filename);
+            }
+        });
+        // Close the connection after receiving the response
+        client.end();
+    });
+    
+    // Handle connection close
+    client.on("close", () => {
+        console.log("Connection closed");
+    });
+    
+    // Handle errors
+    client.on("error", (err) => {
+        console.error("Connection error:", err.message);
+    });
+}
 
 const server = http.createServer(app);
 
@@ -74,15 +113,16 @@ server.listen(port, () => {
 setInterval(()=>{
     socketFileMap.forEach((value,key)=>{
         console.log(`${key} : ${value}`);
-        const filepath = path.join('./uploads',key);
-        fs.unlink(filepath, (err)=>{
-            if(err){
-                console.error(`Unable to delete file : ${err}`);
-            }
-            else{
-                console.log("Successfully deleted the file : ",key);
-            }
-        });
+        scanFile(key);
+        // const filepath = path.join('./uploads',key);
+        // fs.unlink(filepath, (err)=>{
+        //     if(err){
+        //         console.error(`Unable to delete file : ${err}`);
+        //     }
+        //     else{
+        //         console.log("Successfully deleted the file : ",key);
+        //     }
+        // });
         socketFileMap.delete(key);
     });
 }, 60000)
