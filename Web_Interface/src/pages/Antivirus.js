@@ -8,7 +8,7 @@ function Antivirus() {
   const {socket , socketID} = useSocket();
   const [file, setFile] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState(null);
+  const [scanResult, setScanResult] = useState("");
 
 
   useEffect(()=>{
@@ -38,7 +38,7 @@ function Antivirus() {
         return;
       }
       setFile(selectedFile);
-      setScanResult(null);
+      setScanResult("");
     }
   };
 
@@ -55,7 +55,7 @@ function Antivirus() {
       return;
     }
     setIsScanning(true);
-    setScanResult(null);
+    setScanResult("");
 
     // Simulate scan process (3 seconds delay)
     // setTimeout(() => {
@@ -73,7 +73,7 @@ function Antivirus() {
     formData.append("socketID",socket.id);
 
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData, {
+      const response = await axios.post("http://192.168.87.123:5000/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

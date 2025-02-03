@@ -18,7 +18,9 @@ int Antivirus::startScanning (std::string filename){
             return 0;
         }
 
-        std::string command = "clamscan " + filename + " | tee " + reportfile;
+        std::string command = "clamscan " + filename + 
+                          " | awk 'NR==1 { if ($NF == \"FOUND\") print $(NF-1), $NF; else print $NF }'" +
+                          " | tee " + reportfile;
 
         if(system(command.c_str()) != 0) {
             fs::current_path(current_path);

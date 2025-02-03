@@ -13,7 +13,7 @@ export const SocketProvider = ({ children }) => {
   const [socketId, setSocketId] = useState(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5000"); // Connect to the backend
+    const newSocket = io("http://192.168.87.123:5000"); // Connect to the backend
 
     newSocket.on('connect',()=>{
         setSocketId(newSocket.id);
