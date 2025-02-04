@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./Antivirus.css"; // Import CSS file
 import axios from "axios";
 import {useSocket} from "../Contexts/socketContex";
+import "../components/Sidebar.js";
+import Sidebar from "../components/Sidebar.js";
 
 function Antivirus() {
 
@@ -88,7 +90,9 @@ function Antivirus() {
   };
 
   return (
-    <div className="antivirus-container">
+    <>
+      <Sidebar/>
+      <div className="antivirus-container">
       <div className="scanner-box">
         {/* Title */}
         <h1 className="scanner-title">🛡️ Antivirus Scanning</h1>
@@ -118,6 +122,7 @@ function Antivirus() {
         {scanResult && <p className={`scan-result ${scanResult.includes("❌") ? "danger" : "safe"}`}>{scanResult}</p>}
       </div>
     </div>
+    </>
   );
 }
 

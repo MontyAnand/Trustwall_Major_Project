@@ -1,0 +1,24 @@
+.container{
+    display:flex;
+    justify-content: space-between;
+    background-image: linear-gradient(to right,#333A40,#5b5c5d);
+    /* background-color: #333A40; */
+    color:white;
+}
+.box{
+    display:flex;
+    /* flex-direction: row-reverse; */
+    justify-content: space-between;
+}
+.box li{
+    list-style: none;
+    padding: 12px 23px;
+}
+.box li a{
+    text-decoration: none;
+    color:white;
+    font-size:17px;
+}
+.heading{
+    padding: 12px 23px;
+}

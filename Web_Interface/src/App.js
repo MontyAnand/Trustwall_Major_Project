@@ -10,7 +10,7 @@ function App() {
     <SocketProvider>
       <Router>
         <div className="flex">
-          <Sidebar />
+          {/* <Sidebar /> */}
           <div className="flex-1 p-4">
             <Routes>
               <Route path="/" element={<Dashboard />} />
