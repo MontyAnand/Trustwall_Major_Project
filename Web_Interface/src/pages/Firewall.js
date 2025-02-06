@@ -23,7 +23,9 @@ function Firewall() {
   };
 
   return (
-    <div className="firewall-container">
+    <>
+      <Sidebar/>
+      <div className="firewall-container">
       <h1 className="firewall-title">🛡️ Firewall</h1>
 
       <div className="firewall-content">
@@ -82,6 +84,7 @@ function Firewall() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
