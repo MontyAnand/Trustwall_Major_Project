@@ -130,8 +130,8 @@ app.post('/upload', upload.single('file'), getFilename, (req, res) => {
     res.status(200).json({ message: 'File uploaded successfully', file: req.file.filename });
 });
 
-server.listen(port, "192.168.87.123", () => {
-    console.log(`Server running at http://192.168.87.123:${port}`);
+server.listen(port, "127.0.0.1", () => {
+    console.log(`Server running at http://127.0.0.1:${port}`);
 });
 
 setInterval(() => {

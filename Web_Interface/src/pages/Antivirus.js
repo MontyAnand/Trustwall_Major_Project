@@ -73,7 +73,7 @@ function Antivirus() {
     formData.append("socketID",socket.id);
 
     try {
-      const response = await axios.post("http://192.168.87.123:5000/upload", formData, {
+      const response = await axios.post("http://127.0.0.1:5000/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
