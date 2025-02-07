@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Antivirus from "./pages/Antivirus";
 import Firewall from "./pages/Firewall";
-import Sidebar from "./components/Sidebar";
+import VPN from "./pages/VPN";
 import { SocketProvider } from "./Contexts/socketContex";
 
 function App() {
@@ -16,6 +16,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/antivirus" element={<Antivirus />} />
               <Route path="/firewall" element={<Firewall />} />
+              <Route path="/VPN" element={<VPN />} />
             </Routes>
           </div>
         </div>
