@@ -1,8 +1,10 @@
 .container{
     display:flex;
+    position: fixed; 
+    top: 0; 
+    width: 100%;
     justify-content: space-between;
     background-image: linear-gradient(to right,#333A40,#5b5c5d);
-    /* background-color: #333A40; */
     color:white;
 }
 .box{
