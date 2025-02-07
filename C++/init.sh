@@ -1,0 +1,1 @@
+g++ -std=c++17 Antivirus.cpp VPN.cpp Firewall.cpp QR.cpp Server.cpp test.cpp -L/usr/local/lib -lqrencode -lpng && sudo ./a.out

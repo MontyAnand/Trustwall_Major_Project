@@ -9,6 +9,7 @@ const net = require('net');
 
 const app = express();
 const port = 5000;
+const HOST = process.argv[2];
 
 const scanFile = (filename, socketID, io) => {
     const SERVER_IP = "127.0.0.1";  // Change if the server is on another machine
@@ -130,8 +131,8 @@ app.post('/upload', upload.single('file'), getFilename, (req, res) => {
     res.status(200).json({ message: 'File uploaded successfully', file: req.file.filename });
 });
 
-server.listen(port, "127.0.0.1", () => {
-    console.log(`Server running at http://127.0.0.1:${port}`);
+server.listen(port, HOST, () => {
+    console.log(`Server running at http://${HOST}:${port}`);
 });
 
 setInterval(() => {
@@ -149,4 +150,4 @@ setInterval(() => {
         // });
         socketFileMap.delete(key);
     });
-}, 1000)
+}, 1000);

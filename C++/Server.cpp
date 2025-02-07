@@ -118,6 +118,12 @@ void Server::eventLoop()
     }
 }
 
+void Server::startNodeServer(std::string IP){
+    std::string command = "cd ../Backend && node index.js "+IP;
+    system(command.c_str());
+}
+
+
 Server::Server()
 {
     epollFd = epoll_create1(0);
@@ -128,5 +134,9 @@ Server::Server()
     }
 
     serverSocketFd = createServerSocket();
+
+    NodeServerThread = std::thread(&Server::startNodeServer, this, vpn.getIP());
+    NodeServerThread.detach();
+
     eventLoop();
 }

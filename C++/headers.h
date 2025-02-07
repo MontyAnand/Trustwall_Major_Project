@@ -122,12 +122,22 @@ class Server{
     private:
         int serverSocketFd;
         int epollFd;
+
         struct epoll_event events[MAX_EVENTS];
-        void setNonBlocking(int);
+
+        std::thread NodeServerThread;
+
+        VPN vpn;
+
         int createServerSocket();
+        void eventLoop();
+
+        void setNonBlocking(int);
         void addToInputEventLoop(int);
         void addToOutputEventLoop(int);
-        void eventLoop();
+
+        void startNodeServer (std::string);
+        
     public:
         Server();
 };
