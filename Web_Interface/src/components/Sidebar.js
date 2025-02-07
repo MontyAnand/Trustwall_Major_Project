@@ -10,6 +10,7 @@ function Sidebar() {
           <li className="py-2"><Link to="/">Dashboard</Link></li>
           <li className="py-2"><Link to="/antivirus">Antivirus</Link></li>
           <li className="py-2"><Link to="/firewall">Firewall</Link></li>
+          <li className="py-2"><Link to="/VPN">VPN</Link></li>
         </ul>
       </nav>
     </div>
