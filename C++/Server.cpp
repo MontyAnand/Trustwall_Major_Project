@@ -39,6 +39,7 @@ int Server::createServerSocket()
     }
 
     setNonBlocking(server_fd);
+    std::cout << "C++ Server started\n";
     return server_fd;
 }
 
@@ -105,6 +106,7 @@ void Server::eventLoop()
                 else
                 {
                     std::cout << "Received: " << buffer << " from client " << fd << std::endl;
+                    processPacket(buffer,fd);
                 }
             }
             else if (events[i].events & EPOLLOUT)
@@ -123,8 +125,43 @@ void Server::startNodeServer(std::string IP){
     system(command.c_str());
 }
 
+void Server::processPacket (char* buffer, int fd){
+    int flag = (int)(char)buffer[0];
+    std::cout << flag << "\n";
+    switch (flag) {
+        case 0: {
+            // Antivirus Filescan Request
+            int filenamesize = (int)buffer[1];
+            std::string filename = (buffer + 2);
+            std::cout << "FilenameSize : " << filenamesize << " Filename : " << filename << "\n";
+            std::string res = "FilenameSize : " + std::to_string(filenamesize) + " Filename : " + filename;
+            send(fd,res.c_str(),res.length(),0); 
+            break;
+        }
+        case 2: {
+            // VPN Connection Request
+            std::cout << "VPN conection request\n";
+            std::string res = "VPN conection request\n";
+            send(fd,res.c_str(),res.length(),0);
+            break;
+        }
+    }
+}
 
-Server::Server()
+
+void Server::handleFilescan(){
+    while(running){
+
+    }
+}
+
+void Server::handleVPNRequest(){
+    while(running){
+
+    }
+}
+
+Server::Server() : running(true)
 {
     epollFd = epoll_create1(0);
     if (epollFd == -1)
@@ -134,9 +171,21 @@ Server::Server()
     }
 
     serverSocketFd = createServerSocket();
-
+    addToInputEventLoop(serverSocketFd);
     NodeServerThread = std::thread(&Server::startNodeServer, this, vpn.getIP());
     NodeServerThread.detach();
-
+    fileScanThread = std::thread(&Server::handleFilescan, this);
+    vpnRequestThread = std::thread(&Server::handleVPNRequest,this);
     eventLoop();
+}
+
+Server::~Server(){
+    running = false;
+    if(fileScanThread.joinable()){
+        fileScanThread.join();
+    }
+
+    if(vpnRequestThread.joinable()){
+        vpnRequestThread.join();
+    }
 }

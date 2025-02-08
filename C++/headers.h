@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <queue>
 #include <sstream>
 #include <iomanip>
 #include <vector>
@@ -104,7 +105,6 @@ class VPN {
 
     public:
         VPN();
-        void printData();
         std::string getIP();
         std::uint16_t acceptConnectionRequest();
         ~VPN ();
@@ -123,9 +123,18 @@ class Server{
         int serverSocketFd;
         int epollFd;
 
+        std::queue<std::pair<int,char*>>antivirusQueue;
+        std::queue<std::pair<int,char*>>vpnQueue;
+
         struct epoll_event events[MAX_EVENTS];
 
         std::thread NodeServerThread;
+        std::thread fileScanThread;
+        std::thread vpnRequestThread;
+
+        std::mutex fileScanMTX;
+        std::mutex vpnMTX;
+        std::atomic <bool> running;
 
         VPN vpn;
 
@@ -137,7 +146,13 @@ class Server{
         void addToOutputEventLoop(int);
 
         void startNodeServer (std::string);
+        void processPacket (char*,int);
+
+        void handleFilescan();
+        void handleVPNRequest();
+        
         
     public:
         Server();
+        ~Server();
 };
