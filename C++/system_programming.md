@@ -8,4 +8,4 @@ Antivirus request flag => 0
 Antivirus response flag => 1
 
 VPN request => | 1 byte (flag) | => flag = 2
-VPN response => | 1 byte (flag) | 4 byte for ID | => 3
+VPN response => | 1 byte (flag) | 4 byte for ID | => flag = 3

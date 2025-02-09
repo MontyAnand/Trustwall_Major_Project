@@ -118,6 +118,7 @@ void Server::eventLoop()
             }
         }
     }
+    running = false;
 }
 
 void Server::startNodeServer(std::string IP){
@@ -131,18 +132,27 @@ void Server::processPacket (char* buffer, int fd){
     switch (flag) {
         case 0: {
             // Antivirus Filescan Request
-            int filenamesize = (int)buffer[1];
-            std::string filename = (buffer + 2);
-            std::cout << "FilenameSize : " << filenamesize << " Filename : " << filename << "\n";
-            std::string res = "FilenameSize : " + std::to_string(filenamesize) + " Filename : " + filename;
-            send(fd,res.c_str(),res.length(),0); 
+            // int filenamesize = (int)buffer[1];
+            // std::string filename = (buffer + 2);
+            // std::cout << "FilenameSize : " << filenamesize << " Filename : " << filename << "\n";
+            // std::string res = "FilenameSize : " + std::to_string(filenamesize) + " Filename : " + filename;
+            // send(fd,res.c_str(),res.length(),0); 
+
+            {
+                std::lock_guard <std::mutex> lock(fileScanMTX);
+                antivirusQueue.push(std::make_pair(fd,buffer));
+            }
             break;
         }
         case 2: {
             // VPN Connection Request
-            std::cout << "VPN conection request\n";
-            std::string res = "VPN conection request\n";
-            send(fd,res.c_str(),res.length(),0);
+            // std::cout << "VPN conection request\n";
+            // std::string res = "VPN conection request\n";
+            // send(fd,res.c_str(),res.length(),0);
+            {
+                std::lock_guard <std::mutex> lock(vpnMTX);
+                vpnQueue.push(std::make_pair(fd,buffer));
+            }
             break;
         }
     }
@@ -150,15 +160,58 @@ void Server::processPacket (char* buffer, int fd){
 
 
 void Server::handleFilescan(){
+    int fd;
+    std::string filename;
+    char* buffer;
     while(running){
-
+        filename = "";
+        {
+            std::lock_guard <std::mutex> lock(fileScanMTX);
+            if(antivirusQueue.empty())continue;
+            auto p = antivirusQueue.front();
+            antivirusQueue.pop();
+            fd = p.first;
+            buffer = p.second;
+        }
+        int size = (int)buffer[1];
+        for(int i=0;i<size;i++){
+            filename = filename + buffer[2+i];
+        }
+        std::cout << "Antivirus request : " << filename << "\n";
+        if(Antivirus::startScanning(filename) != -1){
+            size = 0;
+            std::cout << "Unable to " << filename <<"\n";
+        }
+        char response[2+filename.length()];
+        response[0] = 1;
+        response[1] = size;
+        for(int i=0;i<filename.length();i++){
+            response[i+2] = filename[i];
+        }
+        send(fd,response, sizeof(response),0);
     }
 }
 
 void Server::handleVPNRequest(){
+    int fd;
+    char* buffer;
     while(running){
-
+        {
+            std::lock_guard <std::mutex> lock(vpnMTX);
+            if(vpnQueue.empty())continue;
+            auto p = vpnQueue.front();
+            vpnQueue.pop();
+            fd = p.first;
+            buffer = p.second;
+        }
+        int id = vpn.acceptConnectionRequest();
+        std::cout << "VPN ID : "<<id <<"\n";
+        char response[5];
+        response[0] = 3;
+        std::memcpy(&response[1],&id, sizeof(id));
+        send(fd,response,5,0);
     }
+    return;
 }
 
 Server::Server() : running(true)
