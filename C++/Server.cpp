@@ -178,7 +178,7 @@ void Server::handleFilescan(){
             filename = filename + buffer[2+i];
         }
         std::cout << "Antivirus request : " << filename << "\n";
-        if(Antivirus::startScanning(filename) != -1){
+        if(Antivirus::startScanning(filename) != 1){
             size = 0;
             std::cout << "Unable to " << filename <<"\n";
         }
