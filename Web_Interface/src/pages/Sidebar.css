@@ -6,6 +6,7 @@
     justify-content: space-between;
     background-image: linear-gradient(to right,#333A40,#5b5c5d);
     color:white;
+    z-index: 100;
 }
 .box{
     display:flex;
