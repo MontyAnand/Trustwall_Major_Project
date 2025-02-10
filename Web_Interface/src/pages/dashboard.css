@@ -1,3 +1,50 @@
 .dashboard_container{
     margin-top: 100px;
 }
+.dashboard_inner_container{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    /* grid-template-areas: []; */
+    grid-gap: 1.5rem;
+}
+
+/* Memory-container related CSS */
+.Mem_container h2{
+    width: 100%;
+    display: block;
+    text-align: center;
+    /* transform: "translateX(-50%)", */
+}
+.Mem_container,.Disk_container,.IncTraffic_container,.OutTraffic_container{
+    margin-left: 40px;
+    margin-bottom: 40px;
+    box-shadow: 4px 6px 10px grey;
+    border-radius: 10px;
+    padding-bottom: 30px;
+}
+.mem_piechart{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* transform: scale(0.7);
+    transform-origin: center;  */
+}
+
+/* Disk Info container */
+.Disk_container h2{
+    text-align: center;
+}
+.Disk_container{
+    margin-right: 50px;
+}
+.Disk_inner_container{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 20px;
+}
+.Disk_box p{
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Incoming Network traffic container */
