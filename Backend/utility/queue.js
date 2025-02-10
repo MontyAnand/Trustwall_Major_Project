@@ -6,7 +6,7 @@ class SocketQueue {
     // Enqueue an item
     enqueue(item) {
         this.queue.push(item);
-        this.processQueue(); // Start processing if not already running
+        // Start processing if not already running
     }
 
     // Dequeue an item

@@ -10,12 +10,15 @@ function VPN(){
     const [content, setContent] = useState(
         <div className="vpn_container_2">
             <button className="qr_btn_2" onClick={() => {
+            if(socket){
+                socket.emit("newVPNConnection");
+                console.log("socket")
                 setContent(
                     <div className="vpn_container_3">
                         <div className="loader"></div>
                         <button className="qr_btn_3">Generate QR Code</button>
                     </div>
-                );
+                );}
             }}>
                 Generate QR Code
             </button>
@@ -26,7 +29,7 @@ function VPN(){
         if(!socket) return;
 
         socket.on('vpn-data', (data)=>{
-            changeImage (ImageURL = ImageURL+data);
+            changeImage (ImageURL => ImageURL+data);
         });
 
         socket.on('vpn-data-completed', ()=>{
