@@ -66,8 +66,8 @@ void Server::eventLoop()
         int event_count = epoll_wait(epollFd, events, MAX_EVENTS, -1);
         if (event_count == -1)
         {
-            perror("epoll_wait failed");
-            break;
+            // perror("epoll_wait failed");
+            continue;
         }
 
         for (int i = 0; i < event_count; i++)
@@ -105,7 +105,6 @@ void Server::eventLoop()
                 }
                 else
                 {
-                    std::cout << "Received: " << buffer << " from client " << fd << std::endl;
                     processPacket(buffer,fd);
                 }
             }
@@ -128,16 +127,8 @@ void Server::startNodeServer(std::string IP){
 
 void Server::processPacket (char* buffer, int fd){
     int flag = (int)(char)buffer[0];
-    std::cout << flag << "\n";
     switch (flag) {
         case 0: {
-            // Antivirus Filescan Request
-            // int filenamesize = (int)buffer[1];
-            // std::string filename = (buffer + 2);
-            // std::cout << "FilenameSize : " << filenamesize << " Filename : " << filename << "\n";
-            // std::string res = "FilenameSize : " + std::to_string(filenamesize) + " Filename : " + filename;
-            // send(fd,res.c_str(),res.length(),0); 
-
             {
                 std::lock_guard <std::mutex> lock(fileScanMTX);
                 antivirusQueue.push(std::make_pair(fd,buffer));
@@ -145,10 +136,6 @@ void Server::processPacket (char* buffer, int fd){
             break;
         }
         case 2: {
-            // VPN Connection Request
-            // std::cout << "VPN conection request\n";
-            // std::string res = "VPN conection request\n";
-            // send(fd,res.c_str(),res.length(),0);
             {
                 std::lock_guard <std::mutex> lock(vpnMTX);
                 vpnQueue.push(std::make_pair(fd,buffer));
@@ -180,7 +167,6 @@ void Server::handleFilescan(){
         std::cout << "Antivirus request : " << filename << "\n";
         if(Antivirus::startScanning(filename) != 1){
             size = 0;
-            std::cout << "Unable to " << filename <<"\n";
         }
         char response[2+filename.length()];
         response[0] = 1;
@@ -205,7 +191,6 @@ void Server::handleVPNRequest(){
             buffer = p.second;
         }
         int id = vpn.acceptConnectionRequest();
-        std::cout << "VPN ID : "<<id <<"\n";
         char response[5];
         response[0] = 3;
         std::memcpy(&response[1],&id, sizeof(id));

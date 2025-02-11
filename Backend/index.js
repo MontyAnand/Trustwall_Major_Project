@@ -46,7 +46,7 @@ const getFilename = (req, res, next) => {
         return;
     }
     socketFileMap.set(filename, socketID);
-    tcpClient.fileScan(filename,socketID);
+    tcpClient.fileScan(filename);
     next();
 }
 

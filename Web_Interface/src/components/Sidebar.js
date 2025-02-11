@@ -4,7 +4,7 @@ import "../pages/Sidebar.css";
 function Sidebar() {
   return (
     <div className="container">
-      <h2 className="heading">UTM_TRUSTWALL</h2>
+      <h2 className="heading">TRUSTWALL</h2>
       <nav className="navbar">
         <ul className="box">
           <li className="py-2"><Link to="/">Dashboard</Link></li>
