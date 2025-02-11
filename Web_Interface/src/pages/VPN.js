@@ -15,7 +15,7 @@ function VPN(){
                 console.log("socket")
                 setContent(
                     <div className="vpn_container_3">
-                        <div className="loader"></div>
+                        <div className="vpn_loader"></div>
                         <button className="qr_btn_3">Generate QR Code</button>
                     </div>
                 );}
@@ -42,7 +42,13 @@ function VPN(){
         });
         // Error Handling 
         socket.on('vpn-connection-error',()=>{
-            setContent();
+            setContent(
+                // <div className="vpn_container_4">
+                //     <div className="vpn_error_container">
+                //     </div>
+                //     <button className="qr_btn_1">Generate QR Code</button>
+                // </div>
+            );
         });
 
         return ()=>{
@@ -56,18 +62,6 @@ function VPN(){
             <Sidebar/>
             <div className="outside_container"> 
                 {content}
-                {/* <div className="vpn_container_1"> */}
-                {/* <img className="vpn_img" src={ImageURL} alt="Search Icon"/> */}
-                {/* <button className="qr_btn_1">Generate QR Code</button> */}
-                {/* </div> */} 
-                {/* // /*
-                // :
-                // (
-                //     <div className="vpn_container_2">
-                //     <button className="qr_btn_2">Generate QR Code</button>
-                //     </div>
-                // )
-                // } */ }
             </div>
         </>
     );
