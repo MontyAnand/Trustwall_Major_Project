@@ -14,6 +14,7 @@ struct ConnectionInfo {
     std::string state;
 };
 
+
 std::vector<ConnectionInfo> getConnections(const std::string& filename, const std::string& protocol) {
     std::ifstream file(filename);
     std::vector<ConnectionInfo> connections;

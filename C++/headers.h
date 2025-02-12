@@ -13,6 +13,10 @@
 #include <stdexcept>
 #include <iterator>
 #include <cassert>
+#include <sys/statvfs.h>
+#include <sys/sysinfo.h>
+#include <cstdlib>
+#include <string>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,12 +32,10 @@
 #include <qrencode.h>
 #include <png.h>
 
-
 #include <thread>
 #include <mutex>
 #include <chrono>
 #include <atomic>
-
 
 #define SERVER_PORT 8080
 #define BUFFER_SIZE 1024
@@ -44,115 +46,150 @@
 #define DES_IP_SET "dip"
 #define MAX_EVENTS 20
 
+struct interface_info
+{
+    std::string interface;
+    float received_data;
+    float transmitted_data;
+};
+
+struct disk_info
+{
+    std::string path;
+    float total_space;
+    float free_space;
+};
+
+struct connection_info
+{
+    std::string protocol;
+    std::string local_ip;
+    int local_port;
+    std::string remote_ip;
+    int remote_port;
+    std::string state;
+};
 
 namespace fs = std::filesystem;
 
-class Firewall {
-    private:
-        char command[150];
-        struct epoll_event events[MAX_EVENTS];
-        void createTable ();
-        void createPortSets ();
-        void createIPSets ();
-        void createChains ();
-        void initialRules ();
+class Firewall
+{
+private:
+    char command[150];
+    struct epoll_event events[MAX_EVENTS];
+    void createTable();
+    void createPortSets();
+    void createIPSets();
+    void createChains();
+    void initialRules();
 
-    public:
+public:
 };
 
-class QR {
-    public:
-        static void write_png(const char *, unsigned char *, int , int);
-        static std::string file_to_base64(const std::string &);
-        static std::string generate_qr_base64(const std::string &text, int scale = 10);
+class QR
+{
+public:
+    static void write_png(const char *, unsigned char *, int, int);
+    static std::string file_to_base64(const std::string &);
+    static std::string generate_qr_base64(const std::string &text, int scale = 10);
 };
 
-class VPN {
-    private:
-        int TIMEOUT_PERIOD;
-        std::string publicInterface;
-        std::string endPoint;
-        std::string publicIP;
-        std::string server_public_key;
-        std::uint64_t ip_pool;
-        std::uint16_t PORT;
-        std::string netmask;
+class VPN
+{
+private:
+    int TIMEOUT_PERIOD;
+    std::string publicInterface;
+    std::string endPoint;
+    std::string publicIP;
+    std::string server_public_key;
+    std::uint64_t ip_pool;
+    std::uint16_t PORT;
+    std::string netmask;
 
-        std::mutex mtx;
-        std::thread cleaner;
-        std::atomic <bool> running;
+    std::mutex mtx;
+    std::thread cleaner;
+    std::atomic<bool> running;
 
-        std::map<std::string,std::uint16_t>record;
+    std::map<std::string, std::uint16_t> record;
 
-        std::string getPublicInterface();
-        std::string getEndPoint();
-        std::string compressData (std::string &);
-        std::uint16_t getAvailableID();
-        std::uint16_t generateClientConfiguration(std::string&, std::string&);
-        std::string prepareIP(std::uint16_t);
-        bool generateServerKeys();
-        bool setupServer();
-        bool generateConfigurationFile(std::string&);
-        bool vpnInterfaceSetup();
-        bool isNumber(std::string &);
-        bool checkConnectivity();
-        void revokeIP(std::uint16_t);
-        void monitorClient();
-        void parseString(std::string &, std::map<std::string,int> &);
-        void generateQRCode(std::uint16_t, std::string&, std::string&);
-        void addFirewallRules();
-        
+    std::string getPublicInterface();
+    std::string getEndPoint();
+    std::string compressData(std::string &);
+    std::uint16_t getAvailableID();
+    std::uint16_t generateClientConfiguration(std::string &, std::string &);
+    std::string prepareIP(std::uint16_t);
+    bool generateServerKeys();
+    bool setupServer();
+    bool generateConfigurationFile(std::string &);
+    bool vpnInterfaceSetup();
+    bool isNumber(std::string &);
+    bool checkConnectivity();
+    void revokeIP(std::uint16_t);
+    void monitorClient();
+    void parseString(std::string &, std::map<std::string, int> &);
+    void generateQRCode(std::uint16_t, std::string &, std::string &);
+    void addFirewallRules();
 
-    public:
-        VPN();
-        std::string getIP();
-        std::uint16_t acceptConnectionRequest();
-        ~VPN ();
+public:
+    VPN();
+    std::string getIP();
+    std::uint16_t acceptConnectionRequest();
+    ~VPN();
 };
 
-
-
-class Antivirus{
-    public:
-        static int startScanning (std::string);
-        static bool searchFile (std::string);
+class Antivirus
+{
+public:
+    static int startScanning(std::string);
+    static bool searchFile(std::string);
 };
 
-class Server{
-    private:
-        int serverSocketFd;
-        int epollFd;
+class HealthMonitor
+{
+public:
+    static int getRamStatus(struct sysinfo *info);
+    static std::vector<struct interface_info> getNetworkTraffic();
+    static std::vector<struct disk_info> getAllMountedDisks();
+    static struct disk_info getDiskStatus(const char *path);
+    static std::vector<connection_info> getProtocolSpecificConnections(const std::string&, const std::string& );
+    static std::vector<connection_info> getNetworkConnections();
+};
 
-        std::queue<std::pair<int,char*>>antivirusQueue;
-        std::queue<std::pair<int,char*>>vpnQueue;
+class Server
+{
+private:
+    int serverSocketFd;
+    int epollFd;
 
-        struct epoll_event events[MAX_EVENTS];
+    std::queue<std::pair<int, char *>> antivirusQueue;
+    std::queue<std::pair<int, char *>> vpnQueue;
 
-        std::thread NodeServerThread;
-        std::thread fileScanThread;
-        std::thread vpnRequestThread;
+    struct epoll_event events[MAX_EVENTS];
 
-        std::mutex fileScanMTX;
-        std::mutex vpnMTX;
-        std::atomic <bool> running;
+    std::thread NodeServerThread;
+    std::thread fileScanThread;
+    std::thread vpnRequestThread;
 
-        VPN vpn;
+    std::mutex fileScanMTX;
+    std::mutex vpnMTX;
+    std::atomic<bool> running;
 
-        int createServerSocket();
-        void eventLoop();
+    VPN vpn;
 
-        void setNonBlocking(int);
-        void addToInputEventLoop(int);
-        void addToOutputEventLoop(int);
+    int createServerSocket();
+    void eventLoop();
 
-        void startNodeServer (std::string);
-        void processPacket (char*,int);
+    void setNonBlocking(int);
+    void addToInputEventLoop(int);
+    void addToOutputEventLoop(int);
 
-        void handleFilescan();
-        void handleVPNRequest();
-        
-        
-    public:
-        Server();
-        ~Server();
+    void startNodeServer(std::string);
+    void processPacket(char *, int);
+
+    void handleFilescan();
+    void handleVPNRequest();
+
+public:
+    Server();
+    ~Server();
 };
