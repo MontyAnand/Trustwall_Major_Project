@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <unordered_set>
 #include <queue>
 #include <sstream>
 #include <iomanip>
@@ -176,9 +177,12 @@ private:
     std::mutex vpnMTX;
     std::atomic<bool> running;
 
+    std::unordered_set<int> connectedFd;
+
     VPN vpn;
 
     int createServerSocket();
+    void broadcastMessage(std::string&);
     void eventLoop();
 
     void setNonBlocking(int);

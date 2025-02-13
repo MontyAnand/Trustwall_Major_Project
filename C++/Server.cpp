@@ -199,6 +199,12 @@ void Server::handleVPNRequest(){
     return;
 }
 
+void Server::broadcastMessage(std::string &data){
+    for(int fd: connectedFd){
+        send(fd,data.c_str(), data.length(), 0);
+    }
+}
+
 Server::Server() : running(true)
 {
     epollFd = epoll_create1(0);
