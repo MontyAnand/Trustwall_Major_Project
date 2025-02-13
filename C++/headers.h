@@ -32,6 +32,8 @@
 #include <qrencode.h>
 #include <png.h>
 
+#include <nlohmann/json.hpp>
+
 #include <thread>
 #include <mutex>
 #include <chrono>
@@ -56,8 +58,8 @@ struct interface_info
 struct disk_info
 {
     std::string path;
-    float total_space;
-    float free_space;
+    double total_space;
+    double free_space;
 };
 
 struct connection_info
@@ -147,10 +149,10 @@ public:
 class HealthMonitor
 {
 public:
-    static int getRamStatus(struct sysinfo *info);
+    static int getRamStatus(struct sysinfo *);
     static std::vector<struct interface_info> getNetworkTraffic();
     static std::vector<struct disk_info> getAllMountedDisks();
-    static struct disk_info getDiskStatus(const char *path);
+    static struct disk_info getDiskStatus(const char *);
     static std::vector<connection_info> getProtocolSpecificConnections(const std::string&, const std::string& );
     static std::vector<connection_info> getNetworkConnections();
 };
