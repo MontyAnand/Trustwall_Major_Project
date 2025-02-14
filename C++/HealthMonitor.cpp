@@ -140,3 +140,51 @@ std::vector<connection_info> HealthMonitor::getNetworkConnections(){
 
     return connections;
 }
+
+std::string HealthMonitor::ramInfoJSON (struct sysinfo &status){
+    json data = {{"total" , (double)status.totalram / (1024*1024)},
+            {"free" , (double)status.freeram / (1024*1024) }
+    };
+    return data.dump();
+}
+
+std::string HealthMonitor::diskInfoJSON (std::vector<struct disk_info>& mountedDisk){
+    json data =json::array();
+    for(auto &info : mountedDisk){
+        data.push_back({
+            {"path", info.path},
+            {"total" , info.total_space},
+            {"free", info.free_space}
+        });
+    }
+
+    return data.dump();
+}
+
+std::string HealthMonitor::networkTrafficJSON (std::vector<struct interface_info> &interfaces){
+    json data = json::array();
+    for(auto &interface : interfaces){
+        data.push_back({
+            {"interface",interface.interface},
+            {"received" , interface.received_data},
+            {"sent" , interface.transmitted_data}
+        });
+    }
+    return data.dump();
+}
+
+std::string HealthMonitor::networkListJSON(std::vector<connection_info>&networkList){
+    json data = json::array();
+    for(auto &connection : networkList){
+        data.push_back({
+            {"protocol", connection.protocol},
+            {"local_ip", connection.local_ip},
+            {"local_port", connection.local_port},
+            {"remote_ip", connection.remote_ip},
+            {"remote_port", connection.remote_port},
+            {"state", connection.state}
+        });
+    }
+
+    return data.dump();
+}

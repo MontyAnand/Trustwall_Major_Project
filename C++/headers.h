@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include <string>
 
+#include <nlohmann/json.hpp>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,6 +76,7 @@ struct connection_info
 };
 
 namespace fs = std::filesystem;
+using json = nlohmann::json;
 
 class Firewall
 {
@@ -156,6 +159,10 @@ public:
     static struct disk_info getDiskStatus(const char *);
     static std::vector<connection_info> getProtocolSpecificConnections(const std::string&, const std::string& );
     static std::vector<connection_info> getNetworkConnections();
+    static std::string ramInfoJSON (struct sysinfo &);;
+    static std::string  diskInfoJSON (std::vector<struct disk_info>&);
+    static std::string networkTrafficJSON (std::vector<struct interface_info> &);
+    static std::string networkListJSON (std::vector<connection_info>&networkList);
 };
 
 class Server
