@@ -88,6 +88,7 @@ void Server::eventLoop()
 
                 setNonBlocking(client_fd);
                 addToInputEventLoop(client_fd);
+                connectedFd.insert(client_fd);
 
                 std::cout << "New client connected: " << client_fd << std::endl;
             }
@@ -100,12 +101,13 @@ void Server::eventLoop()
                 if (bytes_read <= 0)
                 {
                     std::cout << "Client disconnected: " << fd << std::endl;
+                    connectedFd.erase(fd);
                     epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, nullptr);
                     close(fd);
                 }
                 else
                 {
-                    processPacket(buffer,fd);
+                    processPacket(buffer, fd);
                 }
             }
             else if (events[i].events & EPOLLOUT)
@@ -120,71 +122,84 @@ void Server::eventLoop()
     running = false;
 }
 
-void Server::startNodeServer(std::string IP){
-    std::string command = "cd ../Backend && node index.js "+IP;
+void Server::startNodeServer(std::string IP)
+{
+    std::string command = "cd ../Backend && node index.js " + IP;
     system(command.c_str());
 }
 
-void Server::processPacket (char* buffer, int fd){
+void Server::processPacket(char *buffer, int fd)
+{
     int flag = (int)(char)buffer[0];
-    switch (flag) {
-        case 0: {
-            {
-                std::lock_guard <std::mutex> lock(fileScanMTX);
-                antivirusQueue.push(std::make_pair(fd,buffer));
-            }
-            break;
+    switch (flag)
+    {
+    case 0:
+    {
+        {
+            std::lock_guard<std::mutex> lock(fileScanMTX);
+            antivirusQueue.push(std::make_pair(fd, buffer));
         }
-        case 2: {
-            {
-                std::lock_guard <std::mutex> lock(vpnMTX);
-                vpnQueue.push(std::make_pair(fd,buffer));
-            }
-            break;
+        break;
+    }
+    case 2:
+    {
+        {
+            std::lock_guard<std::mutex> lock(vpnMTX);
+            vpnQueue.push(std::make_pair(fd, buffer));
         }
+        break;
+    }
     }
 }
 
-
-void Server::handleFilescan(){
+void Server::handleFilescan()
+{
     int fd;
     std::string filename;
-    char* buffer;
-    while(running){
+    char *buffer;
+    while (running)
+    {
         filename = "";
         {
-            std::lock_guard <std::mutex> lock(fileScanMTX);
-            if(antivirusQueue.empty())continue;
+            std::lock_guard<std::mutex> lock(fileScanMTX);
+            if (antivirusQueue.empty())
+                continue;
             auto p = antivirusQueue.front();
             antivirusQueue.pop();
             fd = p.first;
             buffer = p.second;
         }
         int size = (int)buffer[1];
-        for(int i=0;i<size;i++){
-            filename = filename + buffer[2+i];
+        for (int i = 0; i < size; i++)
+        {
+            filename = filename + buffer[2 + i];
         }
         std::cout << "Antivirus request : " << filename << "\n";
-        if(Antivirus::startScanning(filename) != 1){
+        if (Antivirus::startScanning(filename) != 1)
+        {
             size = 0;
         }
-        char response[2+filename.length()];
+        char response[2 + filename.length()];
         response[0] = 1;
         response[1] = size;
-        for(int i=0;i<filename.length();i++){
-            response[i+2] = filename[i];
+        for (int i = 0; i < filename.length(); i++)
+        {
+            response[i + 2] = filename[i];
         }
-        send(fd,response, sizeof(response),0);
+        send(fd, response, sizeof(response), 0);
     }
 }
 
-void Server::handleVPNRequest(){
+void Server::handleVPNRequest()
+{
     int fd;
-    char* buffer;
-    while(running){
+    char *buffer;
+    while (running)
+    {
         {
-            std::lock_guard <std::mutex> lock(vpnMTX);
-            if(vpnQueue.empty())continue;
+            std::lock_guard<std::mutex> lock(vpnMTX);
+            if (vpnQueue.empty())
+                continue;
             auto p = vpnQueue.front();
             vpnQueue.pop();
             fd = p.first;
@@ -193,15 +208,52 @@ void Server::handleVPNRequest(){
         int id = vpn.acceptConnectionRequest();
         char response[5];
         response[0] = 3;
-        std::memcpy(&response[1],&id, sizeof(id));
-        send(fd,response,5,0);
+        std::memcpy(&response[1], &id, sizeof(id));
+        send(fd, response, 5, 0);
     }
     return;
 }
 
-void Server::broadcastMessage(std::string &data){
-    for(int fd: connectedFd){
-        send(fd,data.c_str(), data.length(), 0);
+void Server::broadcastMessage(std::string &data, uint8_t flag)
+{
+    std::vector<uint8_t> byteArray;
+    byteArray.push_back(flag);
+    byteArray.insert(byteArray.end(), data.begin(), data.end());
+    for (int fd : connectedFd)
+    {
+        send(fd, byteArray.data(), byteArray.size(), 0);
+    }
+}
+
+void Server::continuousMonitoring()
+{
+    std::string data;
+
+    while (running)
+    {
+        // RAM Status
+        struct sysinfo ramStatus;
+        int status = HealthMonitor::getRamStatus(&ramStatus);
+        if (status == 0)
+        {
+            data = HealthMonitor::ramInfoJSON(ramStatus);
+            broadcastMessage(data,4);
+        }
+
+        // Disk Info
+        std::vector<struct disk_info> allDisk = HealthMonitor::getAllMountedDisks();
+        data = HealthMonitor::diskInfoJSON(allDisk);
+        broadcastMessage(data,5);
+
+        // Network Traffic on each Interface
+        std::vector<struct interface_info> interfaces = HealthMonitor::getNetworkTraffic();
+        data = HealthMonitor::networkTrafficJSON(interfaces);
+        broadcastMessage(data,6);
+
+        // List of active Connections
+        std::vector<connection_info>networkList =  HealthMonitor::getNetworkConnections();
+        data = HealthMonitor::networkListJSON(networkList);
+        broadcastMessage(data,7);
     }
 }
 
@@ -219,17 +271,26 @@ Server::Server() : running(true)
     NodeServerThread = std::thread(&Server::startNodeServer, this, vpn.getIP());
     NodeServerThread.detach();
     fileScanThread = std::thread(&Server::handleFilescan, this);
-    vpnRequestThread = std::thread(&Server::handleVPNRequest,this);
+    vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
+    healthMonitorThread = std::thread(&Server::continuousMonitoring, this);
     eventLoop();
 }
 
-Server::~Server(){
+Server::~Server()
+{
     running = false;
-    if(fileScanThread.joinable()){
+    if (fileScanThread.joinable())
+    {
         fileScanThread.join();
     }
 
-    if(vpnRequestThread.joinable()){
+    if (vpnRequestThread.joinable())
+    {
         vpnRequestThread.join();
+    }
+
+    if (healthMonitorThread.joinable())
+    {
+        healthMonitorThread.join();
     }
 }

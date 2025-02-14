@@ -18,6 +18,7 @@
 #include <sys/sysinfo.h>
 #include <cstdlib>
 #include <string>
+#include <chrono>
 
 #include <nlohmann/json.hpp>
 
@@ -179,6 +180,7 @@ private:
     std::thread NodeServerThread;
     std::thread fileScanThread;
     std::thread vpnRequestThread;
+    std::thread healthMonitorThread;
 
     std::mutex fileScanMTX;
     std::mutex vpnMTX;
@@ -189,7 +191,7 @@ private:
     VPN vpn;
 
     int createServerSocket();
-    void broadcastMessage(std::string&);
+    void broadcastMessage(std::string&, uint8_t );
     void eventLoop();
 
     void setNonBlocking(int);
@@ -201,6 +203,7 @@ private:
 
     void handleFilescan();
     void handleVPNRequest();
+    void continuousMonitoring();
 
 public:
     Server();
