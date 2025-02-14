@@ -1,7 +1,30 @@
 import React from 'react';
 import {Chart} from 'react-google-charts';
+import {useSocket} from "../Contexts/socketContex";
+import { useEffect, useState } from "react";
 
 const DiskInfo=()=>{
+    const {socket , socketID} = useSocket();
+    const [diskName,setDiskName ] = useState([]);
+    const [diskValue, setDiskValue] = useState([]);
+
+    useEffect(()=>{
+        if(!socket) return;
+        socket.on('disk-info',(disks)=>{
+            console.log(disks);
+            setDiskName([]);
+            setDiskValue([]);
+            disks.map((disk)=>{
+                setDiskName([...diskName,disk.path]);
+                setDiskValue([...diskValue,disk.used]);
+            });
+        });
+
+        return ()=>{
+            socket.off('disk-info');
+        }
+    },[socket,diskName,diskValue]);
+
     // It has to be received from server-side first place should be the disk name and 2nd one is the actual value 
     const disk_info=[
         ["Disk1",73],
@@ -9,13 +32,10 @@ const DiskInfo=()=>{
         ["Disk3",57],
         ["Disk4",81]
     ];
-
-    let disk_name =[];
-    let disk_value =[];
     for(let i=0;i<disk_info.length;i++)
     {
-        disk_name.push(disk_info[i][0]);
-        disk_value.push(disk_info[i][1]);
+        diskName.push(disk_info[i][0]);
+        diskValue.push(disk_info[i][1]);
     }
     const options={
         legend:{
@@ -35,11 +55,11 @@ const DiskInfo=()=>{
         <div className='Disk_container'>
             <h2>Disk Information</h2>
             <div className='Disk_inner_container'>
-                {disk_name.map((row,rowIndex)=>(
+                {diskName.map((row,rowIndex)=>(
                     data =[
                         ["disk_usage","space"],
-                        ["Used",disk_value[rowIndex]],
-                        ["Free",100-disk_value[rowIndex]]
+                        ["Used",diskValue[rowIndex]],
+                        ["Free",100-diskValue[rowIndex]]
                     ],
                     <div className='Disk_box'>
                         <p>{row}</p>
