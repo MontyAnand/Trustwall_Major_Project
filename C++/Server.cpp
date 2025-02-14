@@ -228,32 +228,53 @@ void Server::broadcastMessage(std::string &data, uint8_t flag)
 void Server::continuousMonitoring()
 {
     std::string data;
-
+    int count = 0;
     while (running)
     {
-        // RAM Status
-        struct sysinfo ramStatus;
-        int status = HealthMonitor::getRamStatus(&ramStatus);
-        if (status == 0)
+        switch (count)
         {
-            data = HealthMonitor::ramInfoJSON(ramStatus);
-            broadcastMessage(data,4);
+        case 0:
+        {
+            // RAM Status
+            struct sysinfo ramStatus;
+            int status = HealthMonitor::getRamStatus(&ramStatus);
+            if (status == 0)
+            {
+                data = HealthMonitor::ramInfoJSON(ramStatus);
+                broadcastMessage(data, 4);
+            }
+            break;
         }
 
-        // Disk Info
-        std::vector<struct disk_info> allDisk = HealthMonitor::getAllMountedDisks();
-        data = HealthMonitor::diskInfoJSON(allDisk);
-        broadcastMessage(data,5);
+        case 1:
+        {
+            // Disk Info
+            std::vector<struct disk_info> allDisk = HealthMonitor::getAllMountedDisks();
+            data = HealthMonitor::diskInfoJSON(allDisk);
+            broadcastMessage(data, 5);
+            break;
+        }
 
-        // Network Traffic on each Interface
-        std::vector<struct interface_info> interfaces = HealthMonitor::getNetworkTraffic();
-        data = HealthMonitor::networkTrafficJSON(interfaces);
-        broadcastMessage(data,6);
-
-        // List of active Connections
-        std::vector<connection_info>networkList =  HealthMonitor::getNetworkConnections();
-        data = HealthMonitor::networkListJSON(networkList);
-        broadcastMessage(data,7);
+        case 2:
+        {
+            // Network Traffic on each Interface
+            std::vector<struct interface_info> interfaces = HealthMonitor::getNetworkTraffic();
+            data = HealthMonitor::networkTrafficJSON(interfaces);
+            broadcastMessage(data, 6);
+            break;
+        }
+        case 3:
+        {
+            // List of active Connections
+            std::vector<connection_info> networkList = HealthMonitor::getNetworkConnections();
+            data = HealthMonitor::networkListJSON(networkList);
+            broadcastMessage(data, 7);
+            break;
+        }
+        default : {}
+        }
+        count = (count + 1) % 4;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2 second delay
     }
 }
 

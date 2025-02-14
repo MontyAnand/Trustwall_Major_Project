@@ -29,6 +29,22 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.handleVPNConnection(data);
                     break;
                 }
+                case 4: {
+                    this.processRAMData(data);
+                    break;
+                }
+                case 5: {
+                    this.processDiskData(data);
+                    break;
+                }
+                case 6: {
+                    this.processNetworkTrafficData(data);
+                    break;
+                }
+                case 7: {
+                    this.processConnectionListData(data);
+                    break;
+                }
                 default: break;
             }
         });
@@ -85,7 +101,7 @@ module.exports.client = class TcpClient extends EventEmitter {
             this.deleteFile(reportPath);
             this.deleteFile(filePath);
         });
-        stream.on('error',(err)=>{
+        stream.on('error', (err) => {
             console.log(`Error while reading report file : ${err}`);
         })
     }
@@ -122,6 +138,54 @@ module.exports.client = class TcpClient extends EventEmitter {
                 console.log("Successfully deleted the file : ", filePath);
             }
         });
+    }
+
+    processRAMData(data) {
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            // Parse JSON string into an object
+            const jsonData = JSON.parse(jsonString);
+            console.log('Received JSON:', jsonData);
+        } catch (error) {
+            console.log(`Error in RAM data`);
+            console.error('Error parsing JSON:', error);
+        }
+    }
+
+    processDiskData(data) {
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            // Parse JSON string into an object
+            const jsonData = JSON.parse(jsonString);
+            console.log('Received JSON:', jsonData);
+        } catch (error) {
+            console.log(`Error in Disk data`);
+            console.error('Error parsing JSON:', error);
+        }
+    }
+
+    processNetworkTrafficData(data) {
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            // Parse JSON string into an object
+            const jsonData = JSON.parse(jsonString);
+            console.log('Received JSON:', jsonData);
+        } catch (error) {
+            console.log(`Error in Network data`);
+            console.error('Error parsing JSON:', error);
+        }
+    }
+
+    processConnectionListData(data) {
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            // Parse JSON string into an object
+            const jsonData = JSON.parse(jsonString);
+            console.log('Received JSON:', jsonData);
+        } catch (error) {
+            console.log(`Error in Connection list data`);
+            console.error('Error parsing JSON:', error);
+        }
     }
 
     close() {
