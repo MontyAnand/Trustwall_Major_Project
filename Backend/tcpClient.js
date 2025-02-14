@@ -146,6 +146,8 @@ module.exports.client = class TcpClient extends EventEmitter {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
             console.log('Received JSON:', jsonData);
+            const percentageUsage = ((jsonData.total - jsonData.free)/jsonData.total);
+            this.io.emit('ram-info',percentageUsage);
         } catch (error) {
             console.log(`Error in RAM data`);
             console.error('Error parsing JSON:', error);
@@ -158,6 +160,7 @@ module.exports.client = class TcpClient extends EventEmitter {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
             console.log('Received JSON:', jsonData);
+            this.io.emit('disk-info',jsonData);
         } catch (error) {
             console.log(`Error in Disk data`);
             console.error('Error parsing JSON:', error);
@@ -169,7 +172,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
-            console.log('Received JSON:', jsonData);
+            // console.log('Received JSON:', jsonData);
         } catch (error) {
             console.log(`Error in Network data`);
             console.error('Error parsing JSON:', error);
@@ -181,7 +184,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
-            console.log('Received JSON:', jsonData);
+            // console.log('Received JSON:', jsonData);
         } catch (error) {
             console.log(`Error in Connection list data`);
             console.error('Error parsing JSON:', error);

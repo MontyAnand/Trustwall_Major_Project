@@ -6,13 +6,11 @@ int HealthMonitor::getRamStatus(struct sysinfo * info){
 
 struct disk_info HealthMonitor::getDiskStatus(const char *path){
     struct statvfs stat;
-    struct disk_info result = {path,0,0};
+    struct disk_info result = {path,0};
     if (statvfs(path, &stat) == 0) {
         unsigned long total = stat.f_blocks * stat.f_frsize;
         unsigned long free = stat.f_bfree * stat.f_frsize;
-
-        result.total_space = (double)total / (1024*1024);
-        result.free_space = (double)free / (1024*1024);
+        result.percentageUsed = ((double)(total-free)/(double)total)/100;
     }
     return result;
 }
@@ -153,8 +151,7 @@ std::string HealthMonitor::diskInfoJSON (std::vector<struct disk_info>& mountedD
     for(auto &info : mountedDisk){
         data.push_back({
             {"path", info.path},
-            {"total" , info.total_space},
-            {"free", info.free_space}
+            {"used", info.percentageUsed}
         });
     }
 

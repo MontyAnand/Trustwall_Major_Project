@@ -62,8 +62,7 @@ struct interface_info
 struct disk_info
 {
     std::string path;
-    double total_space;
-    double free_space;
+    double percentageUsed;
 };
 
 struct connection_info
