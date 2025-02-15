@@ -8,35 +8,37 @@ const DiskInfo=()=>{
     const [diskName,setDiskName ] = useState([]);
     const [diskValue, setDiskValue] = useState([]);
 
-    useEffect(()=>{
-        if(!socket) return;
-        socket.on('disk-info',(disks)=>{
+    useEffect(() => {
+        if (!socket) return;
+    
+        socket.on("disk-info", (disks) => {
             console.log(disks);
-            setDiskName([]);
-            setDiskValue([]);
-            disks.map((disk)=>{
-                setDiskName([...diskName,disk.path]);
-                setDiskValue([...diskValue,disk.used]);
-            });
+    
+            // Extract names and values efficiently
+            const names = disks.map((disk) => disk.path);
+            const values = disks.map((disk) => disk.used);
+    
+            setDiskName(names);
+            setDiskValue(values);
         });
+    
+        return () => {
+            socket.off("disk-info");
+        };
+    }, [socket]);
 
-        return ()=>{
-            socket.off('disk-info');
-        }
-    },[socket,diskName,diskValue]);
-
-    // It has to be received from server-side first place should be the disk name and 2nd one is the actual value 
-    const disk_info=[
-        ["Disk1",73],
-        ["Disk2",61],
-        ["Disk3",57],
-        ["Disk4",81]
-    ];
-    for(let i=0;i<disk_info.length;i++)
-    {
-        diskName.push(disk_info[i][0]);
-        diskValue.push(disk_info[i][1]);
-    }
+    // // It has to be received from server-side first place should be the disk name and 2nd one is the actual value 
+    // const disk_info=[
+    //     ["Disk1",73],
+    //     ["Disk2",61],
+    //     ["Disk3",57],
+    //     ["Disk4",81]
+    // ];
+    // for(let i=0;i<disk_info.length;i++)
+    // {
+    //     diskName.push(disk_info[i][0]);
+    //     diskValue.push(disk_info[i][1]);
+    // }
     const options={
         legend:{
             position: "bottom",
