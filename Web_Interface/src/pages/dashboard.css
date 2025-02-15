@@ -65,9 +65,10 @@
 }
 .Active_connections_container table{
     height: 100%;
+    width: 100%;
 }
 .Table_row_content{
-    padding: 8px 12px;
+    padding: 12px 12px;
 }
 .Active_connections_header th{
     padding: 20px 9px;
@@ -93,4 +94,7 @@ thead{
 }
 .Table_row_content:nth-last-child(1){
     font-weight: bold;
+}
+.Table_row_content:nth-last-child(6){
+    border-left: 1.5px solid rgb(167, 163, 163);
 }

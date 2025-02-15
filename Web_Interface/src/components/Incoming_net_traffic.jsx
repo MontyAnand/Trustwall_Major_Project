@@ -42,7 +42,6 @@ class IncomingTraffic extends Component {
 	render() {
 		const options = {
 			title :{
-				text: "Dynamic Line Chart"
 			},
 			data: [{
 				type: "line",
