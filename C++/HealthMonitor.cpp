@@ -10,7 +10,7 @@ struct disk_info HealthMonitor::getDiskStatus(const char *path){
     if (statvfs(path, &stat) == 0) {
         unsigned long total = stat.f_blocks * stat.f_frsize;
         unsigned long free = stat.f_bfree * stat.f_frsize;
-        result.percentageUsed = ((double)(total-free)/(double)total)/100;
+        result.percentageUsed = ((double)(total-free)/(double)total)*100;
     }
     return result;
 }
