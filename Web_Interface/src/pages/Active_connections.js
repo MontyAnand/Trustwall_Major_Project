@@ -1,6 +1,18 @@
 import React from "react";
+import {useSocket} from "../Contexts/socketContex";
+import { useEffect, useState } from "react";
 
 // Data from Backend
+
+const [connectionList, setConnectionList] = useState([]);
+const {socket , socketID} = useSocket();
+useEffect(()=>{
+    if(!socket) return;
+    socket.on('connection-list',(connections)=>{
+        const list = connections.map((connection)=>[connection.local_ip,connection.local_port,connection.protocol,connection.remote_ip,connection.remote_port,connection.state]);
+        setConnectionList(list);
+    })
+},[socket]);
 const data = [
     ["127.0.0.1",61209,'TCP',"0.0.0.0",0,"LISTEN"],
     ["127.0.0.53",53,'TCP',"0.0.0.0",11,"LISTEN"],
