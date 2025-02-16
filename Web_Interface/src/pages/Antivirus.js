@@ -1,34 +1,34 @@
 import { useEffect, useState } from "react";
 import "./Antivirus.css"; // Import CSS file
 import axios from "axios";
-import {useSocket} from "../Contexts/socketContex";
+import { useSocket } from "../Contexts/socketContex";
 import "../components/Sidebar.js";
 import Sidebar from "../components/Sidebar.js";
 
 function Antivirus() {
 
-  const {socket , socketID} = useSocket();
+  const { socket, socketID } = useSocket();
   const [file, setFile] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState("");
 
 
-  useEffect(()=>{
-    if(!socket) return;
+  useEffect(() => {
+    if (!socket) return;
 
-    socket.on('scan-result', (data)=>{
-      setScanResult (scanResult => scanResult + data);
+    socket.on('scan-result', (data) => {
+      setScanResult(scanResult => scanResult + data);
     });
 
-    socket.on('scan-completed',()=>{
+    socket.on('scan-completed', () => {
       setIsScanning(false);
     })
 
-    return ()=>{
+    return () => {
       socket.off('scan-result');
       socket.off('scan-completed');
     }
-  },[socket]);
+  }, [socket]);
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -52,7 +52,7 @@ function Antivirus() {
 
     console.log(socket.id);
 
-    if(!socket.id){
+    if (!socket.id) {
       setScanResult("Unable to scan: Not connect to Server");
       return;
     }
@@ -72,7 +72,7 @@ function Antivirus() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("socketID",socket.id);
+    formData.append("socketID", socket.id);
 
     try {
       const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/upload`, formData, {
@@ -91,37 +91,37 @@ function Antivirus() {
 
   return (
     <>
-      <Sidebar/>
+      <Sidebar />
       <div className="antivirus-container">
-      <div className="scanner-box">
-        {/* Title */}
-        <h1 className="scanner-title">🛡️ Antivirus Scanning</h1>
+        <div className="scanner-box">
+          {/* Title */}
+          <h1 className="scanner-title">🛡️ Antivirus Scanning</h1>
 
-        {/* File Upload */}
-        <label className="upload-btn">
-          Select File
-          <input type="file" onChange={handleFileChange} className="hidden-file-input" />
-        </label>
+          {/* File Upload */}
+          <label className="upload-btn">
+            Select File
+            <input type="file" onChange={handleFileChange} className="hidden-file-input" />
+          </label>
 
-        {/* Show selected file name */}
-        {file && <p className="file-name">{file.name}</p>}
+          {/* Show selected file name */}
+          {file && <p className="file-name">{file.name}</p>}
 
-        {/* Scan Button */}
-        <button onClick={startScan} className="scan-btn" disabled={isScanning}>
-          {isScanning ? "Scanning..." : "Start Scan"}
-        </button>
+          {/* Scan Button */}
+          <button onClick={startScan} className="scan-btn" disabled={isScanning}>
+            {isScanning ? "Scanning..." : "Start Scan"}
+          </button>
 
-        {/* Buffering Image (Loader) */}
-        {isScanning && (
-          <div className="loader">
-            <img src="https://i.gifer.com/ZZ5H.gif" alt="Scanning..." />
-          </div>
-        )}
+          {/* Buffering Image (Loader) */}
+          {isScanning && (
+            <div className="loader">
+              <img src="https://i.gifer.com/ZZ5H.gif" alt="Scanning..." />
+            </div>
+          )}
 
-        {/* Scan Result */}
-        {scanResult && <p className={`scan-result ${scanResult.includes("❌") ? "danger" : "safe"}`}>{scanResult}</p>}
+          {/* Scan Result */}
+          {scanResult && <p className={`scan-result ${scanResult.includes("❌") ? "danger" : "safe"}`}>{scanResult}</p>}
+        </div>
       </div>
-    </div>
     </>
   );
 }

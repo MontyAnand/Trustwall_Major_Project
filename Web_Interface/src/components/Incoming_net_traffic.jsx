@@ -1,6 +1,6 @@
 import React from 'react';
 
-const IncomingTraffic=()=>{
+const IncomingTraffic = () => {
     return (
         <div className='IncTraffic_container'>
             <h2>Incoming traffic Information</h2>

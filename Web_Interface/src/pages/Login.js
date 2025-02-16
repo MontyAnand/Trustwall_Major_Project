@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import {useAuth} from "../Contexts/authContex";
-import {useNavigate } from "react-router-dom";
+import { useAuth } from "../Contexts/authContex";
+import { useNavigate } from "react-router-dom";
 import './Login.css';
 
 function Login() {

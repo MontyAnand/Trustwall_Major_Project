@@ -1,9 +1,10 @@
 #include "headers.h"
 
-VPN::VPN() : ip_pool(1), netmask("10.2.0."), PORT(51820), running(true), TIMEOUT_PERIOD(10*60)
+VPN::VPN() : ip_pool(1), netmask("10.2.0."), PORT(51820), running(true), TIMEOUT_PERIOD(10 * 60)
 {
     system("sudo wg-quick down wg0");
-    if(! checkConnectivity()){
+    if (!checkConnectivity())
+    {
         std::cerr << "Make sure you are connected to Internet\n";
         exit(1);
     }
@@ -12,7 +13,8 @@ VPN::VPN() : ip_pool(1), netmask("10.2.0."), PORT(51820), running(true), TIMEOUT
     {
         endPoint = getEndPoint();
     }
-    else{
+    else
+    {
         std::cerr << "Unable to detect public Interface\n";
         exit(1);
     }
@@ -30,9 +32,11 @@ VPN::VPN() : ip_pool(1), netmask("10.2.0."), PORT(51820), running(true), TIMEOUT
     cleaner = std::thread(&VPN::monitorClient, this);
 }
 
-VPN:: ~VPN (){
+VPN::~VPN()
+{
     running = false;
-    if (cleaner.joinable()){
+    if (cleaner.joinable())
+    {
         cleaner.join();
     }
 }
@@ -53,9 +57,6 @@ bool VPN::checkConnectivity()
     // std::cout << status << std::endl;
     return (status == "full");
 }
-
-
-
 
 std::string VPN::getPublicInterface()
 {
@@ -327,7 +328,7 @@ std::uint16_t VPN::generateClientConfiguration(std::string &private_key, std::st
     std::string client_ip = prepareIP(id);
     std::string server_ip = prepareIP(1);
     {
-        std::lock_guard <std::mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(mtx);
         record[public_key] = id;
     }
     std::ofstream file((std::to_string(id) + ".conf"));
@@ -363,7 +364,7 @@ void VPN::generateQRCode(std::uint16_t id, std::string &public_key, std::string 
     configuration += "AllowedIPs = 0.0.0.0/0\n";
     configuration += "PersistentKeepalive = 25\n";
     // std::cout << "data:image/png;base64," << QR::generate_qr_base64(configuration) << std::endl;
-    std::string  base64Data = "data:image/png;base64," + QR::generate_qr_base64(configuration);
+    std::string base64Data = "data:image/png;base64," + QR::generate_qr_base64(configuration);
     std::ofstream file((std::to_string(id) + ".qr"));
     // std::cout << "--------------------------- size : " << base64Data.length() << " ---------------------------\n";
     file << base64Data;
@@ -393,11 +394,12 @@ void VPN::monitorClient()
         for (auto &p : handsakeTime)
         {
             // std::cout << p.first << " : " << p.second << std::endl;
-            if(p.second == -1 || p.second > 240){
+            if (p.second == -1 || p.second > 240)
+            {
                 std::string command = "sudo wg set wg0 peer " + p.first + " remove";
                 system(command.c_str());
                 {
-                    std::lock_guard <std::mutex> lock(mtx);
+                    std::lock_guard<std::mutex> lock(mtx);
                     revokeIP(record[p.first]);
                     record.erase(p.first);
                 }
@@ -466,19 +468,21 @@ bool VPN::isNumber(std::string &word)
     return true;
 }
 
-std::string VPN::getIP(){
+std::string VPN::getIP()
+{
     return endPoint;
 }
 
-void VPN::addFirewallRules(){
+void VPN::addFirewallRules()
+{
     system("sudo nft add table ip VPN");
     system("sudo nft add chain ip VPN wg_prerouting '{ type nat hook prerouting priority 0; policy accept; }'");
     system("sudo nft add chain ip VPN wg_postrouting '{ type nat hook postrouting priority 100 ; policy accept ; }'");
-    std::string rule = "sudo nft add rule ip VPN wg_postrouting oifname " + publicInterface +" masquerade";
+    std::string rule = "sudo nft add rule ip VPN wg_postrouting oifname " + publicInterface + " masquerade";
     system(rule.c_str());
 
     system("sudo nft add chain ip VPN wg_forward '{ type filter hook forward priority 0 ; policy drop ; }'");
-    rule = "sudo nft add rule ip VPN wg_forward iifname \"wg0\" oifname " + publicInterface + " accept" ;
+    rule = "sudo nft add rule ip VPN wg_forward iifname \"wg0\" oifname " + publicInterface + " accept";
     system(rule.c_str());
     rule = "sudo nft add rule ip VPN wg_forward iifname " + publicInterface + " oifname \"wg0\" ct state established,related accept";
     system(rule.c_str());

@@ -271,7 +271,9 @@ void Server::continuousMonitoring()
             broadcastMessage(data, 7);
             break;
         }
-        default : {}
+        default:
+        {
+        }
         }
         count = (count + 1) % 4;
         std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2 second delay

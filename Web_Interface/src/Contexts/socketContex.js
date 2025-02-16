@@ -13,13 +13,13 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const newSocket = io(`${process.env.REACT_APP_SERVER_IP}:5000`); // Connect to the backend
 
-    newSocket.on('connect',()=>{
-        setSocketId(newSocket.id);
+    newSocket.on('connect', () => {
+      setSocketId(newSocket.id);
     });
 
     newSocket.on("disconnect", () => {
-        setSocketId(null);
-      });
+      setSocketId(null);
+    });
 
     setSocket(newSocket);
 
