@@ -3,8 +3,6 @@ import { io } from "socket.io-client";
 
 // Create a Context
 const SocketContext = createContext();
-
-// Custom Hook to use the socket
 export const useSocket = () => useContext(SocketContext);
 
 // Socket Provider Component
@@ -17,8 +15,6 @@ export const SocketProvider = ({ children }) => {
 
     newSocket.on('connect',()=>{
         setSocketId(newSocket.id);
-        // console.log(newSocket.id);
-        // console.log(socketId);
     });
 
     newSocket.on("disconnect", () => {
