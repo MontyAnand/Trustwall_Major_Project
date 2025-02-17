@@ -15,6 +15,10 @@ DISK status => |1 byte (flag) | JSON ARRAY DATA | => flag = 5
 NETWORK TRAFFIC => |1 byte (flag) | JSON ARRAY DATA | => flag = 6
 Connection LIST => |1 byte (flag) | JSON ARRAY DATA | => flag = 7
 
+Authentication Request => |1 byte (flag) |1 byte (UserId Length) |1 byte (Password Length) | UserId |Password | => flag = 8
+Authentication Response => |1 byte (flag)| JSON DATA | => flag = 9
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev
+3. libcrypt-dev

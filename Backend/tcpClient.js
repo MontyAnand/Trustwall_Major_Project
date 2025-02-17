@@ -1,6 +1,6 @@
 const net = require('net');
 const EventEmitter = require('events');
-const { socketFileMap } = require('./utility/maps');
+const { socketFileMap, socketUserMap} = require('./utility/maps');
 const { SocketQueue } = require('./utility/queue');
 const path = require('path');
 const fs = require('fs');
@@ -45,6 +45,10 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.processConnectionListData(data);
                     break;
                 }
+                case 9: {
+                    this.handleAuthResponse(data);
+                    break;
+                }
                 default: break;
             }
         });
@@ -67,6 +71,22 @@ module.exports.client = class TcpClient extends EventEmitter {
         buffer.writeUInt8(0);
         buffer.writeUInt8(filenameSize, 1);
         filenameBuffer.copy(buffer, 2);
+        this.client.write(buffer);
+    }
+
+    authenticateUser(data){
+        const flag = 0x08;
+        const userIdBuffer = Buffer.from(data.userId, 'utf-8');
+        const passwordBuffer = Buffer.from(data.password, 'utf-8');
+        const lenUserId = userIdBuffer.length;
+        const lenPassword = passwordBuffer.length;
+        const buffer = Buffer.concat([
+            Buffer.from([flag]),               // 1st byte: Flag
+            Buffer.from([lenUserId]),          // 2nd byte: Length of userId
+            Buffer.from([lenPassword]),        // 3rd byte: Length of password
+            userIdBuffer,                      // UserId as bytes
+            passwordBuffer                      // Password as bytes
+        ]);
         this.client.write(buffer);
     }
 
@@ -192,6 +212,20 @@ module.exports.client = class TcpClient extends EventEmitter {
         }
     }
 
+    handleAuthResponse(data) {
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            const jsonData = JSON.parse(jsonString);
+            const socketId = socketUserMap.get(jsonData.userId);
+            if(! socketId){
+                return;
+            }
+            this.io.to(socketId).emit(jsonData);
+            socketUserMap.delete(jsonData.userId);
+        } catch (error){
+            console.log(`Auth error : ${error}`);
+        }
+    }
     close() {
         this.client.end();
     }

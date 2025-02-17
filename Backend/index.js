@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
-const { socketFileMap } = require('./utility/maps');
+const { socketFileMap, socketUserMap } = require('./utility/maps');
 const { SocketQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
 
@@ -30,11 +30,15 @@ io.on('connection', (socket) => {
         SocketQueue.enqueue(socket.id);
         tcpClient.vpnConnectionRequest();
     });
+    socket.on('authenticate-user',(data)=>{
+        socketUserMap.set(data.userId,socket.id);
+        tcpClient.authenticateUser(data);
+    });
 });
 
 app.use(cors({
     origin: '*',
-}));
+}));                                                
 
 // const socketFileMap = new Map();
 

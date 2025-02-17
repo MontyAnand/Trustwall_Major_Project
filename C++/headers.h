@@ -35,6 +35,9 @@
 #include <net/if.h>
 #include <qrencode.h>
 #include <png.h>
+#include <pwd.h>
+#include <shadow.h>
+#include <crypt.h>
 
 #include <nlohmann/json.hpp>
 
@@ -150,6 +153,13 @@ public:
     static bool searchFile(std::string);
 };
 
+
+class Authentication {
+    public:
+        static std::string authenticateUser (std::string& , std::string&);
+        static std::string authResponseJSON (int, std::string, std::string &);
+};
+
 class HealthMonitor
 {
 public:
@@ -193,6 +203,7 @@ private:
     int createServerSocket();
     void broadcastMessage(std::string &, uint8_t);
     void eventLoop();
+    void handleAuthentication(std::string, int);
 
     void setNonBlocking(int);
     void addToInputEventLoop(int);
