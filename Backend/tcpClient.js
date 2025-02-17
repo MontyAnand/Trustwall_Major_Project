@@ -165,7 +165,6 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
-            console.log('Received JSON:', jsonData);
             const percentageUsage = ((jsonData.total - jsonData.free) / jsonData.total) * 100;
             this.io.emit('ram-info', percentageUsage);
         } catch (error) {
@@ -179,7 +178,6 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
-            console.log('Received JSON:', jsonData);
             this.io.emit('disk-info', jsonData);
         } catch (error) {
             console.log(`Error in Disk data`);
@@ -220,7 +218,7 @@ module.exports.client = class TcpClient extends EventEmitter {
             if(! socketId){
                 return;
             }
-            this.io.to(socketId).emit(jsonData);
+            this.io.to(socketId).emit('auth-result',jsonData);
             socketUserMap.delete(jsonData.userId);
         } catch (error){
             console.log(`Auth error : ${error}`);
