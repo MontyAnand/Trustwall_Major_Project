@@ -1,29 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from "../Contexts/authContex";
 import { useNavigate } from "react-router-dom";
+import { useSocket } from "../Contexts/socketContex";
 import './Login.css';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { setIsAuthenticated } = useAuth();
+  const { socket } = useSocket();
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (!socket) return;
+    socket.on('auth-result',(data)=>{
+      if(data.status === 0){
+        setError(data.message);
+        return;
+      }
+      setIsAuthenticated(true);
+      navigate('/dashboard');
+    });
+
+    return ()=>{
+      socket.off('auth-result');
+    }
+  },[socket]);
 
   const handleLogin = () => {
     if (!username || !password) {
       setError('Please fill in both fields.');
       return;
     }
-
-    // Simulated login validation
-    if (username === 'user' && password === 'password') {
-      setError('');
-      login("Success");
-      navigate('/dashboard');
-    } else {
-      setError('Invalid username or password.');
-    }
+    socket.emit('authenticate-user', {
+      userId : username,
+      password : password
+    });
   };
 
   return (

@@ -220,12 +220,13 @@ module.exports.client = class TcpClient extends EventEmitter {
             if(! socketId){
                 return;
             }
-            this.io.to(socketId).emit(jsonData);
+            this.io.to(socketId).emit('auth-result',jsonData);
             socketUserMap.delete(jsonData.userId);
         } catch (error){
             console.log(`Auth error : ${error}`);
         }
     }
+
     close() {
         this.client.end();
     }
