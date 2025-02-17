@@ -235,7 +235,7 @@ void Server::handleAuthentication(std::string data, int fd)
     }
     std::string userId = data.substr(3, userIDLen);
     std::string password = data.substr(3 + userIDLen, passwordLen);
-    std::string data = Authentication::authenticateUser(userId, password);
+    data = Authentication::authenticateUser(userId, password);
     uint8_t flag = 9;
     std::vector<uint8_t> byteArray;
     byteArray.push_back(flag);
