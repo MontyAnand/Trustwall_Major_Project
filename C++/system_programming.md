@@ -22,3 +22,7 @@ Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev
 3. libcrypt-dev
+4. libqrencode-dev
+5. libpng-dev
+6. nodejs
+7. npm
