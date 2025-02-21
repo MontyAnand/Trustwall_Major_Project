@@ -149,6 +149,13 @@ void Server::processPacket(char *buffer, int fd)
         }
         break;
     }
+    case 8:
+    {
+        handleAuthentication(buffer, fd);
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -214,6 +221,29 @@ void Server::handleVPNRequest()
     return;
 }
 
+void Server::handleAuthentication(std::string data, int fd)
+{
+    if (data.length() < 3)
+    {
+        return;
+    }
+    int userIDLen = (int)data[1];
+    int passwordLen = (int)data[2];
+    if (data.length() != (3 + userIDLen + passwordLen))
+    {
+        return;
+    }
+    std::string userId = data.substr(3, userIDLen);
+    std::string password = data.substr(3 + userIDLen, passwordLen);
+    data = Authentication::authenticateUser(userId, password);
+    uint8_t flag = 9;
+    std::vector<uint8_t> byteArray;
+    byteArray.push_back(flag);
+    byteArray.insert(byteArray.end(), data.begin(), data.end());
+    send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
+}
+
 void Server::broadcastMessage(std::string &data, uint8_t flag)
 {
     std::vector<uint8_t> byteArray;
@@ -271,7 +301,9 @@ void Server::continuousMonitoring()
             broadcastMessage(data, 7);
             break;
         }
-        default : {}
+        default:
+        {
+        }
         }
         count = (count + 1) % 4;
         std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2 second delay

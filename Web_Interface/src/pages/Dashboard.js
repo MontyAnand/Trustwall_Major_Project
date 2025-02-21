@@ -6,18 +6,18 @@ import OutgoingTraffic from "../components/Outgoing_net_traffic";
 import ActiveConnections from "./Active_connections";
 import './dashboard.css'
 
-export default function Dashboard(){
+export default function Dashboard() {
     return (
         <>
             <Sidebar />
             <div className="dashboard_container">
                 <h2>Dashboard</h2>
                 <div className="dashboard_inner_container">
-                    <MemoryInfo/>
-                    <DiskInfo/>
-                    <IncomingTraffic/>
-                    <OutgoingTraffic/>
-                    <ActiveConnections/>
+                    <MemoryInfo />
+                    <DiskInfo />
+                    <IncomingTraffic />
+                    <OutgoingTraffic />
+                    <ActiveConnections />
                 </div>
             </div>
         </>

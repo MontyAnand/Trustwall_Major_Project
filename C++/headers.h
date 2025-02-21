@@ -35,6 +35,9 @@
 #include <net/if.h>
 #include <qrencode.h>
 #include <png.h>
+#include <pwd.h>
+#include <shadow.h>
+#include <crypt.h>
 
 #include <nlohmann/json.hpp>
 
@@ -150,6 +153,13 @@ public:
     static bool searchFile(std::string);
 };
 
+
+class Authentication {
+    public:
+        static std::string authenticateUser (std::string& , std::string&);
+        static std::string authResponseJSON (int, std::string, std::string &);
+};
+
 class HealthMonitor
 {
 public:
@@ -157,12 +167,13 @@ public:
     static std::vector<struct interface_info> getNetworkTraffic();
     static std::vector<struct disk_info> getAllMountedDisks();
     static struct disk_info getDiskStatus(const char *);
-    static std::vector<connection_info> getProtocolSpecificConnections(const std::string&, const std::string& );
+    static std::vector<connection_info> getProtocolSpecificConnections(const std::string &, const std::string &);
     static std::vector<connection_info> getNetworkConnections();
-    static std::string ramInfoJSON (struct sysinfo &);;
-    static std::string  diskInfoJSON (std::vector<struct disk_info>&);
-    static std::string networkTrafficJSON (std::vector<struct interface_info> &);
-    static std::string networkListJSON (std::vector<connection_info>&networkList);
+    static std::string ramInfoJSON(struct sysinfo &);
+    ;
+    static std::string diskInfoJSON(std::vector<struct disk_info> &);
+    static std::string networkTrafficJSON(std::vector<struct interface_info> &);
+    static std::string networkListJSON(std::vector<connection_info> &networkList);
 };
 
 class Server
@@ -190,8 +201,9 @@ private:
     VPN vpn;
 
     int createServerSocket();
-    void broadcastMessage(std::string&, uint8_t );
+    void broadcastMessage(std::string &, uint8_t);
     void eventLoop();
+    void handleAuthentication(std::string, int);
 
     void setNonBlocking(int);
     void addToInputEventLoop(int);

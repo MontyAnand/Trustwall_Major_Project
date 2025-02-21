@@ -3,8 +3,6 @@ import { io } from "socket.io-client";
 
 // Create a Context
 const SocketContext = createContext();
-
-// Custom Hook to use the socket
 export const useSocket = () => useContext(SocketContext);
 
 // Socket Provider Component
@@ -15,15 +13,13 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const newSocket = io(`${process.env.REACT_APP_SERVER_IP}:5000`); // Connect to the backend
 
-    newSocket.on('connect',()=>{
-        setSocketId(newSocket.id);
-        // console.log(newSocket.id);
-        // console.log(socketId);
+    newSocket.on('connect', () => {
+      setSocketId(newSocket.id);
     });
 
     newSocket.on("disconnect", () => {
-        setSocketId(null);
-      });
+      setSocketId(null);
+    });
 
     setSocket(newSocket);
 

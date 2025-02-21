@@ -119,7 +119,8 @@ void Firewall::createChains()
     return;
 }
 
-void Firewall::initialRules (){
+void Firewall::initialRules()
+{
     int result;
 
     // Allowing Source Port from the set
@@ -211,5 +212,3 @@ void Firewall::initialRules (){
 
     return;
 }
-
-

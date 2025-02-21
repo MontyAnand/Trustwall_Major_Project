@@ -1,6 +1,7 @@
 #include "headers.h"
 
-int main(){
+int main()
+{
     Server server;
     return 0;
 }

@@ -59,7 +59,7 @@ function VPN() {
             socket.off('vpn-data-completed', showQR);
             socket.off('vpn-connection-error');
         };
-    }, [socket, imageURL,content]); // Added imageURL as dependency to always get the latest value
+    }, [socket, imageURL, content]); // Added imageURL as dependency to always get the latest value
 
     return (
         <>
