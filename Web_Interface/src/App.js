@@ -3,8 +3,9 @@ import Dashboard from "./pages/Dashboard";
 import Antivirus from "./pages/Antivirus";
 import Firewall from "./pages/Firewall";
 import VPN from "./pages/VPN";
-import Login from "./pages/Login"
-import ProtectedRoute from "./components/ProtectedRoute"
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import ServiceTable from "./pages/ServiceList";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <div className="flex-1 p-4">
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/services" element={<ServiceTable/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
