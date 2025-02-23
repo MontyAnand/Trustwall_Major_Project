@@ -154,6 +154,11 @@ void Server::processPacket(char *buffer, int fd)
         handleAuthentication(buffer, fd);
         break;
     }
+    case 10:
+    {
+        handleServiceListRequest(fd);
+        break;
+    }
     default:
         break;
     }
@@ -240,6 +245,17 @@ void Server::handleAuthentication(std::string data, int fd)
     std::vector<uint8_t> byteArray;
     byteArray.push_back(flag);
     byteArray.insert(byteArray.end(), data.begin(), data.end());
+    send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
+}
+
+void Server::handleServiceListRequest(int fd)
+{
+    std::string serviceList = HealthMonitor::getServicesJSON();
+    std::vector<uint8_t> byteArray;
+    uint8_t flag = 11;
+    byteArray.push_back(flag);
+    byteArray.insert(byteArray.end(), serviceList.begin(), serviceList.end());
     send(fd, byteArray.data(), byteArray.size(), 0);
     return;
 }

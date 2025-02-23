@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <string>
 #include <chrono>
+#include <cstdio>
 
 #include <nlohmann/json.hpp>
 
@@ -38,8 +39,6 @@
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
-
-#include <nlohmann/json.hpp>
 
 #include <thread>
 #include <mutex>
@@ -170,10 +169,11 @@ public:
     static std::vector<connection_info> getProtocolSpecificConnections(const std::string &, const std::string &);
     static std::vector<connection_info> getNetworkConnections();
     static std::string ramInfoJSON(struct sysinfo &);
-    ;
     static std::string diskInfoJSON(std::vector<struct disk_info> &);
     static std::string networkTrafficJSON(std::vector<struct interface_info> &);
     static std::string networkListJSON(std::vector<connection_info> &networkList);
+    static bool validService (std::string &);
+    static std::string getServicesJSON();
 };
 
 class Server
@@ -215,6 +215,7 @@ private:
     void handleFilescan();
     void handleVPNRequest();
     void continuousMonitoring();
+    void handleServiceListRequest (int );
 
 public:
     Server();

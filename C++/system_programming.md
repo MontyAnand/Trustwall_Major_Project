@@ -18,6 +18,9 @@ Connection LIST => |1 byte (flag) | JSON ARRAY DATA | => flag = 7
 Authentication Request => |1 byte (flag) |1 byte (UserId Length) |1 byte (Password Length) | UserId |Password | => flag = 8
 Authentication Response => |1 byte (flag)| JSON DATA | => flag = 9
 
+Service List Request => |1 byte (flag) | => flag = 10
+Service List Response => |1 byte (flag) | JSON Array | => flag = 11
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev

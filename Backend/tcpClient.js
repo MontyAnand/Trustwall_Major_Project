@@ -1,7 +1,7 @@
 const net = require('net');
 const EventEmitter = require('events');
 const { socketFileMap, socketUserMap} = require('./utility/maps');
-const { SocketQueue } = require('./utility/queue');
+const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const path = require('path');
 const fs = require('fs');
 
@@ -49,6 +49,10 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.handleAuthResponse(data);
                     break;
                 }
+                case 11: {
+                    this.handleServiceListData(data);
+                    break;
+                }
                 default: break;
             }
         });
@@ -93,6 +97,12 @@ module.exports.client = class TcpClient extends EventEmitter {
     vpnConnectionRequest(socketId) {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(2);
+        this.client.write(buffer);
+    }
+
+    serviceListRequest (){
+        const buffer = Buffer.alloc(1);
+        buffer.writeUInt8(10);
         this.client.write(buffer);
     }
 
@@ -222,6 +232,21 @@ module.exports.client = class TcpClient extends EventEmitter {
             socketUserMap.delete(jsonData.userId);
         } catch (error){
             console.log(`Auth error : ${error}`);
+        }
+    }
+
+    handleServiceListData(data) {
+        if(serviceListQueue.isEmpty()){
+            return;
+        }
+        const socketID = serviceListQueue.dequeue();
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            const jsonData = JSON.parse(jsonString);
+            this.io.to(socketID).emit('service-list',jsonData);
+
+        } catch (error){
+            console.log(`Service List Error :  ${error}`);
         }
     }
 

@@ -1,4 +1,4 @@
-class SocketQueue {
+class Queue {
     constructor() {
         this.queue = [];
     }
@@ -20,6 +20,7 @@ class SocketQueue {
     }
 }
 
-module.exports.SocketQueue = new SocketQueue();
+module.exports.SocketQueue = new Queue();
+module.exports.serviceListQueue = new Queue();
 
 
