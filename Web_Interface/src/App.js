@@ -6,6 +6,7 @@ import VPN from "./pages/VPN";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ServiceTable from "./pages/ServiceList";
+import CPUInfo from "./components/CPU_info";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/services" element={<ServiceTable/>}/>
+            <Route path="/cpu-info" element={<CPUInfo/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
