@@ -159,6 +159,11 @@ void Server::processPacket(char *buffer, int fd)
         handleServiceListRequest(fd);
         break;
     }
+    case 12:
+    {
+        handleCPUStatusRequest(fd);
+        break;
+    }
     default:
         break;
     }
@@ -260,6 +265,17 @@ void Server::handleServiceListRequest(int fd)
     return;
 }
 
+void Server::handleCPUStatusRequest(int fd)
+{
+    std::string cpuStatus = HealthMonitor::getCPUStatusJSON();
+    std::vector<uint8_t> byteArray;
+    uint8_t flag = 13;
+    byteArray.push_back(flag);
+    byteArray.insert(byteArray.end(), cpuStatus.begin(), cpuStatus.end());
+    send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
+}
+
 void Server::broadcastMessage(std::string &data, uint8_t flag)
 {
     std::vector<uint8_t> byteArray;
@@ -317,11 +333,16 @@ void Server::continuousMonitoring()
             broadcastMessage(data, 7);
             break;
         }
+        case 4:
+        {
+            data = HealthMonitor::getCPUStatusJSON();
+            broadcastMessage(data, 13);
+        }
         default:
         {
         }
         }
-        count = (count + 1) % 4;
+        count = (count + 1) % 5;
         std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2 second delay
     }
 }

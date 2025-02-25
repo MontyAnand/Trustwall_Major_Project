@@ -20,6 +20,7 @@
 #include <string>
 #include <chrono>
 #include <cstdio>
+#include <memory>
 
 #include <nlohmann/json.hpp>
 
@@ -174,6 +175,8 @@ public:
     static std::string networkListJSON(std::vector<connection_info> &networkList);
     static bool validService (std::string &);
     static std::string getServicesJSON();
+    static std::string getCPUStatusJSON();
+    static json parseMpstatOutput(const std::string &);
 };
 
 class Server
@@ -216,6 +219,7 @@ private:
     void handleVPNRequest();
     void continuousMonitoring();
     void handleServiceListRequest (int );
+    void handleCPUStatusRequest(int );
 
 public:
     Server();

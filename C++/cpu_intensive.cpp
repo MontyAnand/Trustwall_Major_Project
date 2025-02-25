@@ -1,8 +1,5 @@
-#include <iostream>
+#include "headers.h"
 
 int main(){
-    int i=0;
-    while(true){
-        i++;
-    }
+    std::cout << HealthMonitor::getCPUStatusJSON() << std::endl;
 }

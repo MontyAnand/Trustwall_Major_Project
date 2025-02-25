@@ -21,6 +21,9 @@ Authentication Response => |1 byte (flag)| JSON DATA | => flag = 9
 Service List Request => |1 byte (flag) | => flag = 10
 Service List Response => |1 byte (flag) | JSON Array | => flag = 11
 
+CPU Status Request => |1 byte (flag) | => flag = 12
+CPU Status Response => |1 byte (flag) | JSON DATA | => flag = 13
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev
@@ -29,3 +32,4 @@ Dependencies:
 5. libpng-dev
 6. nodejs
 7. npm
+8. sysstat

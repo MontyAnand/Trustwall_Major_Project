@@ -1,5 +1,59 @@
 #include "headers.h"
 
+json HealthMonitor::parseMpstatOutput(const std::string& line){
+    if(line.size() == 0)return json();
+    std::istringstream linestream(line);
+    std::string token;
+    std::vector<std::string> words;
+
+    // Tokenize the line
+    while (linestream >> token) {
+        words.push_back(token);
+    }
+
+    // Skip headers and invalid lines
+    if (words.size() < 13 || words[0] == "Linux" || words[2] == "CPU") return json();
+
+    try {
+        // Extract required fields
+        double usr = std::stod(words[3]);     // %usr
+        double sys = std::stod(words[5]);     // %sys
+        double iowait = std::stod(words[6]);  // %iowait
+        double idle = std::stod(words[12]);   // %idle
+        double other = 100.0 - (usr + sys + iowait + idle); // %other
+
+        return json({
+            {"CPU", words[2]},
+            {"usr", usr},
+            {"sys", sys},
+            {"iowait", iowait},
+            {"idle", idle},
+            {"other", other}
+        });
+    } catch (...) {
+        return json();
+    }
+    return json();
+}
+std::string HealthMonitor::getCPUStatusJSON(){
+    json result = json::array();
+    const char* command = "mpstat -P ALL"; 
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command, "r"), pclose);
+    if (!pipe) {
+        std::cerr << "Error: Failed to run mpstat command!\n";
+        return "";
+    }
+
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
+        json data = parseMpstatOutput(buffer);
+        if(!data.empty()){
+            result.push_back(data);
+        }
+    }
+    return result.dump();
+}
+
 bool HealthMonitor::validService (std::string &service){
     if(service.length() < 8) return false;
     return service.substr(service.length() - 8) == ".service";

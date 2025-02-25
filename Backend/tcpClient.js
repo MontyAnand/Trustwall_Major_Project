@@ -53,6 +53,10 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.handleServiceListData(data);
                     break;
                 }
+                case 13: {
+                    this.handleCPUData(data);
+                    break;
+                }
                 default: break;
             }
         });
@@ -245,6 +249,16 @@ module.exports.client = class TcpClient extends EventEmitter {
             const jsonData = JSON.parse(jsonString);
             this.io.to(socketID).emit('service-list',jsonData);
 
+        } catch (error){
+            console.log(`Service List Error :  ${error}`);
+        }
+    }
+
+    handleCPUData(data){
+        const jsonString = data.subarray(1).toString('utf-8');
+        try {
+            const jsonData = JSON.parse(jsonString);
+            this.io.emit('cpu-data',jsonData);
         } catch (error){
             console.log(`Service List Error :  ${error}`);
         }
