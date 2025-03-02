@@ -306,3 +306,31 @@ std::string HealthMonitor::networkListJSON(std::vector<connection_info> &network
 
     return data.dump();
 }
+
+std::map <std::string, std::vector<unsigned long>> HealthMonitor::getNetworkStats(){
+    std::vector<NetStats> stats;
+    std::map<std::string, std::vector<unsigned long>> bytes;
+    std::ifstream file("/proc/net/dev");
+    std::string line;
+
+    if (!file) {
+        std::cerr << "Error: Could not open /proc/net/dev" << std::endl;
+        bytes;
+    }
+
+    // Skip headers
+    std::getline(file, line);
+    std::getline(file, line);
+
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        NetStats ns;
+        iss >> ns.iface >> ns.rx_bytes >> ns.rx_packets >> ns.rx_errs >> ns.rx_drop >> ns.rx_fifo >> ns.rx_frame
+            >> ns.rx_compressed >> ns.rx_multicast >> ns.tx_bytes >> ns.tx_packets >> ns.tx_errs >> ns.tx_drop
+            >> ns.tx_fifo >> ns.tx_colls >> ns.tx_carrier >> ns.tx_compressed;
+        
+        ns.iface = ns.iface.substr(0, ns.iface.find(':')); // Remove trailing ':'
+        bytes[ns.iface] = {ns.rx_bytes, ns.tx_bytes};
+    }
+    return bytes;
+}

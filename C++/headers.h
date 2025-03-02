@@ -55,6 +55,12 @@
 #define DES_IP_SET "dip"
 #define MAX_EVENTS 20
 
+struct NetStats {
+    std::string iface;
+    unsigned long rx_bytes, rx_packets, rx_errs, rx_drop, rx_fifo, rx_frame, rx_compressed, rx_multicast;
+    unsigned long tx_bytes, tx_packets, tx_errs, tx_drop, tx_fifo, tx_colls, tx_carrier, tx_compressed;
+};
+
 struct interface_info
 {
     std::string interface;
@@ -177,6 +183,7 @@ public:
     static std::string getServicesJSON();
     static std::string getCPUStatusJSON();
     static json parseMpstatOutput(const std::string &);
+    static std::map <std::string, std::vector<unsigned long>> getNetworkStats();
 };
 
 class Server
@@ -194,6 +201,7 @@ private:
     std::thread fileScanThread;
     std::thread vpnRequestThread;
     std::thread healthMonitorThread;
+    std::thread networkTrafficThread;
 
     std::mutex fileScanMTX;
     std::mutex vpnMTX;
@@ -214,6 +222,7 @@ private:
 
     void startNodeServer(std::string);
     void processPacket(char *, int);
+    void watchNetworkTraffic ();
 
     void handleFilescan();
     void handleVPNRequest();

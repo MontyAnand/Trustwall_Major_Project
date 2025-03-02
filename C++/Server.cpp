@@ -319,21 +319,13 @@ void Server::continuousMonitoring()
 
         case 2:
         {
-            // Network Traffic on each Interface
-            std::vector<struct interface_info> interfaces = HealthMonitor::getNetworkTraffic();
-            data = HealthMonitor::networkTrafficJSON(interfaces);
-            broadcastMessage(data, 6);
-            break;
-        }
-        case 3:
-        {
             // List of active Connections
             std::vector<connection_info> networkList = HealthMonitor::getNetworkConnections();
             data = HealthMonitor::networkListJSON(networkList);
             broadcastMessage(data, 7);
             break;
         }
-        case 4:
+        case 3:
         {
             data = HealthMonitor::getCPUStatusJSON();
             broadcastMessage(data, 13);
@@ -342,8 +334,27 @@ void Server::continuousMonitoring()
         {
         }
         }
-        count = (count + 1) % 5;
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2 second delay
+        count = (count + 1) % 4;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // 2 second delay
+    }
+}
+
+void Server::watchNetworkTraffic (){
+    std::map<std::string, std::vector<unsigned long>> prev_traffic = HealthMonitor::getNetworkStats();
+    while(running){
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        json data = json::array();
+        std::map<std::string, std::vector<unsigned long>> curr_traffic = HealthMonitor::getNetworkStats();
+        for(auto &p : curr_traffic){
+            data.push_back({
+                {"interface", p.first},
+                {"RX", (double)((p.second)[0] - prev_traffic[p.first][0])/1024.0},
+                {"TX", (double)((p.second)[1] - prev_traffic[p.first][1])/1024.0}
+            });
+        }
+        std::string message = data.dump();
+        broadcastMessage(message,6);
+        prev_traffic = curr_traffic;
     }
 }
 
@@ -363,6 +374,7 @@ Server::Server() : running(true)
     fileScanThread = std::thread(&Server::handleFilescan, this);
     vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
     healthMonitorThread = std::thread(&Server::continuousMonitoring, this);
+    networkTrafficThread = std::thread(&Server::watchNetworkTraffic, this);
     eventLoop();
 }
 
@@ -382,5 +394,9 @@ Server::~Server()
     if (healthMonitorThread.joinable())
     {
         healthMonitorThread.join();
+    }
+
+    if(networkTrafficThread.joinable()){
+        networkTrafficThread.join();
     }
 }
