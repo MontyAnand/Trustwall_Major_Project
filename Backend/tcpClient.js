@@ -205,6 +205,7 @@ module.exports.client = class TcpClient extends EventEmitter {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
             console.log('Received JSON:', jsonData);
+            this.io.emit('network-traffic',jsonData);
         } catch (error) {
             console.log(`Error in Network data`);
             console.error('Error parsing JSON:', error);
