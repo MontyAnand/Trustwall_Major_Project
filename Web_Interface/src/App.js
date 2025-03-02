@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ServiceTable from "./pages/ServiceList";
 import CPUInfo from "./components/CPU_info";
+import NetworkTrafficChart from "./pages/Network_Traffic"
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/services" element={<ServiceTable/>}/>
             <Route path="/cpu-info" element={<CPUInfo/>}/>
+            <Route path="/netwok-traffic" element={<NetworkTrafficChart/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
