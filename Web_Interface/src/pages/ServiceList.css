@@ -1,0 +1,88 @@
+/* Center the table container */
+.table-container {
+    width: 80%;
+    margin: 20px auto;
+    overflow-x: auto;
+}
+
+/* Style the table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Style table header */
+.table th {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+}
+
+/* Style table cells */
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+/* Alternate row background */
+.table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Status badge */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Active status */
+.status-active {
+    background-color: #28a745;
+}
+
+/* Inactive status */
+.status-inactive {
+    background-color: #dc3545;
+}
+
+/* Button Styles */
+.action-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Start/Restart Button */
+.start-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.start-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Enable/Disable Button */
+.enable-btn {
+    background-color: #ffc107;
+    color: black;
+}
+
+.enable-btn:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+}

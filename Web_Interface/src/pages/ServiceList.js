@@ -1,9 +1,10 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import "./servicePage.css";
 import { useSocket } from "../Contexts/socketContex";
 
-const TableContainer = styled.div`
+/*const TableContainer = styled.div`
   width: 80%;
   margin: 20px auto;
   overflow-x: auto;
@@ -45,6 +46,7 @@ const StatusBadge = styled.span`
   color: white;
   background-color: ${(props) => (props.active ? "#28a745" : "#dc3545")};
 `;
+*/
 
 const ServiceTable = () => {
     const [services, setServices] = useState([
@@ -69,6 +71,24 @@ const ServiceTable = () => {
         }
     },[socket]);
 
+    // start/restart button
+    const handleStartRestart = (index) => {
+      setServices((prevServices) =>
+        prevServices.map((service, i) =>
+          i === index ? { ...service, isActive: 1, status: "running" } : service
+        )
+      );
+    };
+
+    // enable/diable button
+    const handleEnableDisable = (index) => {
+      setServices((prevServices) =>
+        prevServices.map((service, i) =>
+          i === index ? { ...service, isActive: service.isActive ? 0 : 1 } : service
+        )
+      );
+    };
+
   return (
     <TableContainer>
       <Table>
@@ -77,6 +97,8 @@ const ServiceTable = () => {
             <Th>Service</Th>
             <Th>Active</Th>
             <Th>Status</Th>
+            <Th>Start/Restart</Th>
+            <Th>Enable/Disable</Th>
           </tr>
         </thead>
         <tbody>
@@ -89,6 +111,16 @@ const ServiceTable = () => {
                 </StatusBadge>
               </Td>
               <Td>{item.status}</Td>
+              <Td>
+              <button className="action-btn start-btn" onClick={() => handleStartRestart(index)}>
+                  {item.status === "running" ? "Restart" : "Start"}
+                </button>
+              </Td>
+              <Td>
+              <button className="action-btn enable-btn" onClick={() => handleEnableDisable(index)}>
+                  {item.isActive ? "Disable" : "Enable"}
+                </button>
+              </Td>
             </Tr>
           ))}
         </tbody>
