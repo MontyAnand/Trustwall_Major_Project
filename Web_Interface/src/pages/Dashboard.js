@@ -1,8 +1,8 @@
 import Sidebar from "../components/Sidebar";
 import MemoryInfo from "../components/Memory_info";
 import DiskInfo from "../components/Disk_info";
-import IncomingTraffic from "../components/Incoming_net_traffic";
-import OutgoingTraffic from "../components/Outgoing_net_traffic";
+// import IncomingTraffic from "../components/Incoming_net_traffic";
+// import OutgoingTraffic from "../components/Outgoing_net_traffic";
 import ActiveConnections from "./Active_connections";
 import './dashboard.css'
 
@@ -15,8 +15,8 @@ export default function Dashboard() {
                 <div className="dashboard_inner_container">
                     <MemoryInfo />
                     <DiskInfo />
-                    <IncomingTraffic />
-                    <OutgoingTraffic />
+                    {/* <IncomingTraffic />
+                    <OutgoingTraffic /> */}
                     <ActiveConnections />
                 </div>
             </div>
