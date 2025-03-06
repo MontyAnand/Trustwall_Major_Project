@@ -40,6 +40,7 @@
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
+#include <dbus/dbus.h>
 
 #include <thread>
 #include <mutex>
@@ -186,6 +187,16 @@ public:
     static std::map <std::string, std::vector<unsigned long>> getNetworkStats();
 };
 
+class SystemdServiceManager {
+    public:
+        static bool sendMessage(const std::string&, const std::vector<std::string>&);
+        static bool startService(const std::string&);
+        static bool stopService( const std::string&);
+        static bool restartService(const std::string&);
+        static bool enableService(const std::string&);
+        static bool disableService(const std::string&);
+};
+
 class Server
 {
 private:
@@ -229,6 +240,7 @@ private:
     void continuousMonitoring();
     void handleServiceListRequest (int );
     void handleCPUStatusRequest(int );
+    void manageServiceRequest(std::string);
 
 public:
     Server();

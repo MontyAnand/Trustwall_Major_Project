@@ -110,6 +110,13 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
+    serviceManagementRquest (data){
+        const jsonString = JSON.stringify(data);
+        const jsonBuffer = Buffer.from(jsonString, 'utf-8');
+        const buffer = Buffer.concat([Buffer.from([14]), jsonBuffer]);
+        this.client.write(buffer);
+    }
+
     handleFilescanResult(data) {
         const filenameSize = data.readUInt8(1);
         const filename = data.slice(2, 2 + filenameSize).toString();
@@ -204,7 +211,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
-            console.log('Received JSON:', jsonData);
+            // console.log('Received JSON:', jsonData);
             this.io.emit('network-traffic',jsonData);
         } catch (error) {
             console.log(`Error in Network data`);
