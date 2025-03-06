@@ -187,6 +187,18 @@ public:
     static std::map <std::string, std::vector<unsigned long>> getNetworkStats();
 };
 
+class SystemdServiceManager {
+    public:
+        static DBusConnection* conn;
+        static DBusError err;
+        static bool sendMessage(const std::string&, const std::vector<std::string>&);
+        static bool startService(const std::string&);
+        static bool stopService( const std::string&);
+        static bool restartService(const std::string&);
+        static bool enableService(const std::string&);
+        static bool disableService(const std::string&);
+};
+
 class Server
 {
 private:
