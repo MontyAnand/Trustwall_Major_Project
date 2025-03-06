@@ -1,1 +1,1 @@
-g++ -std=c++17 Antivirus.cpp VPN.cpp Firewall.cpp QR.cpp Server.cpp HealthMonitor.cpp Authentication.cpp main.cpp -L/usr/local/lib -lqrencode -lpng -lcrypt && sudo ./a.out
+g++ -std=c++17 Antivirus.cpp VPN.cpp Firewall.cpp QR.cpp Server.cpp HealthMonitor.cpp Authentication.cpp main.cpp -L/usr/local/lib -lqrencode -lpng -lcrypt $(pkg-config --cflags --libs dbus-1) && sudo ./a.out
