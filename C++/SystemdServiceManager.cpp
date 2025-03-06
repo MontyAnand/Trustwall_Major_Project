@@ -2,6 +2,8 @@
 
 bool SystemdServiceManager::sendMessage(const std::string &method, const std::vector<std::string> &args = {})
 {
+    DBusConnection* conn;
+    DBusError err;
     dbus_error_init(&err);
     conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
     if (!conn)

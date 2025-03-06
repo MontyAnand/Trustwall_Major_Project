@@ -189,8 +189,6 @@ public:
 
 class SystemdServiceManager {
     public:
-        static DBusConnection* conn;
-        static DBusError err;
         static bool sendMessage(const std::string&, const std::vector<std::string>&);
         static bool startService(const std::string&);
         static bool stopService( const std::string&);
