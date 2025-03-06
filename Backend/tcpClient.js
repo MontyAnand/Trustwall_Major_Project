@@ -110,6 +110,13 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
+    serviceManagementRquest (data){
+        const jsonString = JSON.stringify(data);
+        const jsonBuffer = Buffer.from(jsonString, 'utf-8');
+        const buffer = Buffer.concat([Buffer.from([14]), jsonBuffer]);
+        this.client.write(buffer);
+    }
+
     handleFilescanResult(data) {
         const filenameSize = data.readUInt8(1);
         const filename = data.slice(2, 2 + filenameSize).toString();

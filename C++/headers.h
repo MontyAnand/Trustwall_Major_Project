@@ -240,6 +240,7 @@ private:
     void continuousMonitoring();
     void handleServiceListRequest (int );
     void handleCPUStatusRequest(int );
+    void manageServiceRequest(std::string);
 
 public:
     Server();
