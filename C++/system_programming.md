@@ -24,6 +24,9 @@ Service List Response => |1 byte (flag) | JSON Array | => flag = 11
 CPU Status Request => |1 byte (flag) | => flag = 12
 CPU Status Response => |1 byte (flag) | JSON DATA | => flag = 13
 
+Service Management Request => |1 byte (flag) | JSON DATA | => flag = 14
+JSON DATA => |service name|operation| => operation: {0:start,1:stop,2:restart,3:enable,4:disable}
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev

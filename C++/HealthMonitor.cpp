@@ -85,7 +85,7 @@ std::string HealthMonitor::getServicesJSON(){
                 active = 1;
             }
             data.push_back({
-                {"service", first},
+                {"service", first.substr(0,first.length()-8)},
                 {"isActive", active},
                 {"status", fourth}
             });

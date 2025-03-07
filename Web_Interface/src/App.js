@@ -17,9 +17,9 @@ function App() {
         <div className="flex-1 p-4">
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/services" element={<ServiceTable/>}/>
+            {<Route path="/services" element={<ServiceTable/>}/> }
             <Route path="/cpu-info" element={<CPUInfo/>}/>
-            <Route path="/netwok-traffic" element={<NetworkTrafficChart/>}/>
+            <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />

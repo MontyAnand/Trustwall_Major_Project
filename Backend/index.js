@@ -38,6 +38,9 @@ io.on('connection', (socket) => {
         serviceListQueue.enqueue(socket.id);
         tcpClient.serviceListRequest();
     });
+    socket.on('update-service-status',(data)=>{
+        tcpClient.serviceManagementRquest(data);
+    });
 });
 
 app.use(cors({
