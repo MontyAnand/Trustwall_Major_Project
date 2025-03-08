@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ServiceTable from "./pages/ServiceList";
 import CPUInfo from "./components/CPU_info";
 import NetworkTrafficChart from "./pages/Network_Traffic"
+import CommandInterface from "./pages/Command_executor"
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             {<Route path="/services" element={<ServiceTable/>}/> }
             <Route path="/cpu-info" element={<CPUInfo/>}/>
             <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>
+            <Route path="/executor" element={<CommandInterface/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
