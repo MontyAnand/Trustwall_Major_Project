@@ -4,57 +4,27 @@ import { useSocket } from "../Contexts/socketContex";
 import "../pages/cpu_info.css"
 
 const CPUInfo = () => {
-    // const [data, setData] = useState([]);
-    // const [loading, setLoading] = useState(true);
-    // const { socket } = useSocket();
+    const [cleanedData, setCleanedData] = useState([]);
+    const [cpuNames, setCpuNames] = useState([]);
+    const { socket } = useSocket();
 
-    // useEffect(() => {
-    //     if (!socket) return;
+    useEffect(() => {
+        if (!socket) return;
 
-    //     socket.on("cpu-data", (incomingData) => {
-    //         setData(incomingData);
-    //         console.log(incomingData);
-    //         setLoading(false);
-    //     });
+        socket.on("cpu-data", (data) => {
+            setCpuNames(data.map(obj => "Core : "+obj.CPU));
+            const X = data.map(({ CPU, ...rest }) => rest);
+            const listFormat = X.map(obj => Object.entries(obj));
+            const cpu_data_list = listFormat.map(arr => [["cpu_name","cpu_value"],...arr]);
+            console.log(cpu_data_list);
+            setCleanedData(cpu_data_list);
+            console.log(cleanedData);
+        });
 
-    //     return () => {
-    //         socket.off("cpu-data");
-    //     };
-    // }, [socket]);
-
-    // if (loading) return <p>Loading...</p>;
-    const cpu_data_list = [
-        [
-            ["cpu_name","cpu_value"],
-            ["CPU","core 1"],
-            ["idle",0],
-            ["iowait",1.78],
-            ["other",98.02],
-            ["sys",0.2],
-            ["usr",3.92]
-        ],
-        [
-            ["cpu_name","cpu_value"],
-            ["CPU","core 2"],
-            ["idle",9.2],
-            ["iowait",8.24],
-            ["other",52.77],
-            ["sys",9.81],
-            ["usr",3.0]
-        ],
-        [
-            ["cpu_name","cpu_value"],
-            ["CPU","core 3"],
-            ["idle",7.21],
-            ["iowait",0.42],
-            ["other",61.80],
-            ["sys",0.63],
-            ["usr",12.45]
-        ]
-    ];
-
-    const cleanedData = cpu_data_list.map(cpuData => cpuData.filter((_, index) => index !== 1));
-    const cpuNames = cpu_data_list.map(cpuData => cpuData[1][1]); 
+        return () => {
+            socket.off("cpu-data");
+        };
+    }, [socket]); 
 
     const options={
         is3D :true,
