@@ -1,1 +1,1 @@
-sudo apt install Wireguard nlohmann-json3-dev libcrypt-dev libqrencode-dev libpng-dev nodejs npm sysstat libdbus-1-dev
+sudo apt install wireguard nlohmann-json3-dev libcrypt-dev libqrencode-dev libpng-dev nodejs npm sysstat libdbus-1-dev
