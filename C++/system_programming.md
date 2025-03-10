@@ -27,6 +27,10 @@ CPU Status Response => |1 byte (flag) | JSON DATA | => flag = 13
 Service Management Request => |1 byte (flag) | JSON DATA | => flag = 14
 JSON DATA => |service name|operation| => operation: {0:start,1:stop,2:restart,3:enable,4:disable}
 
+Command Execution Request => |1 byte (flag) |1 byte (Client ID) |1 byte (length of the command) | Command | => flag = 15
+
+comand Execution Response => |1 byte (flag)|1 byte (Client ID)| Response | => flag = 16
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev

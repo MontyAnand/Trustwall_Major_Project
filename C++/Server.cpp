@@ -169,6 +169,10 @@ void Server::processPacket(char *buffer, int fd)
         manageServiceRequest(buffer);
         break;
     }
+    case 15:
+    {
+        Executor::executeCommand(buffer,fd);
+    }
     default:
         break;
     }

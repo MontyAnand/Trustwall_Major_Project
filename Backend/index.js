@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
-const { socketFileMap, socketUserMap } = require('./utility/maps');
+const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
 
@@ -25,6 +25,7 @@ const tcpClient = new client('127.0.0.1', 8080, io);
 
 io.on('connection', (socket) => {
     console.log(`Client is conneced with socketID ${socket.id}`);
+    ClientIDMap.push(socket.id);
     socket.emit('connection', "SuccessFully connected with server");
     socket.on('newVPNConnection', () => {
         SocketQueue.enqueue(socket.id);
@@ -40,6 +41,9 @@ io.on('connection', (socket) => {
     });
     socket.on('update-service-status',(data)=>{
         tcpClient.serviceManagementRquest(data);
+    });
+    socket.on('execute-command', (data)=>{
+        tcpClient.executeCommand(data, socket.id);
     });
 });
 

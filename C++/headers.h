@@ -197,6 +197,11 @@ class SystemdServiceManager {
         static bool disableService(const std::string&);
 };
 
+class Executor{
+    public:
+        static void executeCommand(std::string ,int );
+};
+
 class Server
 {
 private:
