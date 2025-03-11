@@ -107,8 +107,8 @@ void Executor::executeCommand(std::string data, int fd)
         packet.flag = flag;
         packet.ID = ID;
         memset(packet.data, 0, sizeof(packet.data));
-        strcpy(packet.data, "\r\nEnd\r\n");
-        send(fd, &packet, offsetof(Packet, data) + 2, 0);
+        strcpy(packet.data, "\r\nEnd\r\n>  ");
+        send(fd, &packet, offsetof(Packet, data) + 9, 0);
     }
     catch (const std::exception &e)
     {
