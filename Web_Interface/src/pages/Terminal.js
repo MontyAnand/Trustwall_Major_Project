@@ -25,8 +25,7 @@ const LinuxTerminal = () => {
     useEffect(() => {
         if (term && terminalRef.current) {
             term.open(terminalRef.current);
-            term.write("Welcome to Remote terminal...\r\n");
-
+            term.write("Welcome to Remote terminal...\r\n> ");
             let commandBuffer = "";
 
             term.onData((data) => {
@@ -70,11 +69,11 @@ const LinuxTerminal = () => {
         if (!command.trim()) return;
         if(command.trim() === "clear"){
             term.clear();
-            term.write("Welcome to Remote terminal...\r\n");
+            term.write("Welcome to Remote terminal...\r\n> ");
             return;
         }
         if (!socket.id) {
-            term.write("Not connected with UTM\r\n");
+            term.write("Not connected with UTM\r\n> ");
             return;
         }
         socket.emit("execute-command", command.trim());
