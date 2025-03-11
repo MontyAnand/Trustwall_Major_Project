@@ -54,7 +54,6 @@ const LinuxTerminal = () => {
         socket.on("command-execution-result", (data) => {
             if (term) {
                 term.write(data);
-                term.write("\r\n");
             }
         });
 
