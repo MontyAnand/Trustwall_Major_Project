@@ -31,6 +31,8 @@ Command Execution Request => |1 byte (flag) |1 byte (Client ID) |1 byte (length 
 
 comand Execution Response => |1 byte (flag)|1 byte (Client ID)| Response | => flag = 16
 
+Shell Script Execution Request => |1 byte (flag) | 1 byte (Client ID) | 1 byte (length of the script filename) | Script filename |  
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev
