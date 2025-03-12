@@ -1,4 +1,3 @@
-// const process = require('node:process');
 const { runCommand } = require('./runCommand');
 
 // Starting firewall

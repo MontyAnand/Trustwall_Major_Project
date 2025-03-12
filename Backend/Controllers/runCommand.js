@@ -1,4 +1,3 @@
-// const process = require('node:process');
 
 module.exports.runCommand = (command, res) => {
     exec(command, (error, stdout, stderr) => {
