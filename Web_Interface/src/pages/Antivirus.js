@@ -49,23 +49,12 @@ function Antivirus() {
       alert("Please select a file to scan!");
       return;
     }
-
-    console.log(socket.id);
-
     if (!socket.id) {
       setScanResult("Unable to scan: Not connect to Server");
       return;
     }
     setIsScanning(true);
     setScanResult("");
-
-    // Simulate scan process (3 seconds delay)
-    // setTimeout(() => {
-    //   setIsScanning(false);
-    //   // Simulate a random scan result
-    //   const isSafe = Math.random() > 0.3; // 70% chance the file is safe
-    //   setScanResult(isSafe ? "✅ No threats found" : "❌ Threat detected");
-    // }, 3000);
 
 
     // Uploading file to backend Server

@@ -1,0 +1,39 @@
+.cpu_container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #0A192F;
+    color:rgb(255, 255, 255);
+}
+.cpu_internal_container{
+    display:grid;
+    grid-template-columns: 1fr 1fr ;
+    grid-gap: 2.5rem;
+    margin-top: 30px;
+}
+.cpu_name{
+    width: 100%;
+    text-align: center;
+    text-emphasis-color: red;
+}
+.cpu_box{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width:500px;
+    background-color: #EAEAEA;
+    margin-bottom: 50px;
+    color:black;
+    border-radius: 20px;
+}
+.cpu_chart{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 500px;
+}
+h1{
+    color: rgb(173, 166, 166);
+}

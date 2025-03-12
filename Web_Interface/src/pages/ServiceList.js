@@ -1,89 +1,113 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ServiceList.css";
 import { useSocket } from "../Contexts/socketContex";
 
-
-
 const ServiceTable = () => {
-    const [services, setServices] = useState([
-        { service: "cron.service", isActive: 1, status: "running" },
-        { service: "apache2.service", isActive: 0, status: "stopped" }
-      ]);
+  const [services, setServices] = useState([]);
 
-    const {socket} = useSocket();
-    
-    if(socket){
-        socket.emit('service-list-request');
+  const { socket } = useSocket();
+
+  // Ensure service-list-request is called whenever the component is mounted/reloaded
+  useEffect(() => {
+    if (socket) {
+      socket.emit("service-list-request");
     }
+  }, [socket]); // Runs only when `socket` is available or changes
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("service-list", (data) => {
+      setServices(data);
+    });
+
+    return () => {
+      socket.off("service-list");
+    };
+  }, [socket]);
+
+  // Button handlers
+  const handleStart = (service) => {
+    socket?.emit("update-service-status", { service, operation: 0 });
     
-    useEffect(()=>{
-        if (!socket) return;
-        socket.on('service-list',(data)=>{
-            setServices(data);
-        });
-
-        return ()=>{
-            socket.off('service-list');
-        }
-    },[socket]);
-
-    // start/restart button
-    const handleStartRestart = (index) => {
-      setServices((prevServices) =>
-        prevServices.map((service, i) =>
-          i === index ? { ...service, isActive: 1, status: "running" } : service
-        )
-      );
-    };
-
-    // enable/diable button
-    const handleEnableDisable = (index) => {
-      setServices((prevServices) =>
-        prevServices.map((service, i) =>
-          i === index ? { ...service, isActive: service.isActive ? 0 : 1 } : service
-        )
-      );
-    };
-
-    return (
-      <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Active</th>
-              <th>Status</th>
-              <th>Start/Restart</th>
-              <th>Enable/Disable</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.map((item, index) => (
-              <tr key={index}>
-                <td>{item.service}</td>
-                <td>
-                  <span className={`status-badge ${item.isActive === 1 ? "status-active" : "status-inactive"}`}>
-                    {item.isActive === 1 ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td>{item.status}</td>
-                <td>
-                  <button className="action-btn start-btn" onClick={() => handleStartRestart(index)}>
-                    {item.status === "running" ? "Restart" : "Start"}
-                  </button>
-                </td>
-                <td>
-                  <button className="action-btn enable-btn" onClick={() => handleEnableDisable(index)}>
-                    {item.isActive ? "Disable" : "Enable"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
   };
+
+  const handleStop = (service) => {
+    socket?.emit("update-service-status", { service, operation: 1 });
+    socket?.emit("service-list-request");
+  };
+
+  const handleRestart = (service) => {
+    socket?.emit("update-service-status", { service, operation: 2 });
+    socket?.emit("service-list-request");
+  };
+
+  const handleEnable = (service) => {
+    socket?.emit("update-service-status", { service, operation: 3 });
+    socket?.emit("service-list-request");
+  };
+
+  const handleDisable = (service) => {
+    socket?.emit("update-service-status", { service, operation: 4 });
+    socket?.emit("service-list-request");
+  };
+
+  return (
+    <div className="table-container">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Active</th>
+            <th>Status</th>
+            <th>Start</th>
+            <th>Stop</th>
+            <th>Restart</th>
+            <th>Enable</th>
+            <th>Disable</th>
+          </tr>
+        </thead>
+        <tbody>
+          {services.map((item, index) => (
+            <tr key={index}>
+              <td>{item.service}</td>
+              <td>
+                <span className={`status-badge ${item.isActive ? "status-active" : "status-inactive"}`}>
+                  {item.isActive ? "Active" : "Inactive"}
+                </span>
+              </td>
+              <td>{item.status}</td>
+              <td>
+                <button className="action-btn start-btn" onClick={() => handleStart(item.service)}>
+                  Start
+                </button>
+              </td>
+              <td>
+                <button className="action-btn stop-btn" onClick={() => handleStop(item.service)}>
+                  Stop
+                </button>
+              </td>
+              <td>
+                <button className="action-btn restart-btn" onClick={() => handleRestart(item.service)}>
+                  Restart
+                </button>
+              </td>
+              <td>
+                <button className="action-btn enable-btn" onClick={() => handleEnable(item.service)}>
+                  Enable
+                </button>
+              </td>
+              <td>
+                <button className="action-btn disable-btn" onClick={() => handleDisable(item.service)}>
+                  Disable
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 export default ServiceTable;

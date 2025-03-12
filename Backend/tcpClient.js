@@ -1,6 +1,6 @@
 const net = require('net');
 const EventEmitter = require('events');
-const { socketFileMap, socketUserMap} = require('./utility/maps');
+const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const path = require('path');
 const fs = require('fs');
@@ -57,6 +57,9 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.handleCPUData(data);
                     break;
                 }
+                case 16: {
+                    this.handleCommandExecutionResult(data);
+                }
                 default: break;
             }
         });
@@ -82,7 +85,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
-    authenticateUser(data){
+    authenticateUser(data) {
         const flag = 0x08;
         const userIdBuffer = Buffer.from(data.userId, 'utf-8');
         const passwordBuffer = Buffer.from(data.password, 'utf-8');
@@ -104,10 +107,36 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
-    serviceListRequest (){
+    serviceListRequest() {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(10);
         this.client.write(buffer);
+    }
+
+    serviceManagementRquest(data) {
+        const jsonString = JSON.stringify(data);
+        const jsonBuffer = Buffer.from(jsonString, 'utf-8');
+        const buffer = Buffer.concat([Buffer.from([14]), jsonBuffer]);
+        this.client.write(buffer);
+    }
+
+    executeCommand(data, socketID) {
+        const index = ClientIDMap.indexOf(socketID);
+        const length = data.length;
+        // console.log(length);
+        const commandBuffer = Buffer.from(data, 'utf-8');
+        const indexBuffer = Buffer.from([index & 0xFF]); 
+        const lengthBuffer = Buffer.from([length & 0xFF]);
+        const buffer = Buffer.concat([Buffer.from([15]), indexBuffer,lengthBuffer, commandBuffer]);
+        // console.log(buffer.toString());
+        this.client.write(buffer);
+    }
+
+    handleCommandExecutionResult(data) {
+        const index = data.readUInt8(1);
+        const socketID = ClientIDMap[index];
+        const result = data.slice(2,data.length).toString();
+        this.io.to(socketID).emit('command-execution-result',result);
     }
 
     handleFilescanResult(data) {
@@ -182,8 +211,8 @@ module.exports.client = class TcpClient extends EventEmitter {
             const percentageUsage = ((jsonData.total - jsonData.free) / jsonData.total) * 100;
             this.io.emit('ram-info', percentageUsage);
         } catch (error) {
-            console.log(`Error in RAM data`);
-            console.error('Error parsing JSON:', error);
+            // console.log(`Error in RAM data`);
+            // console.error('Error parsing JSON:', error);
         }
     }
 
@@ -194,8 +223,8 @@ module.exports.client = class TcpClient extends EventEmitter {
             const jsonData = JSON.parse(jsonString);
             this.io.emit('disk-info', jsonData);
         } catch (error) {
-            console.log(`Error in Disk data`);
-            console.error('Error parsing JSON:', error);
+            // console.log(`Error in Disk data`);
+            // console.error('Error parsing JSON:', error);
         }
     }
 
@@ -204,11 +233,11 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             // Parse JSON string into an object
             const jsonData = JSON.parse(jsonString);
-            console.log('Received JSON:', jsonData);
-            this.io.emit('network-traffic',jsonData);
+            // console.log('Received JSON:', jsonData);
+            this.io.emit('network-traffic', jsonData);
         } catch (error) {
-            console.log(`Error in Network data`);
-            console.error('Error parsing JSON:', error);
+            // console.log(`Error in Network data`);
+            // console.error('Error parsing JSON:', error);
         }
     }
 
@@ -220,8 +249,8 @@ module.exports.client = class TcpClient extends EventEmitter {
             this.io.emit('connection-list', jsonData);
             // console.log('Received JSON:', jsonData);
         } catch (error) {
-            console.log(`Error in Connection list data`);
-            console.error('Error parsing JSON:', error);
+            // console.log(`Error in Connection list data`);
+            // console.error('Error parsing JSON:', error);
         }
     }
 
@@ -230,38 +259,38 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             const jsonData = JSON.parse(jsonString);
             const socketId = socketUserMap.get(jsonData.userId);
-            if(! socketId){
+            if (!socketId) {
                 return;
             }
-            this.io.to(socketId).emit('auth-result',jsonData);
+            this.io.to(socketId).emit('auth-result', jsonData);
             socketUserMap.delete(jsonData.userId);
-        } catch (error){
-            console.log(`Auth error : ${error}`);
+        } catch (error) {
+            // console.log(`Auth error : ${error}`);
         }
     }
 
     handleServiceListData(data) {
-        if(serviceListQueue.isEmpty()){
+        if (serviceListQueue.isEmpty()) {
             return;
         }
         const socketID = serviceListQueue.dequeue();
         const jsonString = data.subarray(1).toString('utf-8');
         try {
             const jsonData = JSON.parse(jsonString);
-            this.io.to(socketID).emit('service-list',jsonData);
+            this.io.to(socketID).emit('service-list', jsonData);
 
-        } catch (error){
-            console.log(`Service List Error :  ${error}`);
+        } catch (error) {
+            // console.log(`Service List Error :  ${error}`);
         }
     }
 
-    handleCPUData(data){
+    handleCPUData(data) {
         const jsonString = data.subarray(1).toString('utf-8');
         try {
             const jsonData = JSON.parse(jsonString);
-            this.io.emit('cpu-data',jsonData);
-        } catch (error){
-            console.log(`Service List Error :  ${error}`);
+            this.io.emit('cpu-data', jsonData);
+        } catch (error) {
+            // console.log(`Service List Error :  ${error}`);
         }
     }
 

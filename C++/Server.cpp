@@ -164,6 +164,15 @@ void Server::processPacket(char *buffer, int fd)
         handleCPUStatusRequest(fd);
         break;
     }
+    case 14:
+    {
+        manageServiceRequest(buffer);
+        break;
+    }
+    case 15:
+    {
+        Executor::executeCommand(buffer,fd);
+    }
     default:
         break;
     }
@@ -273,6 +282,41 @@ void Server::handleCPUStatusRequest(int fd)
     byteArray.push_back(flag);
     byteArray.insert(byteArray.end(), cpuStatus.begin(), cpuStatus.end());
     send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
+}
+
+void Server::manageServiceRequest(std::string req){
+    try{
+        json obj = json::parse(req.substr(1));
+        std::string service = obj.at("service");
+        int operation = obj.at("operation");
+        switch (operation){
+            case 0: {
+                SystemdServiceManager::startService(service);
+                break;
+            }
+            case 1: {
+                SystemdServiceManager::stopService(service);
+                break;
+            }
+            case 2: {
+                SystemdServiceManager::restartService(service);
+                break;
+            }
+            case 3: {
+                SystemdServiceManager::enableService(service);
+                break;
+            }
+            case 4: {
+                SystemdServiceManager::disableService(service);
+                break;
+            }
+            default: break;
+        }
+
+    }catch (const std::exception& e) {
+        std::cerr << "Error during Service Management request handling " << e.what() << '\n';
+    }
     return;
 }
 
