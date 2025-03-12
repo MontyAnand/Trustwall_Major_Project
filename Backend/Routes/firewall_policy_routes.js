@@ -55,7 +55,7 @@ const {
     newPolicy,
     newPolicyFromFile,
     deletePolicy
-} = require('../Controllers/firewall_zone_controller');
+} = require('../Controllers/firewall_policy_controller');
 
 const router = Router();
 

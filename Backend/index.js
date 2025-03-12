@@ -17,6 +17,7 @@ const firewall_icmptype_routes = require('./Routes/firewall_icmptype_routes');
 const app = express();
 const port = 5000;
 const HOST = process.argv[2];
+const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
@@ -52,7 +53,6 @@ io.on('connection', (socket) => {
 });
 
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(cors({
     origin: '*',
 }));
@@ -103,7 +103,6 @@ app.use('/firewall', firewall_ipset_routes);
 app.use('/firewall', firewall_service_routes);
 app.use('/firewall', firewall_icmptype_routes);
 
-const server = http.createServer(app);
 
 server.listen(port, HOST, () => {
     console.log(`Server running at http://${HOST}:${port}`);
