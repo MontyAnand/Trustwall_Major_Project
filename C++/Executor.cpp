@@ -23,7 +23,7 @@ void Executor::executeCommand(std::string data, int fd)
             return;
 
         // Open the command process
-        FILE *pipe = popen((data.substr(3) + " 2>&1").c_str(), "r");
+        FILE *pipe = popen(("cd / && " + data.substr(3) + " 2>&1").c_str(), "r");
         if (!pipe)
         {
             std::cerr << "Error: popen failed!" << std::endl;
