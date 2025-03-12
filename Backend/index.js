@@ -7,12 +7,16 @@ const cors = require('cors');
 const { socketFileMap, socketUserMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
+const firewall_routes = require('./Routes/firewall_routes');
+const firewall_zone_routes = require('./Routes/firewall_zone_routes');
+const firewall_policy_routes = require('./Routes/firewall_policy_routes');
+const firewall_ipset_routes = require('./Routes/firewall_ipset_routes');
+const firewall_service_routes = require('./Routes/firewall_service_routes');
+const firewall_icmptype_routes = require('./Routes/firewall_icmptype_routes');
 
 const app = express();
 const port = 5000;
 const HOST = process.argv[2];
-
-const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
@@ -40,6 +44,8 @@ io.on('connection', (socket) => {
     });
 });
 
+app.use(express.json());
+app.use(bodyParser.json());
 app.use(cors({
     origin: '*',
 }));
@@ -81,6 +87,16 @@ app.post('/upload', upload.single('file'), getFilename, (req, res) => {
     }
     res.status(200).json({ message: 'File uploaded successfully', file: req.file.filename });
 });
+
+// firewall endpoints
+app.use('/firewall', firewall_routes);
+app.use('/firewall', firewall_zone_routes);
+app.use('/firewall', firewall_policy_routes);
+app.use('/firewall', firewall_ipset_routes);
+app.use('/firewall', firewall_service_routes);
+app.use('/firewall', firewall_icmptype_routes);
+
+const server = http.createServer(app);
 
 server.listen(port, HOST, () => {
     console.log(`Server running at http://${HOST}:${port}`);
