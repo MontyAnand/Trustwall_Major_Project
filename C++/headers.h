@@ -56,7 +56,8 @@
 #define DES_IP_SET "dip"
 #define MAX_EVENTS 20
 
-struct NetStats {
+struct NetStats
+{
     std::string iface;
     unsigned long rx_bytes, rx_packets, rx_errs, rx_drop, rx_fifo, rx_frame, rx_compressed, rx_multicast;
     unsigned long tx_bytes, tx_packets, tx_errs, tx_drop, tx_fifo, tx_colls, tx_carrier, tx_compressed;
@@ -160,11 +161,11 @@ public:
     static bool searchFile(std::string);
 };
 
-
-class Authentication {
-    public:
-        static std::string authenticateUser (std::string& , std::string&);
-        static std::string authResponseJSON (int, std::string, std::string &);
+class Authentication
+{
+public:
+    static std::string authenticateUser(std::string &, std::string &);
+    static std::string authResponseJSON(int, std::string, std::string &);
 };
 
 class HealthMonitor
@@ -180,26 +181,30 @@ public:
     static std::string diskInfoJSON(std::vector<struct disk_info> &);
     static std::string networkTrafficJSON(std::vector<struct interface_info> &);
     static std::string networkListJSON(std::vector<connection_info> &networkList);
-    static bool validService (std::string &);
+    static bool validService(std::string &);
     static std::string getServicesJSON();
     static std::string getCPUStatusJSON();
     static json parseMpstatOutput(const std::string &);
-    static std::map <std::string, std::vector<unsigned long>> getNetworkStats();
+    static std::map<std::string, std::vector<unsigned long>> getNetworkStats();
 };
 
-class SystemdServiceManager {
-    public:
-        static bool sendMessage(const std::string&, const std::vector<std::string>&);
-        static bool startService(const std::string&);
-        static bool stopService( const std::string&);
-        static bool restartService(const std::string&);
-        static bool enableService(const std::string&);
-        static bool disableService(const std::string&);
+class SystemdServiceManager
+{
+public:
+    static bool sendMessage(const std::string &, const std::vector<std::string> &);
+    static bool startService(const std::string &);
+    static bool stopService(const std::string &);
+    static bool restartService(const std::string &);
+    static bool enableService(const std::string &);
+    static bool disableService(const std::string &);
 };
 
-class Executor{
-    public:
-        static void executeCommand(std::string ,int );
+class Executor
+{
+public:
+    static const int limit = 2048;
+    static void executeCommand(std::string, int);
+    static void executeScriptFile(std::string, int);
 };
 
 class Server
@@ -238,13 +243,13 @@ private:
 
     void startNodeServer(std::string);
     void processPacket(char *, int);
-    void watchNetworkTraffic ();
+    void watchNetworkTraffic();
 
     void handleFilescan();
     void handleVPNRequest();
     void continuousMonitoring();
-    void handleServiceListRequest (int );
-    void handleCPUStatusRequest(int );
+    void handleServiceListRequest(int);
+    void handleCPUStatusRequest(int);
     void manageServiceRequest(std::string);
 
 public:
