@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./login.css";
+import "./Suricata.css";
 
 function App() {
     const [interfaces, setInterfaces] = useState([
@@ -48,14 +48,14 @@ function App() {
   };
 
     return (
-        <div className="container">
+        <div className="suricata-container">
             <h1>Suricata Configuration</h1>
 
             {/* Add Interface Button */}
-            <button className="add-btn" onClick={addInterface}>+ Add Interface</button>
+            <button className="suricata-add-btn" onClick={addInterface}>+ Add Interface</button>
 
             {/* Interface Overview Table */}
-            <div className="table-container">
+            <div className="suricata-table-container">
                 <h2>Interface Settings Overview</h2>
                 <table>
                     <thead>
@@ -77,8 +77,8 @@ function App() {
                                 <td>{intf.blockingMode}</td>
                                 <td>{intf.description}</td>
                                 <td>
-                                    <button className="edit-btn">✏️</button>
-                                    <button className="delete-btn" onClick={() => deleteInterface(index)}>🗑️</button>
+                                    <button className="suricata-edit-btn">✏️</button>
+                                    <button className="suricata-delete-btn" onClick={() => deleteInterface(index)}>🗑️</button>
                                 </td>
                             </tr>
                         ))}
@@ -87,7 +87,7 @@ function App() {
             </div>
 
             {/* Logging & General Settings */}
-            <div className="settings-container">
+            <div className="suricata-settings-container">
                 <h2>General Settings</h2>
                 <label>
                     <input type="checkbox" name="enableSuricata" checked={settings.enableSuricata} onChange={handleChange} />
@@ -135,7 +135,7 @@ function App() {
             </div>
 
             {/* Save Button */}
-            <button className="save-btn" onClick={saveSettings}>Save Settings</button>
+            <button className="suricata-save-btn" onClick={saveSettings}>Save Settings</button>
         </div>
     );
 }

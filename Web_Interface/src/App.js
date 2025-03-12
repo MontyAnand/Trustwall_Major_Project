@@ -9,6 +9,7 @@ import ServiceTable from "./pages/ServiceList";
 import CPUInfo from "./components/CPU_info";
 import NetworkTrafficChart from "./pages/Network_Traffic"
 import CommandInterface from "./pages/Terminal"
+import Suricata from "./pages/Suricata"
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <div className="flex-1 p-4">
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/suricata" element={<Suricata />} />
             {<Route path="/services" element={<ServiceTable/>}/> }
             <Route path="/cpu-info" element={<CPUInfo/>}/>
             <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>

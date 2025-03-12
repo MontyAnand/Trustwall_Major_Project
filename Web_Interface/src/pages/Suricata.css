@@ -5,7 +5,7 @@ body {
     padding: 0;
   }
   
-  .container {
+  .suricata-container {
     width: 80%;
     margin: auto;
     background: white;
@@ -14,11 +14,11 @@ body {
     border-radius: 5px;
   }
   
-  h1{
+  .suricata-container h1{
     text-align: center;
     color: black;
   } 
-  h2 {
+  .suricata-container h2 {
     
     text-align: center;
     color: whitesmoke;
@@ -26,7 +26,7 @@ body {
   }
 
   
-  button {
+  .suricata-container button {
     display: block;
     width: 100%;
     padding: 10px;
@@ -37,31 +37,31 @@ body {
     font-size: 16px;
   }
   
-  .add-btn {
+  .suricata-add-btn {
     background-color: #28a745;
     color: white;
   }
   
-  .delete-btn {
+  .suricata-delete-btn {
     background-color: #dc3545;
     color: white;
   }
   
-  .edit-btn {
+  .suricata-edit-btn {
     background-color: #ffc107;
     color: black;
   }
   
-  .save-btn {
+  .suricata-save-btn {
     background-color: #007bff;
     color: white;
   }
   
-  button:hover {
+  .suricata-container button:hover {
     opacity: 0.8;
   }
   
-  .settings-container {
+  .suricata-settings-container {
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -69,12 +69,12 @@ body {
     margin-top: 20px;
   }
   
-  label {
+  .suricata-conatiner label {
     display: block;
     margin: 10px 0;
   }
   
-  input[type="text"], select {
+  .suricata-container input[type="text"], .suricata-container select {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
@@ -82,22 +82,22 @@ body {
     border-radius: 4px;
   }
   
-  .table-container {
+  .suricata-table-container {
     margin-top: 20px;
   }
   
-  table {
+  .suricata-table-container table {
     width: 100%;
     border-collapse: collapse;
   }
   
-  th, td {
+  .suricata-table-container th, .suricata-table-container td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: left;
   }
   
-  th {
+  .suricata-table-container th {
     background-color: #007bff;
     color: white;
   }
