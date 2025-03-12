@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const {
     getIPSets,
-    getIPSetInfo,
+    getIPSet,
     getIPSetTypes,
     loadDefaultSettingsIPSet,
     getPathIPSet,
@@ -23,7 +23,7 @@ const {
 const router = Router();
 
 router.post('/firewall_ipsets/get_ipsets', getIPSets);
-router.post('/firewall_ipsets/get_ipset_info', getIPSetInfo);
+router.post('/firewall_ipsets/get_ipset_info', getIPSet);
 router.post('/firewall_ipsets/get_ipsettypes', getIPSetTypes);
 router.post('/firewall_ipsets/load_default_settings_ipset', loadDefaultSettingsIPSet);
 router.post('/firewall_ipsets/get_path_ipset', getPathIPSet);
