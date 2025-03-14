@@ -1,4 +1,3 @@
-// const process = require('node:process')
 const { runCommand } = require('./runCommand')
 const { reloadFirewall } = require('./firewall_controller');
 
@@ -534,9 +533,10 @@ module.exports.listRichRules = (req, res) => {
 
 module.exports.queryRichRule = (req, res) => {
     const { zone, rule } = req.body;
-    const { family, source, destination, service, port, protocol, icmpblock, icmptype, masquerade, forwardport, log, nflog, audit, accept, reject, drop, mark } = rule;
+    const { family, priority, source, destination, service, port, protocol, icmpblock, icmptype, masquerade, forwardport, log, nflog, audit, accept, reject, drop, mark } = rule;
     let cmd = `sudo firewall-cmd --permanent --zone=${zone} --query-rich-rule='rule`;
     if(family) cmd += ` family="${family}"`;
+    if(priority) cmd += ` priority="${priority}"`;
     if(source) {
         cmd += ` source address="${source.address}"`
         if(source.invert) cmd += ` invert="True"`;
@@ -602,9 +602,10 @@ module.exports.queryRichRule = (req, res) => {
 
 module.exports.addRichRule = (req, res) => {
     const { zone, rule } = req.body;
-    const { family, source, destination, service, port, protocol, icmpblock, icmptype, masquerade, forwardport, log, nflog, audit, accept, reject, drop, mark } = rule;
+    const { family, priority, source, destination, service, port, protocol, icmpblock, icmptype, masquerade, forwardport, log, nflog, audit, accept, reject, drop, mark } = rule;
     let cmd = `sudo firewall-cmd --permanent --zone=${zone} --add-rich-rule='rule`;
     if(family) cmd += ` family="${family}"`;
+    if(priority) cmd += ` priority="${priority}"`;
     if(source) {
         cmd += ` source address="${source.address}"`
         if(source.invert) cmd += ` invert="True"`;
@@ -670,9 +671,10 @@ module.exports.addRichRule = (req, res) => {
 
 module.exports.removeRichRule = (req, res) => {
     const { zone, rule } = req.body;
-    const { family, source, destination, service, port, protocol, icmpblock, icmptype, masquerade, forwardport, log, nflog, audit, accept, reject, drop, mark } = rule;
+    const { family, priority, source, destination, service, port, protocol, icmpblock, icmptype, masquerade, forwardport, log, nflog, audit, accept, reject, drop, mark } = rule;
     let cmd = `sudo firewall-cmd --permanent --zone=${zone} --remove-rich-rule='rule`;
     if(family) cmd += ` family="${family}"`;
+    if(priority) cmd += ` priority="${priority}"`;
     if(source) {
         cmd += ` source address="${source.address}"`
         if(source.invert) cmd += ` invert="True"`;

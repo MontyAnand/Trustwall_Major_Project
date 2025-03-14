@@ -79,7 +79,7 @@ const LinuxTerminal = () => {
         socket.emit("execute-command", command.trim());
     };
 
-    return <div ref={terminalRef} style={{ width: "100%", height: "500px", backgroundColor: "black" }} />;
+    return <div ref={terminalRef} style={{ width: "100%", height: "100vh", backgroundColor: "black" }} />;
 };
 
 export default LinuxTerminal;

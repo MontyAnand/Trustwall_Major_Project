@@ -1,4 +1,3 @@
-// const process = require('node:process')
 const { runCommand } = require('./runCommand')
 const { reloadFirewall } = require('./firewall_controller');
 
