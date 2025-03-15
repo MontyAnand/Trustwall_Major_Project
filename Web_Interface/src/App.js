@@ -10,6 +10,7 @@ import CPUInfo from "./components/CPU_info";
 import NetworkTrafficChart from "./pages/Network_Traffic"
 import CommandInterface from "./pages/Terminal"
 import Suricata from "./pages/Suricata"
+import DHCPConfiguration from "./pages/dhcp_configuration";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/cpu-info" element={<CPUInfo/>}/>
             <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>
             <Route path="/terminal" element={<CommandInterface/>}/>
+            <Route path="/DHCP-Configuration" element={<DHCPConfiguration/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />

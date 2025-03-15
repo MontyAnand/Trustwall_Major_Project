@@ -26,17 +26,17 @@
     margin-bottom: 15px;
   }
   
-  input {
+  .login-page input {
     width: calc(100% - 20px);
     padding: 13px;
     border:none;
     font-size: 16px;
   }
   
-  input:focus{
+  .login-page input:focus{
     outline:none;
   }
-  button {
+  .login-page button {
     margin-top: 10px;
     padding: 13px 36px;
     border: none;
