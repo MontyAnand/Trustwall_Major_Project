@@ -141,11 +141,11 @@ input[type="number"]::-webkit-inner-spin-button {
     text-align: center;
     font-size: 18px;
     font-weight: bold;
-}
-.dhcp_add_btn{
-    display: flex;
-    flex-direction: column;
-    width:100%;
+} 
+ .dhcp_add_btn{
+    /* display: flex; */
+    /* flex-direction: column; */
+    width:50%;
 }
 .dhcp_add_btn label{
     padding-bottom: 20px;
@@ -159,8 +159,8 @@ input[type="number"]::-webkit-inner-spin-button {
     font-size:15px;
     background-image: linear-gradient(to top right,#143D60,rgb(31, 150, 150));
     width: 50%;
-    display: block;
-    margin:30px auto;
+    /* display: block; */
+    /* margin:30px auto; */
     transition: transform 0.1s ease-in-out;
     box-shadow: 3px 5px 10px rgb(159, 157, 157);
 }

@@ -18,50 +18,56 @@ function DHCPConfiguration() {
             !prevContent[0],
             <div className="dhcp_internal_container">
               <form className="dhcp_general_container">
-                <div className="dhcp_text">
+
+                r<div className="dhcp_text">
                   <label>DHCP Backend:</label>
-                  <input type="text" placeholder="ISC DHCP"></input>
+                  <input type="text" placeholder="DHCP vendor" value="ISC DHCP" readOnly></input>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label>Enable</label>
-                    <input type="checkbox"></input>
+                    <label for="interface">Enable</label>
+                    <input type="checkbox" name="interface"></input>
                   </div>
                   <p>Enable DHCP server on LAN interface</p>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">BOOTP</label>
-                    <input type="checkbox"></input>
+                    <label for="bootp">BOOTP</label>
+                    <input type="checkbox" name="bootp"></input>
                   </div>
                   <p>Ignore BOOTP queries</p>
                 </div>
+
                 <div className="dhcp_select">
                   <label>Deny Unknown Clients:</label>
-                  <select name="Interfaces">
-                    <option>Allow All Clients</option>
-                    <option value="option1">option1</option>
-                    <option value="option2">option2</option>
-                    <option value="option2">option3</option>
+                  <select name="client_accept">
+                    <option value="0">Allow all clients</option>
+                    <option value="1">Allow all clients from any interface</option>
+                    <option value="2">Allow clients from only this interface</option>
                   </select>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">Ignore Denied Clients</label>
-                    <input type="checkbox"></input>
+                    <label for="deny_client">Ignore Denied Clients</label>
+                    <input type="checkbox" name="deny_client"></input>
                   </div>
                   <p>Ignore denied clients rather than reject</p>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">Ignored Client Identifiers</label>
-                    <input type="checkbox"></input>
+                    <label for="ign_client_id">Ignored Client Identifiers</label>
+                    <input type="checkbox" name="ign_client_id"></input>
                   </div>
                   <p>
                     Do not record a unique identifier(UID) in client <br></br>
                     lease data if present in client DHCP request
                   </p>
                 </div>
+
               </form>
             </div>,
           ])
@@ -77,28 +83,49 @@ function DHCPConfiguration() {
             !prevContent[0],
             <div className="dhcp_internal_container">
               <div className="dhcp_primary_container">
+
                 <div className="dhcp_text">
-                  <label>Subnet: </label>
-                  <input type="text" placeholder="192.168.1.0/24"></input>
+                  <label for="subnet">Subnet: </label>
+                  <input type="text" name="subnet" value="192.168.1.0" readOnly></input>
                 </div>
+
                 <div className="dhcp_text">
-                  <label>Subnet Range: </label>
+                  <label for="mask" >Subnet Mask: </label>
                   <input
-                    type="text"
-                    placeholder="192.168.1.1 - 192.168.1.254"
+                    type="number"
+                    placeholder=""
+                    name="mask"
+                    value="24"
+                    max="32"
+                    min="1"
+                    readOnly
                   ></input>
                 </div>
+
                 <div className="dhcp_text">
-                  <label className="dhcp_special_text">
-                    Address pool range{" "}
-                  </label>
-                  <label>From</label>
-                  <input type="text" placeholder="192.168.1.100"></input>
-                  <label>To</label>
-                  <input type="text" placeholder="192.168.1.200"></input>
+                  <label for="subnet_range">Subnet Range: </label>
+                  <input
+                    type="text"
+                    name="subnet_range"
+                    value="192.168.1.1 - 192.168.1.254"
+                    readOnly
+                  ></input>
                 </div>
+
+                <div className="dhcp_text">
+                  <label className="dhcp_special_text">Address pool range:</label>
+                  <br></br><br></br>
+                  <label for="startIP">From</label>
+                  <br></br>
+                  <input type="text" name="startIP" value="192.168.1.100"></input>
+                  <br></br><br></br>
+                  <label for="endIP">To</label>
+                  <br></br>
+                  <input type="text" name="endIP" value="192.168.1.200"></input>
+                </div>
+
                 <div className="dhcp_add_btn">
-                  {/* <label>Additional Pools</label> */}
+                  <label>Additional Pools</label>
                   <button
                     onClick={() => {
                       // Write a custom function to add more address pool if someone click this button
@@ -107,6 +134,7 @@ function DHCPConfiguration() {
                     <span>&#43;</span> Add Address Pool
                   </button>
                 </div>
+
               </div>
             </div>,
           ])
@@ -122,11 +150,13 @@ function DHCPConfiguration() {
             !prevContent[0],
             <div className="dhcp_internal_container">
               <div className="dhcp_server_container">
+
                 <div className="dhcp_text">
                   <label>WINS Servers</label>
                   <input type="text" placeholder="WINS Server 1"></input>
                   <input type="text" placeholder="WINS Server 2"></input>
                 </div>
+
                 <div className="dhcp_text">
                   <label>DNS Servers</label>
                   <input type="text" placeholder="192.168.1.1"></input>
@@ -139,7 +169,7 @@ function DHCPConfiguration() {
           ])
         }
       >
-        Server Settings
+        Server Options
       </h2>
       {content3[0] ? <>{content3[1]}</> : <></>}
 
@@ -150,28 +180,30 @@ function DHCPConfiguration() {
             !prevContent[0],
             <div className="dhcp_internal_container">
               <div className="dhcp_omapi_container">
+
                 <div className="dhcp_text">
                   <label>OMAPI Port</label>
                   <input type="text" placeholder="OMAPI Port"></input>
                 </div>
+
                 <div className="dhcp_text">
                   <label>OMAPI Key</label>
                   <input type="text" placeholder="OMAPI Key"></input>
+                  <div className="dhcp_checkbox">
+                    <label for="algo_key">Generate New Key</label>
+                    <input type="checkbox" name="algo_key"></input>
+                  </div>
+                  <p>Generate a new key based one selected algorithm</p>
                 </div>
+
                 <div className="dhcp_select">
-                  <label>Key Algorithm</label>
+                  <label for="Algorithm_names">Key Algorithm</label>
                   <select name="Algorithm_names">
-                    <option>Select Algorithm</option>
                     <option value="algo1">Algorithm 1</option>
                     <option value="algo2">Algorithm 2</option>
                     <option value="algo3">Algorithm 3</option>
                   </select>
                 </div>
-                <div className="dhcp_checkbox">
-                  <label>Generate New Key</label>
-                  <input type="checkbox"></input>
-                </div>
-                <p>Generate a new key based one selected algorithm</p>
               </div>
             </div>,
           ])
@@ -188,106 +220,124 @@ function DHCPConfiguration() {
             !prevContent[0],
             <div className="dhcp_internal_container">
               <div className="dhcp_other_container">
+
                 <div className="dhcp_text">
-                  <label>Gateway:</label>
-                  <input type="text" placeholder="192.168.1.1"></input>
+                  <label for="gateway">Gateway:</label>
+                  <input type="text" name="gateway" value="192.168.1.1" readOnly></input>
                 </div>
+
                 <div className="dhcp_text">
-                  <label>Domain Name:</label>
-                  <input type="text" placeholder="home arpa"></input>
+                  <label for="domainName">Domain Name:</label>
+                  <input type="text" name="domainName" placeholder="home arpa"></input>
                 </div>
+
                 <div className="dhcp_text">
-                  <label>Domain Search List:</label>
-                  <input type="text" placeholder="example.com"></input>
+                  <label for="domain_search">Domain Search List:</label>
+                  <input type="text" name="domain_search" placeholder="example.com"></input>
                 </div>
+
                 <div className="dhcp_number">
-                  <label>Default Lease Time:</label>
-                  <input type="number" placeholder="7200"></input>
+                  <label for="lease_time">Default Lease Time:</label>
+                  <input type="number" name="lease_time" value="7200"></input>
                 </div>
+
                 <div className="dhcp_number">
-                  <label>Maximum Lease Time:</label>
-                  <input type="number" placeholder="86400"></input>
+                  <label for="max_lease_time">Maximum Lease Time:</label>
+                  <input type="number" name="max_lease_time" value="86400"></input>
                 </div>
+
                 <div className="dhcp_text">
-                  <label>Failover peer IP:</label>
-                  <input type="text"></input>
+                  <label for="failover_ip">Failover peer IP:</label>
+                  <input type="text" name="failover_ip" placeholder="192.168.x.x"></input>
                 </div>
+                
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">Static ARP:</label>
-                    <input type="checkbox" for=""></input>
+                    <label for="enable_static_arp">Static ARP:</label>
+                    <input type="checkbox" name="enable_static_arp"></input>
                   </div>
                   <p>Enable Static ARP enteries</p>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">Time Format Change:</label>
-                    <input type="checkbox" for=""></input>
+                    <label for="time_format">Time Format Change:</label>
+                    <input type="checkbox" name="time_format"></input>
                   </div>
                   <p>Change DHCP display lease time from UTC to local time</p>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">Statistics graphs:</label>
-                    <input type="checkbox" for=""></input>
+                    <label for="enable_stats">Statistics graphs:</label>
+                    <input type="checkbox" name="enable_stats"></input>
                   </div>
                   <p>Enable monitoring graphs for DHCP lease statistics</p>
                 </div>
+
                 <div className="dhcp_checkbox">
                   <div>
-                    <label name="">Ping check:</label>
-                    <input type="checkbox" for=""></input>
+                    <label for="ping_check">Ping check:</label>
+                    <input type="checkbox" name="ping_check"></input>
                   </div>
                   <p>Disable ping check</p>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>Dynamic DNS:</label>
+                  <label for="ddns">Dynamic DNS:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>MAC Address Control:</label>
+                  <label for="mac_addr_cntl" >MAC Address Control:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>NTP:</label>
+                  <label for="ntp">NTP:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>TFTP:</label>
+                  <label for="tftp">TFTP:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>LDAP:</label>
+                  <label for="ldap">LDAP:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>Network Booting:</label>
+                  <label for="net_boot">Network Booting:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
                 <div className="dhcp_btn">
-                  <label>Custom DHCP Options:</label>
+                  <label for="cus_dhcp">Custom DHCP Options:</label>
                   <button>
                     <span>&#9965;</span> Display Advanced
                   </button>
                 </div>
+
               </div>
             </div>,
           ])
         }
       >
-        Other DHCP Settings
+        Other DHCP Options
       </h2>
       {content5[0] ? <>{content5[1]}</> : <></>}
       <div className="dhcp_btn_container">
