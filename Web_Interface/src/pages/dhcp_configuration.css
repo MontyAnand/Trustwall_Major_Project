@@ -7,6 +7,26 @@ margin: 0;
     background-color: #2C3930;
     color: white;
 }
+.dhcp_container label{
+    font-weight: bold;
+}
+.dhcp_container input[type="text"], .dhcp_container input[type="number"], .dhcp_container select{
+    border: none;
+    box-shadow: 1px 2px 6px gray;
+}
+.dhcp_container h2{
+    cursor:pointer;
+}
+.dhcp_container input[type="checkbox"] {
+    accent-color: #3D8D7A; 
+}
+.dhcp_container p{
+    color:#373A40;
+}
+.dhcp_checkbox input{
+    margin-right: 10px;
+} 
+
 /* DHCP general setting */
 .dhcp_internal_container{
     display: flex;
@@ -28,7 +48,7 @@ margin: 0;
     font-size: 16px;
     margin: 12px 0;
     border-radius: 10px;
-    border:1px solid black;
+    /* border:1px solid black; */
 }
 .dhcp_internal_container input[type="text"]:focus{
     outline: none;
@@ -58,7 +78,7 @@ margin: 0;
     display: flex;
     flex-direction: row;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 26px;
 }
 .dhcp_checkbox label{
     padding-right: 30px;
@@ -68,9 +88,11 @@ margin: 0;
 }
 .dhcp_select{
     width: 100%;
+    margin-bottom: 25px;
 }
 .dhcp_text{
     width:100%;
+    margin-bottom: 25px;
 }
 .dhcp_general_container .dhcp_checkbox p{
     margin-left: -20px;
@@ -129,10 +151,14 @@ input[type="number"]::-webkit-inner-spin-button {
     padding: 20px 23px;
     border-radius: 20px;
     border:none;
-    background-color:rgb(31, 150, 150);
+    color: aliceblue;
     font-size:15px;
-    /* box-shadow: 4px 7px 10px grey; */
-    transition: transform 0.3s ease-in-out;
+    background-image: linear-gradient(to top right,#143D60,rgb(31, 150, 150));
+    width: 50%;
+    display: block;
+    margin:30px auto;
+    transition: transform 0.1s ease-in-out;
+    box-shadow: 3px 5px 10px rgb(159, 157, 157);
 }
 
 .dhcp_add_btn button:hover{
@@ -186,7 +212,7 @@ input[type="number"]::-webkit-inner-spin-button {
     font-size: 16px;
     margin: 12px 0;
     border-radius: 10px;
-    border:1px solid black;
+    /* border:1px solid black; */
 }
 .dhcp_other_container input[type="number"]:focus
 {
@@ -217,7 +243,7 @@ input[type="number"]::-webkit-inner-spin-button {
     border:none;
     font-size: 15px;
     cursor: pointer;
-    /* background-image: liner-gredirgb(33, 216, 216); */
+    box-shadow: 3px 4px 10px grey;
     background-image: linear-gradient(to right bottom,rgb(33, 216, 216),rgb(80, 80, 176));
     font-weight: bold;
 }
@@ -236,9 +262,11 @@ input[type="number"]::-webkit-inner-spin-button {
     font-size: 17px;
     margin: 28px 30px;
     color:white;
-    box-shadow: 3px 5px 7px #ddd;
+    box-shadow: 7px 8px #1a3f23 ;
     cursor: pointer;
+    transition: transform 0.1s ease-in-out;
 }
 .dhcp_save_btn:hover{
     background-color: #1c6d2f;
+    transform: scale(0.9);
 }
