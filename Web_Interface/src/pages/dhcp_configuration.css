@@ -41,6 +41,7 @@ margin: 0;
     padding-left: 10px;
     appearance: none;
     border-radius: 10px;
+    color: grey;
 }
 .dhcp_internal_container select:focus{
     outline: none;
@@ -57,7 +58,13 @@ margin: 0;
     display: flex;
     flex-direction: row;
     width: 100%;
-    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.dhcp_checkbox label{
+    padding-right: 30px;
+}
+.dhcp_checkbox p{
+    padding-left: 30px;
 }
 .dhcp_select{
     width: 100%;
@@ -65,16 +72,24 @@ margin: 0;
 .dhcp_text{
     width:100%;
 }
-
-/* Lease Setting */
-.dhcp_lease_container{
+.dhcp_general_container .dhcp_checkbox p{
+    margin-left: -20px;
+    text-align:left;
+    /* white-space: pre-line; */
+}
+.dhcp_general_container .dhcp_checkbox{
+    justify-content: space-between;
+    align-items: center;
+}
+/* Primary Address pool*/
+.dhcp_primary_container{
     display:flex;
     flex-direction: column;
     width: 50%;
     align-items: center;
     justify-content: center;
 }
-.dhcp_lease_container input[type="number"]
+.dhcp_primary_container input[type="number"]
 {
     width: 94%;
     padding: 12px 23px;
@@ -84,7 +99,7 @@ margin: 0;
     border-radius: 10px;
     border:1px solid black;
 }
-.dhcp_lease_container input[type="number"]:focus
+.dhcp_primary_container input[type="number"]:focus
 {
     outline: none;
 }
@@ -95,9 +110,39 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     display: none; 
 }
+.dhcp_special_text{
+    display: block;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+.dhcp_add_btn{
+    display: flex;
+    flex-direction: column;
+    width:100%;
+}
+.dhcp_add_btn label{
+    padding-bottom: 20px;
+    padding-top:20px;
+}
+.dhcp_add_btn button{
+    padding: 20px 23px;
+    border-radius: 20px;
+    border:none;
+    background-color:rgb(31, 150, 150);
+    font-size:15px;
+    /* box-shadow: 4px 7px 10px grey; */
+    transition: transform 0.3s ease-in-out;
+}
 
-/* DNS and Gateway setting */
-.dhcp_DNS_container{
+.dhcp_add_btn button:hover{
+    transform: scale(1.03); 
+    cursor: pointer;
+    background-color:rgb(32, 130, 130);
+}
+
+/* Server setting */
+.dhcp_server_container{
     display:flex;
     flex-direction: column;
     width: 50%;
@@ -105,15 +150,77 @@ input[type="number"]::-webkit-inner-spin-button {
     justify-content: center;
 }
 
-/* Advanced Setting */
-.dhcp_advanced_container{
+/* OMAPI */
+.dhcp_omapi_container{
     display:flex;
     flex-direction: column;
     width: 50%;
     align-items: center;
     justify-content: center;
 }
-
+.dhcp_omapi_container .dhcp_checkbox{
+    padding-top: 30px;
+    align-items: center;
+    justify-content: center;
+}
+.dhcp_omapi_container .dhcp_checkbox label{
+    font-weight: bold;
+    padding-right: 12px;
+}
+.dhcp_omapi_container .dhcp_checkbox p{
+    display: block;
+}
+/* other DHCP Setting */
+.dhcp_other_container{
+    display:flex;
+    flex-direction: column;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
+}
+.dhcp_other_container input[type="number"]
+{
+    width: 94%;
+    padding: 12px 23px;
+    padding-left: 10px;
+    font-size: 16px;
+    margin: 12px 0;
+    border-radius: 10px;
+    border:1px solid black;
+}
+.dhcp_other_container input[type="number"]:focus
+{
+    outline: none;
+}
+.dhcp_number{
+    width: 100%;
+}
+.dhcp_other_container .dhcp_checkbox{
+    padding-top: 20px;
+    justify-content: space-between;
+}
+.dhcp_other_container .dhcp_checkbox p{
+    margin-left: -20px;
+}
+.dhcp_btn{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 50px;
+}
+.dhcp_btn button{
+    margin-left: 30px;
+    padding: 18px 21px;
+    border-radius: 10px;
+    border:none;
+    font-size: 15px;
+    cursor: pointer;
+    /* background-image: liner-gredirgb(33, 216, 216); */
+    background-image: linear-gradient(to right bottom,rgb(33, 216, 216),rgb(80, 80, 176));
+    font-weight: bold;
+}
 /* Button */
 .dhcp_btn_container{
     display:flex;
