@@ -26,7 +26,11 @@ margin: 0;
 .dhcp_checkbox input{
     margin-right: 10px;
 } 
-
+.dhcp_general_container,.dhcp_omapi_container,.dhcp_other_container,.dhcp_primary_container,.dhcp_server_container{
+    margin: 20px 0;
+    padding: 40px;
+    box-shadow: 3px 4px 10px gray;
+}
 /* DHCP general setting */
 .dhcp_internal_container{
     display: flex;
