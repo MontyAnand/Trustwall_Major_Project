@@ -89,10 +89,12 @@ function App() {
             {/* Logging & General Settings */}
             <div className="suricata-settings-container">
                 <h2>General Settings</h2>
+                <div className="">
                 <label>
                     <input type="checkbox" name="enableSuricata" checked={settings.enableSuricata} onChange={handleChange} />
-                    Enable Suricata
-                </label>
+                    <p>Enable Suricata</p>
+                    </label>
+                </div>
 
                 <label>Interface:</label>
                 <select name="interface" value={settings.interface} onChange={handleChange}>
@@ -107,7 +109,7 @@ function App() {
                 <h2>Logging Settings</h2>
                 <label>
                     <input type="checkbox" name="sendAlerts" checked={settings.sendAlerts} onChange={handleChange} />
-                    Send Alerts to System Log
+                    <p>Send Alerts to System Log</p>
                 </label>
 
                 <label>Log Facility:</label>
@@ -125,7 +127,7 @@ function App() {
 
                 <label>
                     <input type="checkbox" name="enableStats" checked={settings.enableStats} onChange={handleChange} />
-                    Enable Stats Collection
+                    <p>Enable Stats Collection</p>
                 </label>
 
                 <label>
