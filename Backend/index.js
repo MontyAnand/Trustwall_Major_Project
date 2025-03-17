@@ -104,6 +104,85 @@ app.use('/firewall', firewall_service_routes);
 app.use('/firewall', firewall_icmptype_routes);
 
 
+
+// This part is to manage DHCP configuration
+
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
+
+// Example in-memory storage for demonstration purposes
+let dhcpConfig = {
+    enabled: false,
+    interface: '',
+    subnet: '',
+    netmask:'',
+    rangeStart: '',
+    rangeEnd: '',
+    defaultLeaseTime: 0,
+    maxLeaseTime: 0,
+    dnsServer1: '',
+    dnsServer2: '',
+    defaultGateway: '',
+    // staticMappings: [],
+    ntpServer: '',
+    // winsServer: '', 
+    domainName: ''
+};
+
+// API endpoint to save DHCP configuration
+app.post('/dhcp/save', (req, res) => {
+    try {
+        dhcpConfig = req.body;
+        res.status(200).send({ message: 'DHCP configuration saved successfully' });
+    } catch (error) {
+        console.error('Error saving DHCP config:', error);
+        res.status(500).send({ message: 'Failed to save DHCP configuration' });
+    }
+});
+
+// API endpoint to apply DHCP configuration
+
+function generateDhcpConfig(config) {
+    return `
+
+# DHCP Server Configuration
+subnet ${config.subnet} netmask ${config.netmask} {
+range ${config.rangeStart} ${config.rangeEnd};
+option routers ${config.defaultGateway};
+option domain-name-servers ${config.dnsServer1} , ${config.dnsServer2};
+option domain-name ${config.domainName};
+option ntp-servers ${config.ntpServer};
+default-lease-time ${config.defaultLeaseTime};
+max-lease-time ${config.maxLeaseTime};
+}
+`;
+}
+
+app.post('/dhcp/apply', (req, res) => {
+    try {
+        // Logic to apply the configuration goes here
+        // For demonstration, just log the config
+        console.log('Applying DHCP configuration:', dhcpConfig);
+
+        const configContent = generateDhcpConfig(dhcpConfig);
+
+        // Save configuration file
+        const dhcp_conf_filePath = "/etc/dhcp/check.conf";
+        fs.appendFile(dhcp_conf_filePath, configContent, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error saving configuration');
+            }
+            // res.status(200).send('DHCP configuration updated successfully!');
+        });
+        res.status(200).send({ message: 'DHCP configuration applied successfully' });
+    } catch (error) {
+        console.error('Error applying DHCP config:', error);
+        res.status(500).send({ message: 'Failed to apply DHCP configuration' });
+    }
+});
+
+
 server.listen(port, HOST, () => {
     console.log(`Server running at http://${HOST}:${port}`);
 });
