@@ -80,7 +80,7 @@ function DHCPConfiguration() {
             <div className="dhcp_internal_container">
               <form className="dhcp_general_container">
 
-                r<div className="dhcp_text">
+                <div className="dhcp_text">
                   <label>DHCP Backend:</label>
                   <input type="text" placeholder="DHCP vendor" value="ISC DHCP" readOnly></input>
                 </div>
