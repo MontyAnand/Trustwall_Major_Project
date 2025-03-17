@@ -14,6 +14,8 @@ function DHCPConfiguration() {
   const [clientAccept, changeClientAccept] = useState("0");
   const [denyClient, changeDenyClient] = useState(false);
   const [ignoreClientID, changeIgnoreClientID] = useState(false);
+  const [subnet, changeSubnet] = useState("192.168.1.0");
+  const [mask, changeMask] = useState("24");
   const [startIP, changeStartIP] = useState("192.168.10.100");
   const [endIP, changeEndIP] = useState("192.168.10.200");
 
@@ -22,52 +24,64 @@ function DHCPConfiguration() {
     console.log("Checkbox is now:", event.target.checked);
   };
 
-  const handleBootp = (event) =>{
+  const handleBootp = (event) => {
     changeBootp(event.target.checked);
   }
 
-  const handleClientAccept = (event) =>{
+  const handleClientAccept = (event) => {
     changeClientAccept(event.target.value);
   }
 
-  const handleDenyClient = (event) =>{
+  const handleDenyClient = (event) => {
     changeDenyClient(event.target.checked);
   }
 
-  const handleIgnoreClientID = (event)=>{
+  const handleIgnoreClientID = (event) => {
     changeIgnoreClientID(event.target.checked);
   }
 
-  const handleStartIP = (event)=>{
+  const handleStartIP = (event) => {
     changeStartIP(event.target.value);
   }
 
-  const handleEndIP = (event) =>{
+  const handleEndIP = (event) => {
     changeEndIP(event.target.value);
   }
 
+  const handleSubnet = (event) => {
+    changeSubnet(event.traget.value);
+  }
 
-  const submitConfiguration = async () =>{
-    const data = new FormData;
+  const handleMask = (event) => {
+    changeMask(event.target.value);
+  }
+
+  const submitConfiguration = async () => {
+    const data = new FormData();
     data.append("lan", lanInterface);
-    data.append("bootp",bootp);
-    data.append("clientAccept",clientAccept);
+    data.append("bootp", bootp);
+    data.append("clientAccept", clientAccept);
     data.append("denyClient", denyClient);
-    data.append("ignoreClientID",ignoreClientID);
-    data.append("startIP",startIP);
-    data.append("endIP",endIP);
-  
-    try{
-      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`,data,{
+    data.append("ignoreClientID", ignoreClientID);
+    data.append("subnet",subnet);
+    data.append("mask",mask);
+    data.append("startIP", startIP);
+    data.append("endIP", endIP);
+
+    try {
+      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`, data, {
         header: {
           'Content-Type': "multpart/form-data"
         }
       });
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
-      
-    }catch(error){
-      alert("Error in submitting the configuration : ",error);
+      //creating apply button for apply the save configuration
+      // const container = document.createElement('div');
+
+
+    } catch (error) {
+      alert("Error in submitting the configuration : ", error);
     }
   }
 
@@ -90,7 +104,7 @@ function DHCPConfiguration() {
                 <div className="dhcp_checkbox">
                   <div>
                     <label for="interface">Enable</label>
-                    <input type="checkbox" name="interface" checked={lanInterface} onChange={handleLanInterface}></input>
+                    <input type="checkbox" name="interface" onChange={handleLanInterface} ></input>
                   </div>
                   <p>Enable DHCP server on LAN interface</p>
                 </div>
@@ -98,14 +112,14 @@ function DHCPConfiguration() {
                 <div className="dhcp_checkbox">
                   <div>
                     <label for="bootp">BOOTP</label>
-                    <input type="checkbox" name="bootp" checked={bootp} onChange={handleBootp}></input>
+                    <input type="checkbox" name="bootp" onChange={handleBootp}></input>
                   </div>
                   <p>Ignore BOOTP queries</p>
                 </div>
 
                 <div className="dhcp_select">
                   <label>Deny Unknown Clients:</label>
-                  <select name="client_accept" value={clientAccept} onChange={handleClientAccept}>
+                  <select name="client_accept" onChange={handleClientAccept}>
                     <option value="0">Allow all clients</option>
                     <option value="1">Allow all clients from any interface</option>
                     <option value="2">Allow clients from only this interface</option>
@@ -115,7 +129,7 @@ function DHCPConfiguration() {
                 <div className="dhcp_checkbox">
                   <div>
                     <label for="deny_client">Ignore Denied Clients</label>
-                    <input type="checkbox" name="deny_client" value={denyClient} onChange={handleDenyClient}></input>
+                    <input type="checkbox" name="deny_client" onChange={handleDenyClient}></input>
                   </div>
                   <p>Ignore denied clients rather than reject</p>
                 </div>
@@ -123,7 +137,7 @@ function DHCPConfiguration() {
                 <div className="dhcp_checkbox">
                   <div>
                     <label for="ign_client_id">Ignored Client Identifiers</label>
-                    <input type="checkbox" name="ign_client_id" value={ignoreClientID} onChange={ handleIgnoreClientID}></input>
+                    <input type="checkbox" name="ign_client_id" onChange={handleIgnoreClientID}></input>
                   </div>
                   <p>
                     Do not record a unique identifier(UID) in client <br></br>
@@ -149,7 +163,7 @@ function DHCPConfiguration() {
 
                 <div className="dhcp_text">
                   <label for="subnet">Subnet: </label>
-                  <input type="text" name="subnet" value="192.168.1.0" readOnly></input>
+                  <input type="text" name="subnet" value="192.168.1.0" onChange={handleSubnet} readOnly></input>
                 </div>
 
                 <div className="dhcp_text">
@@ -161,6 +175,7 @@ function DHCPConfiguration() {
                     value="24"
                     max="32"
                     min="1"
+                    onChange={handleMask}
                     readOnly
                   ></input>
                 </div>
@@ -180,11 +195,11 @@ function DHCPConfiguration() {
                   <br></br><br></br>
                   <label for="startIP">From</label>
                   <br></br>
-                  <input type="text" name="startIP" value={startIP} onChange={handleStartIP}></input>
+                  <input type="text" name="startIP" value="192.168.1.100" onChange={handleStartIP}></input>
                   <br></br><br></br>
                   <label for="endIP">To</label>
                   <br></br>
-                  <input type="text" name="endIP" value={endIP} onChange={handleEndIP}></input>
+                  <input type="text" name="endIP" value="192.168.1.200" onChange={handleEndIP}></input>
                 </div>
 
                 <div className="dhcp_add_btn">
@@ -222,7 +237,7 @@ function DHCPConfiguration() {
 
                 <div className="dhcp_text">
                   <label>DNS Servers</label>
-                  <input type="text" name="gateway" value="192.168.1.1"readOnly></input>
+                  <input type="text" name="gateway" value="192.168.1.1" readOnly></input>
                   <input type="text" name="dns1" placeholder="DNS Server 1"></input>
                   <input type="text" name="dns2" placeholder="DNS Server 2"></input>
                   <input type="text" name="dns3" placeholder="DNS Server 3"></input>
@@ -313,7 +328,7 @@ function DHCPConfiguration() {
                   <label for="failover_ip">Failover peer IP:</label>
                   <input type="text" name="failover_ip" placeholder="192.168.x.x"></input>
                 </div>
-                
+
                 <div className="dhcp_checkbox">
                   <div>
                     <label for="enable_static_arp">Static ARP:</label>

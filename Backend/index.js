@@ -119,6 +119,8 @@ let dhcpConfig = {
     clientAccept: '',
     denyClient: '',
     ignoreClientID: '',
+    subnet:'',
+    netmask:'',
     startIP: '',
     endIP: ''
 };
