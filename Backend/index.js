@@ -3,6 +3,7 @@ const multer = require('multer');
 const { Server } = require('socket.io');
 const http = require('http');
 const path = require('path');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
@@ -44,10 +45,10 @@ io.on('connection', (socket) => {
         serviceListQueue.enqueue(socket.id);
         tcpClient.serviceListRequest();
     });
-    socket.on('update-service-status',(data)=>{
+    socket.on('update-service-status', (data) => {
         tcpClient.serviceManagementRquest(data);
     });
-    socket.on('execute-command', (data)=>{
+    socket.on('execute-command', (data) => {
         tcpClient.executeCommand(data, socket.id);
     });
 });
@@ -115,7 +116,7 @@ let dhcpConfig = {
     enabled: false,
     interface: '',
     subnet: '',
-    netmask:'',
+    netmask: '',
     rangeStart: '',
     rangeEnd: '',
     defaultLeaseTime: 0,
