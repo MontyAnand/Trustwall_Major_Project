@@ -3,6 +3,7 @@ const multer = require('multer');
 const { Server } = require('socket.io');
 const http = require('http');
 const path = require('path');
+const fs=require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
@@ -113,32 +114,33 @@ app.use(bodyParser.json());
 
 // Example in-memory storage for demonstration purposes
 let dhcpConfig = {
-    enabled: false,
-    interface: '',
-    subnet: '',
-    netmask: '',
-    rangeStart: '',
-    rangeEnd: '',
-    defaultLeaseTime: 0,
-    maxLeaseTime: 0,
-    dnsServer1: '',
-    dnsServer2: '',
-    defaultGateway: '',
-    // staticMappings: [],
-    ntpServer: '',
-    // winsServer: '', 
-    domainName: ''
+    lan: '',
+    bootp: '',
+    clientAccept: '',
+    denyClient: '',
+    ignoreClientID: '',
+    startIP: '',
+    endIP: ''
 };
 
 // API endpoint to save DHCP configuration
 app.post('/dhcp/save', (req, res) => {
     try {
         dhcpConfig = req.body;
-        res.status(200).send({ message: 'DHCP configuration saved successfully' });
-    } catch (error) {
-        console.error('Error saving DHCP config:', error);
-        res.status(500).send({ message: 'Failed to save DHCP configuration' });
+        const dhcp_conf_filePath = "/home/po/Desktop/a.txt";
+        fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error saving configuration');
+            }
+            res.status(200).send('DHCP configuration updated successfully!');
+        });
     }
+ catch (error) {
+    console.error('Error saving DHCP config:', error);
+    res.status(500).send({ message: 'Failed to save DHCP configuration' });
+}
+    
 });
 
 // API endpoint to apply DHCP configuration
@@ -148,7 +150,7 @@ function generateDhcpConfig(config) {
 
 # DHCP Server Configuration
 subnet ${config.subnet} netmask ${config.netmask} {
-range ${config.rangeStart} ${config.rangeEnd};
+range ${config.startIP} ${config.endIP};
 option routers ${config.defaultGateway};
 option domain-name-servers ${config.dnsServer1} , ${config.dnsServer2};
 option domain-name ${config.domainName};
