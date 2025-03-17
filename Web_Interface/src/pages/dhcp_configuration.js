@@ -65,6 +65,7 @@ function DHCPConfiguration() {
       });
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
+      
     }catch(error){
       alert("Error in submitting the configuration : ",error);
     }
