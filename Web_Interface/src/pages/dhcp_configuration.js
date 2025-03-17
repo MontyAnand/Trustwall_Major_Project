@@ -9,13 +9,13 @@ function DHCPConfiguration() {
   const [content4, setContent4] = useState([false, null]);
   const [content5, setContent5] = useState([false, null]);
 
-  const [lanInterface, changeLANInterface] = useState(false);
+  const [lanInterface, changeLANInterface] = useState(true);
   const [bootp, changeBootp] = useState(false);
   const [clientAccept, changeClientAccept] = useState("0");
   const [denyClient, changeDenyClient] = useState(false);
   const [ignoreClientID, changeIgnoreClientID] = useState(false);
-  const [startIP, changeStartIP] = useState("eg. 192.168.10.100");
-  const [endIP, changeEndIP] = useState("eg. 192.168.10.200");
+  const [startIP, changeStartIP] = useState("192.168.10.100");
+  const [endIP, changeEndIP] = useState("192.168.10.200");
 
   const handleLanInterface = (event) => {
     changeLANInterface(event.target.checked);
@@ -56,8 +56,9 @@ function DHCPConfiguration() {
     data.append("ignoreClientID",ignoreClientID);
     data.append("startIP",startIP);
     data.append("endIP",endIP);
+  
     try{
-      const response = await axios.post("sujit-url",data,{
+      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`,data,{
         header: {
           'Content-Type': "multpart/form-data"
         }
@@ -214,16 +215,16 @@ function DHCPConfiguration() {
 
                 <div className="dhcp_text">
                   <label>WINS Servers</label>
-                  <input type="text" placeholder="WINS Server 1"></input>
-                  <input type="text" placeholder="WINS Server 2"></input>
+                  <input type="text" name="wins1" placeholder="WINS Server 1"></input>
+                  <input type="text" name="wins2" placeholder="WINS Server 2"></input>
                 </div>
 
                 <div className="dhcp_text">
                   <label>DNS Servers</label>
-                  <input type="text" placeholder="192.168.1.1"></input>
-                  <input type="text" placeholder="DNS Server 1"></input>
-                  <input type="text" placeholder="DNS Server 2"></input>
-                  <input type="text" placeholder="DNS Server 3"></input>
+                  <input type="text" name="gateway" value="192.168.1.1"readOnly></input>
+                  <input type="text" name="dns1" placeholder="DNS Server 1"></input>
+                  <input type="text" name="dns2" placeholder="DNS Server 2"></input>
+                  <input type="text" name="dns3" placeholder="DNS Server 3"></input>
                 </div>
               </div>
             </div>,
