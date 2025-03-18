@@ -1,106 +1,138 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .suricata-container {
-    width: 80%;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-  }
-  
-  .suricata-container h1{
-    text-align: center;
-    color: black;
-  } 
-  .suricata-container h2 {
-    text-align: center;
-    color: whitesmoke;
-    background-color: rgb(41, 41, 41);
-  }
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
 
-  
-  .suricata-container button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .suricata-add-btn {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .suricata-delete-btn {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .suricata-edit-btn {
-    background-color: #ffc107;
-    color: black;
-  }
-  
-  .suricata-save-btn {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .suricata-container button:hover {
-    opacity: 0.8;
-  }
-  
-  .suricata-settings-container {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #fff;
-    margin-top: 20px;
-  }
-  
-  .suricata-settings-container label {
-    display: block;
-    margin: 10px 0;
-  }
-  
-  .suricata-container input[type="text"], .suricata-container select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .suricata-table-container {
-    margin-top: 20px;
-  }
-  
-  .suricata-table-container table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .suricata-table-container th, .suricata-table-container td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  .suricata-table-container th {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .suricata-settings-container input[type="checkbox"],p{
-    display:inline-block;
-  }
+.navbar {
+  background-color: #fff;
+  padding: 10px;
+  text-align: center;
+}
+
+.navbar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.navbar li {
+  display: inline;
+  margin: 0 15px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: red;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+
+.suricata-container {
+  width: 80%;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.suricata-container h1 {
+  text-align: center;
+  color: black;
+}
+
+.suricata-container h2 {
+  text-align: center;
+  color: whitesmoke;
+  background-color: rgb(41, 41, 41);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Buttons */
+.suricata-container button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.suricata-add-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.suricata-delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.suricata-edit-btn {
+  background-color: #ffc107;
+  color: black;
+}
+
+.suricata-save-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.suricata-container button:hover {
+  opacity: 0.8;
+}
+
+/* Table Styling */
+.suricata-table-container {
+  margin-top: 20px;
+}
+
+.suricata-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.suricata-table-container th, .suricata-table-container td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.suricata-table-container th {
+  background-color: #007bff;
+  color: white;
+}
+
+.suricata-table-container tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Settings Section */
+.suricata-settings-container {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+  margin-top: 20px;
+}
+
+.suricata-settings-container label {
+  display: block;
+  margin: 10px 0;
+}
+
+.suricata-container input[type="text"], .suricata-container select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
