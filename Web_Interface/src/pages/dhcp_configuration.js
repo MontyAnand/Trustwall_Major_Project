@@ -63,27 +63,35 @@ function DHCPConfiguration() {
     data.append("clientAccept", clientAccept);
     data.append("denyClient", denyClient);
     data.append("ignoreClientID", ignoreClientID);
-    data.append("subnet",subnet);
-    data.append("mask",mask);
+    data.append("subnet", subnet);
+    data.append("mask", mask);
     data.append("startIP", startIP);
     data.append("endIP", endIP);
 
+    // Print FormData values before sending
+    console.log("FormData Contents:");
+    for (let [key, value] of data.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
     try {
-      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`, data, {
-        header: {
-          'Content-Type': "multpart/form-data"
+      const response = await axios.post(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-      });
+      );
+
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
-      //creating apply button for apply the save configuration
-      // const container = document.createElement('div');
-
-
     } catch (error) {
-      alert("Error in submitting the configuration : ", error);
+      console.error("Error in submitting the configuration:", error);
+      alert("Error in submitting the configuration.");
     }
-  }
+  };
 
   return (
     <div className="dhcp_container">
@@ -195,11 +203,11 @@ function DHCPConfiguration() {
                   <br></br><br></br>
                   <label for="startIP">From</label>
                   <br></br>
-                  <input type="text" name="startIP" value="192.168.1.100" onChange={handleStartIP}></input>
+                  <input type="text" name="startIP" onChange={handleStartIP}></input>
                   <br></br><br></br>
                   <label for="endIP">To</label>
                   <br></br>
-                  <input type="text" name="endIP" value="192.168.1.200" onChange={handleEndIP}></input>
+                  <input type="text" name="endIP" onChange={handleEndIP}></input>
                 </div>
 
                 <div className="dhcp_add_btn">
