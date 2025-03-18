@@ -3,6 +3,8 @@ const multer = require('multer');
 const { Server } = require('socket.io');
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
@@ -44,10 +46,10 @@ io.on('connection', (socket) => {
         serviceListQueue.enqueue(socket.id);
         tcpClient.serviceListRequest();
     });
-    socket.on('update-service-status',(data)=>{
+    socket.on('update-service-status', (data) => {
         tcpClient.serviceManagementRquest(data);
     });
-    socket.on('execute-command', (data)=>{
+    socket.on('execute-command', (data) => {
         tcpClient.executeCommand(data, socket.id);
     });
 });
@@ -102,6 +104,90 @@ app.use('/firewall', firewall_policy_routes);
 app.use('/firewall', firewall_ipset_routes);
 app.use('/firewall', firewall_service_routes);
 app.use('/firewall', firewall_icmptype_routes);
+
+
+
+// This part is to manage DHCP configuration
+
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
+
+// Example in-memory storage for demonstration purposes
+let dhcpConfig = {
+    lan: '',
+    bootp: '',
+    clientAccept: '',
+    denyClient: '',
+    ignoreClientID: '',
+    subnet: '',
+    netmask: '',
+    startIP: '',
+    endIP: ''
+};
+
+// API endpoint to save DHCP configuration
+app.post('/dhcp/save',upload.none(), (req, res) => {
+    try {
+        dhcpConfig = req.body;
+        console.log(req.body);
+        const dhcp_conf_filePath = "/home/po/Desktop/a.txt";
+        // fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
+        //     if (err) {
+        //         console.error(err);
+        //         return res.status(500).send('Error saving configuration');
+        //     }
+        //     res.status(200).send('DHCP configuration updated successfully!');
+        // });
+        res.status(200).send("Dekhiye Sujiit   Data aa rhha hai...");
+    }
+    catch (error) {
+        console.error('Error saving DHCP config:', error);
+        res.status(500).send({ message: 'Failed to save DHCP configuration' });
+    }
+
+});
+
+// API endpoint to apply DHCP configuration
+
+function generateDhcpConfig(config) {
+    return `
+
+# DHCP Server Configuration
+subnet ${config.subnet} netmask ${config.netmask} {
+range ${config.startIP} ${config.endIP};
+option routers ${config.defaultGateway};
+option domain-name-servers ${config.dnsServer1} , ${config.dnsServer2};
+option domain-name ${config.domainName};
+option ntp-servers ${config.ntpServer};
+default-lease-time ${config.defaultLeaseTime};
+max-lease-time ${config.maxLeaseTime};
+}
+`;
+}
+
+app.post('/dhcp/apply', (req, res) => {
+    try {
+        // Logic to apply the configuration goes here
+        // For demonstration, just log the config
+        console.log('Applying DHCP configuration:', dhcpConfig);
+
+        const configContent = generateDhcpConfig(dhcpConfig);
+
+        // Save configuration file
+        const dhcp_conf_filePath = "/etc/dhcp/check.conf";
+        fs.appendFile(dhcp_conf_filePath, configContent, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error saving configuration');
+            }
+            // res.status(200).send('DHCP configuration updated successfully!');
+        });
+        res.status(200).send({ message: 'DHCP configuration applied successfully' });
+    } catch (error) {
+        console.error('Error applying DHCP config:', error);
+        res.status(500).send({ message: 'Failed to apply DHCP configuration' });
+    }
+});
 
 
 server.listen(port, HOST, () => {
