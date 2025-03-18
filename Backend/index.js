@@ -126,17 +126,19 @@ let dhcpConfig = {
 };
 
 // API endpoint to save DHCP configuration
-app.post('/dhcp/save', (req, res) => {
+app.post('/dhcp/save',upload.none(), (req, res) => {
     try {
         dhcpConfig = req.body;
+        console.log(req.body);
         const dhcp_conf_filePath = "/home/po/Desktop/a.txt";
-        fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send('Error saving configuration');
-            }
-            res.status(200).send('DHCP configuration updated successfully!');
-        });
+        // fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
+        //     if (err) {
+        //         console.error(err);
+        //         return res.status(500).send('Error saving configuration');
+        //     }
+        //     res.status(200).send('DHCP configuration updated successfully!');
+        // });
+        res.status(200).send("Dekhiye Sujiit   Data aa rhha hai...");
     }
  catch (error) {
     console.error('Error saving DHCP config:', error);
