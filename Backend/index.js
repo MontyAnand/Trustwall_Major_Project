@@ -3,7 +3,7 @@ const multer = require('multer');
 const { Server } = require('socket.io');
 const http = require('http');
 const path = require('path');
-const fs=require('fs');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
@@ -119,8 +119,8 @@ let dhcpConfig = {
     clientAccept: '',
     denyClient: '',
     ignoreClientID: '',
-    subnet:'',
-    netmask:'',
+    subnet: '',
+    netmask: '',
     startIP: '',
     endIP: ''
 };
@@ -140,11 +140,11 @@ app.post('/dhcp/save',upload.none(), (req, res) => {
         // });
         res.status(200).send("Dekhiye Sujiit   Data aa rhha hai...");
     }
- catch (error) {
-    console.error('Error saving DHCP config:', error);
-    res.status(500).send({ message: 'Failed to save DHCP configuration' });
-}
-    
+    catch (error) {
+        console.error('Error saving DHCP config:', error);
+        res.status(500).send({ message: 'Failed to save DHCP configuration' });
+    }
+
 });
 
 // API endpoint to apply DHCP configuration
