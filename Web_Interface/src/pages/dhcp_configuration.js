@@ -1,14 +1,110 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./dhcp_configuration.css";
 // import axios from "axios";
 
 function DHCPConfiguration() {
+  // useState for main blocks 
   const [content1, setContent1] = useState([false, null]);
   const [content2, setContent2] = useState([false, null]);
   const [content3, setContent3] = useState([false, null]);
   const [content4, setContent4] = useState([false, null]);
   const [content5, setContent5] = useState([false, null]);
 
+  //useState for all form elements
+  const [interfacechecked, setInterfaceChecked] = useState(true);
+  const [bootpchecked, setBootpChecked] = useState(true);
+  const [isclientaccept, setIsClientAccept] = useState(2);
+  const [isdenyclient, setIsDenyClient] = useState(true);
+  const [isignclientname, setIsIgnClientname] = useState(true);
+
+  const [subnet, setSubnet] = useState('192.168.1.1');
+  const [mask, setMask] = useState('255.255.255.0');
+  const [subnet_range, setSubnetRange] = useState('192.168.1.1-192.168.1.254');
+  const [startIP, setStartIP] = useState('');
+  const [endIP, setEndIP] = useState('');
+
+  const [wins1, setWinS1] = useState('');
+  const [wins2, setWinS2] = useState('');
+  const [dns0, setDnS0] = useState('8.8.8.8');
+  const [dns1, setDnS1] = useState('');
+  const [dns2, setDnS2] = useState('');
+  const [dns3, setDnS3] = useState('');
+
+  const [omapiport, setOmapiPort] = useState('');
+  const [omapikey, setOmapikKey] = useState('');
+  const [checkkey, setCheckKey] = useState('');
+  const [omapialgo, setOmapiAlgo] = useState('');
+
+  const [gateway, setGateway] = useState('192.168.1.1');
+  const [domainname, setDomainName] = useState('');
+  const [domainsearchlist, setDomainSearchList] = useState('');
+  const [defaultleasetime, setDefaultLeaseTime] = useState('600');
+  const [maxleasetime, setMaxLeaseTime] = useState('7200');
+  const [failoverpeerip, setFailOverPeerIp] = useState('');
+  const [enablestaticarp, setEnableStaticArp] = useState('');
+  const [enablechangetimeformat, setEnableChangeTimeFormat] = useState('');
+  const [enablestaticticsgraph, setEnableStaticticsGraph] = useState('');
+  const [disablepingcheck, setDisablePingCheck] = useState('');
+
+  //useState for controlling submit button's functionality
+  const [issubmitbuttondisabled, setIsSubmitDisabled] = useState(true);
+
+  //useEffect for controlling submit button's functionality and rendeing the updates
+  useEffect(() => {
+    if (interfacechecked) {
+      setIsSubmitDisabled(false);
+    } else {
+      setIsSubmitDisabled(true);
+    }
+  }, [interfacechecked]);
+
+
+
+  function handleSubmit() {
+    const data = {
+      Interface_enable: interfacechecked,
+      Bootp_enable: bootpchecked,
+      Deny_unknown_clients: isclientaccept,
+      Ignore_client_identifier: isignclientname,
+      Subnet:subnet,
+      Subnet_mask:mask,
+      // Subnet_range:subnet_range,
+      StartIP:startIP,
+      EndIP:endIP,
+      Wins1:wins1,
+      Wins2:wins2,
+      Dns0:dns0,
+      Dns1:dns1,
+      Dns2:dns2,
+      Dns3:dns3,
+      Omapi_port:omapiport,
+      Omapi_key:omapikey,
+      Omapi_enable_algo:checkkey,
+      Omapi_algorithm:omapialgo,
+      Gateway:gateway,
+      Domain_name:domainname,
+      Domain_search_list:domainsearchlist,
+      Default_lease_time:defaultleasetime,
+      Maximum_lease_time:maxleasetime,
+      Failover_peer_Ip:failoverpeerip,
+      Static_arp_entries_enable:enablestaticarp,
+      Dhcp_lease_time_format_UTC_to_Local_enable:enablechangetimeformat,
+      Dhcp_lease_monitoring_stats_enable:enablestaticticsgraph,
+      Ping_check_disable:disablepingcheck
+    };
+
+    //  Send data to backend using Fetch API
+    fetch('http://10.31.38.228:5000/dhcp/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(error => console.error('Error:', error));
+  }
 
   return (
     <div className="dhcp_container">
@@ -28,29 +124,29 @@ function DHCPConfiguration() {
           <div className="dhcp_general_container">
 
             <div className="dhcp_text">
-              <label>DHCP Backend:</label>
-              <input type="text" placeholder="DHCP vendor" value="ISC DHCP" readOnly></input>
+              <label htmlFor="dhcp_vendor">DHCP Backend:</label>
+              <input type="text" name="dhcp_vendor" placeholder="DHCP vendor" value="ISC DHCP" readOnly></input>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="interface">Enable</label>
-                <input type="checkbox" name="interface"  ></input>
+                <label htmlFor="interface">Enable</label>
+                <input type="checkbox" name="interface" checked={interfacechecked} onChange={(e) => setInterfaceChecked(e.target.checked)} ></input>
               </div>
               <p>Enable DHCP server on LAN interface</p>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="bootp">BOOTP</label>
-                <input type="checkbox" name="bootp" ></input>
+                <label htmlFor="bootp">BOOTP</label>
+                <input type="checkbox" name="bootp" checked={bootpchecked} onChange={(e) => setBootpChecked(e.target.checked)} ></input>
               </div>
               <p>Ignore BOOTP queries</p>
             </div>
 
             <div className="dhcp_select">
-              <label>Deny Unknown Clients:</label>
-              <select name="client_accept" >
+              <label htmlFor="client_accept">Deny Unknown Clients:</label>
+              <select name="client_accept" value={isclientaccept} onChange={(e) => setIsClientAccept(e.target.value)} >
                 <option value="0">Allow all clients</option>
                 <option value="1">Allow all clients from any interface</option>
                 <option value="2">Allow clients from only this interface</option>
@@ -59,19 +155,19 @@ function DHCPConfiguration() {
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="deny_client">Ignore Denied Clients</label>
-                <input type="checkbox" name="deny_client" ></input>
+                <label htmlFor="deny_client">Ignore Denied Clients</label>
+                <input type="checkbox" name="deny_client" checked={isdenyclient} onChange={(e) => setIsDenyClient(e.target.checked)}></input>
               </div>
               <p>Ignore denied clients rather than reject</p>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="ign_client_id">Ignored Client Identifiers</label>
-                <input type="checkbox" name="ign_client_id" ></input>
+                <label htmlFor="ign_client_name">Ignored Client Identifiers</label>
+                <input type="checkbox" name="ign_client_name" checked={isignclientname} onChange={(e) => setIsIgnClientname(e.target.checked)} ></input>
               </div>
               <p>
-                Do not record a unique identifier(UID) in client <br></br>
+                Do not record a unique nameentifier(Uname) in client <br></br>
                 lease data if present in client DHCP request
               </p>
             </div>
@@ -94,48 +190,34 @@ function DHCPConfiguration() {
           <div className="dhcp_primary_container">
 
             <div className="dhcp_text">
-              <label for="subnet">Subnet: </label>
-              <input type="text" name="subnet" value="192.168.1.0" readOnly></input>
+              <label htmlFor="subnet">Subnet: </label>
+              <input type="text" name="subnet" value={subnet} onChange={(e) => setSubnet(e.target.value)} readOnly></input>
             </div>
 
             <div className="dhcp_text">
-              <label for="mask" >Subnet Mask: </label>
-              <input
-                type="number"
-                placeholder=""
-                name="mask"
-                value="24"
-                max="32"
-                min="1"
-
-                readOnly
-              ></input>
+              <label htmlFor="mask" >Subnet Mask: </label>
+              <input type="text" name="mask" value={mask} onChange={(e) => setMask(e.target.value)} readOnly></input>
             </div>
 
             <div className="dhcp_text">
-              <label for="subnet_range">Subnet Range: </label>
-              <input
-                type="text"
-                name="subnet_range"
-                value="192.168.1.1 - 192.168.1.254"
-                readOnly
-              ></input>
+              <label htmlFor="subnet_range">Subnet Range: </label>
+              <input type="text" name="subnet_range" value={subnet_range} onChange={(e) => setSubnetRange(e.target.value)} readOnly></input>
             </div>
 
             <div className="dhcp_text">
               <label className="dhcp_special_text">Address pool range:</label>
               <br></br><br></br>
-              <label for="startIP">From</label>
+              <label htmlFor="startIP">From</label>
               <br></br>
-              <input type="text" name="startIP" ></input>
+              <input type="text" name="startIP" value={startIP} onChange={(e) => setStartIP(e.target.value)} ></input>
               <br></br><br></br>
-              <label for="endIP">To</label>
+              <label htmlFor="endIP">To</label>
               <br></br>
-              <input type="text" name="endIP" ></input>
+              <input type="text" name="endIP" value={endIP} onChange={(e) => setEndIP(e.target.value)} ></input>
             </div>
 
             <div className="dhcp_add_btn">
-              <label>Additional Pools</label>
+              <label htmlFor="additional_pool">Additional Pools</label>
               <button
                 onClick={() => {
                   // Write a custom function to add more address pool if someone click this button
@@ -163,17 +245,17 @@ function DHCPConfiguration() {
           <div className="dhcp_server_container">
 
             <div className="dhcp_text">
-              <label>WINS Servers</label>
-              <input type="text" name="wins1" placeholder="WINS Server 1"></input>
-              <input type="text" name="wins2" placeholder="WINS Server 2"></input>
+              <label htmlFor="wins_servers">WINS Servers</label>
+              <input type="text" name="wins1" placeholder="WINS Server 1" value={wins1} onChange={(e) => setWinS1(e.target.value)}></input>
+              <input type="text" name="wins2" placeholder="WINS Server 2" value={wins2} onChange={(e) => setWinS2(e.target.value)}></input>
             </div>
 
             <div className="dhcp_text">
-              <label>DNS Servers</label>
-              <input type="text" name="gateway" value="192.168.1.1" readOnly></input>
-              <input type="text" name="dns1" placeholder="DNS Server 1"></input>
-              <input type="text" name="dns2" placeholder="DNS Server 2"></input>
-              <input type="text" name="dns3" placeholder="DNS Server 3"></input>
+              <label htmlFor="dns_servers">DNS Servers</label>
+              <input type="text" name="gateway" value={dns0} onChange={(e) => setDnS0(e.target.value)} readOnly ></input>
+              <input type="text" name="dns1" placeholder="DNS Server 1" value={dns1} onChange={(e) => setDnS1(e.target.value)}></input>
+              <input type="text" name="dns2" placeholder="DNS Server 2" value={dns2} onChange={(e) => setDnS2(e.target.value)}></input>
+              <input type="text" name="dns3" placeholder="DNS Server 3" value={dns3} onChange={(e) => setDnS3(e.target.value)}></input>
             </div>
           </div>
         </div>
@@ -194,26 +276,27 @@ function DHCPConfiguration() {
           <div className="dhcp_omapi_container">
 
             <div className="dhcp_text">
-              <label>OMAPI Port</label>
-              <input type="text" placeholder="OMAPI Port"></input>
+              <label htmlFor="omapi_port">OMAPI Port</label>
+              <input type="text" name="omapi_port" placeholder="OMAPI Port" value={omapiport} onChange={(e) => setOmapiPort
+                (e.target.value)}></input>
             </div>
 
             <div className="dhcp_text">
-              <label>OMAPI Key</label>
-              <input type="text" placeholder="OMAPI Key"></input>
+              <label htmlFor="omapi_key">OMAPI Key</label>
+              <input type="text" name="omapi_key" placeholder="OMAPI Key" value={omapikey} onChange={(e) => setOmapikKey(e.target.value)}></input>
               <div className="dhcp_checkbox">
-                <label for="algo_key">Generate New Key</label>
-                <input type="checkbox" name="algo_key"></input>
+                <label htmlFor="algo_key">Generate New Key</label>
+                <input type="checkbox" name="algo_key" checked={checkkey} onChange={(e) => setCheckKey(e.target.checked)}></input>
               </div>
               <p>Generate a new key based one selected algorithm</p>
             </div>
 
             <div className="dhcp_select">
-              <label for="Algorithm_names">Key Algorithm</label>
-              <select name="Algorithm_names">
-                <option value="algo1">Algorithm 1</option>
-                <option value="algo2">Algorithm 2</option>
-                <option value="algo3">Algorithm 3</option>
+              <label htmlFor="Algorithm_names">Key Algorithm</label>
+              <select name="Algorithm_names" value={omapialgo} onChange={(e) => setOmapiAlgo(e.target.value)}>
+                <option value="1">Algorithm 1</option>
+                <option value="2">Algorithm 2</option>
+                <option value="3">Algorithm 3</option>
               </select>
             </div>
           </div>
@@ -235,111 +318,112 @@ function DHCPConfiguration() {
           <div className="dhcp_other_container">
 
             <div className="dhcp_text">
-              <label for="gateway">Gateway:</label>
-              <input type="text" name="gateway" value="192.168.1.1" readOnly></input>
+              <label htmlFor="gateway">Gateway:</label>
+              <input type="text" name="gateway" value={gateway} onChange={(e) => setGateway(e.target.value)} readOnly></input>
             </div>
 
             <div className="dhcp_text">
-              <label for="domainName">Domain Name:</label>
-              <input type="text" name="domainName" placeholder="home arpa"></input>
+              <label htmlFor="domainName">Domain Name:</label>
+              <input type="text" name="domainName" placeholder="home arpa" value={domainname} onChange={(e) => setDomainName(e.target.value)}></input>
             </div>
 
             <div className="dhcp_text">
-              <label for="domain_search">Domain Search List:</label>
-              <input type="text" name="domain_search" placeholder="example.com"></input>
+              <label htmlFor="domain_search">Domain Search List:</label>
+              <input type="text" name="domain_search" placeholder="example.com" value={domainsearchlist} onChange={(e) => setDomainSearchList(e.target.value)}></input>
             </div>
 
             <div className="dhcp_number">
-              <label for="lease_time">Default Lease Time:</label>
-              <input type="number" name="lease_time" value="7200"></input>
+              <label htmlFor="lease_time">Default Lease Time:</label>
+              <input type="number" name="lease_time" value={defaultleasetime} onChange={(e) => setDefaultLeaseTime(e.target.value)}></input>
             </div>
 
             <div className="dhcp_number">
-              <label for="max_lease_time">Maximum Lease Time:</label>
-              <input type="number" name="max_lease_time" value="86400"></input>
+              <label htmlFor="max_lease_time">Maximum Lease Time:</label>
+              <input type="number" name="max_lease_time" value={maxleasetime} onChange={(e) => setMaxLeaseTime(e.target.value)}></input>
             </div>
 
             <div className="dhcp_text">
-              <label for="failover_ip">Failover peer IP:</label>
-              <input type="text" name="failover_ip" placeholder="192.168.x.x"></input>
+              <label htmlFor="failover_ip">Failover peer IP:</label>
+              <input type="text" name="failover_ip" placeholder="192.168.x.x" value={failoverpeerip} onChange={(e) => setFailOverPeerIp(e.target.value)}></input>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="enable_static_arp">Static ARP:</label>
-                <input type="checkbox" name="enable_static_arp"></input>
+                <label htmlFor="enable_static_arp">Static ARP:</label>
+                <input type="checkbox" name="enable_static_arp" checked={enablestaticarp} onChange={(e) => setEnableStaticArp(e.target.checked)}></input>
               </div>
               <p>Enable Static ARP enteries</p>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="time_format">Time Format Change:</label>
-                <input type="checkbox" name="time_format"></input>
+                <label htmlFor="time_format">Time Format Change:</label>
+                <input type="checkbox" name="time_format" checked={enablechangetimeformat} onChange={(e) => setEnableChangeTimeFormat
+                  (e.target.checked)}></input>
               </div>
               <p>Change DHCP display lease time from UTC to local time</p>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="enable_stats">Statistics graphs:</label>
-                <input type="checkbox" name="enable_stats"></input>
+                <label htmlFor="enable_stats">Statistics graphs:</label>
+                <input type="checkbox" name="enable_stats" checked={enablestaticticsgraph} onChange={(e) => setEnableStaticticsGraph(e.target.checked)}></input>
               </div>
               <p>Enable monitoring graphs for DHCP lease statistics</p>
             </div>
 
             <div className="dhcp_checkbox">
               <div>
-                <label for="ping_check">Ping check:</label>
-                <input type="checkbox" name="ping_check"></input>
+                <label htmlFor="ping_check">Ping check:</label>
+                <input type="checkbox" name="ping_check" checked={disablepingcheck} onChange={(e) => setDisablePingCheck(e.target.checked)}></input>
               </div>
               <p>Disable ping check</p>
             </div>
 
             <div className="dhcp_btn">
-              <label for="ddns">Dynamic DNS:</label>
+              <label >Dynamic DNS:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
             </div>
 
             <div className="dhcp_btn">
-              <label for="mac_addr_cntl" >MAC Address Control:</label>
+              <label  >MAC Address Control:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
             </div>
 
             <div className="dhcp_btn">
-              <label for="ntp">NTP:</label>
+              <label >NTP:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
             </div>
 
             <div className="dhcp_btn">
-              <label for="tftp">TFTP:</label>
+              <label >TFTP:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
             </div>
 
             <div className="dhcp_btn">
-              <label for="ldap">LDAP:</label>
+              <label >LDAP:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
             </div>
 
             <div className="dhcp_btn">
-              <label for="net_boot">Network Booting:</label>
+              <label >Network Booting:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
             </div>
 
             <div className="dhcp_btn">
-              <label for="cus_dhcp">Custom DHCP Options:</label>
+              <label >Custom DHCP Options:</label>
               <button>
                 <span>&#9965;</span> Display Advanced
               </button>
@@ -349,7 +433,7 @@ function DHCPConfiguration() {
         </div>
       }</> : <></>}
       <div className="dhcp_btn_container">
-        <button type="submit" className="dhcp_save_btn">
+        <button type="button" disabled={issubmitbuttondisabled} onClick={handleSubmit} className="dhcp_save_btn">
           Save Configuration
         </button>
       </div>
