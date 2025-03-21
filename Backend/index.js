@@ -5,6 +5,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const cors = require('cors');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
@@ -238,7 +239,8 @@ app.post('/dhcp/save', function(req, res) {
     const data = req.body;
 
     // Write data to a file
-    fs.writeFile('/home/po/Desktop/data.json', JSON.stringify(data, null, 2), function(err) {
+    const configContent = generateDhcpConfig(dhcpConfig);
+    fs.writeFile('/etc/dhcp/check.conf', configContent, function(err) {
         if (err) {
             console.error('Error writing to file:', err);
             res.status(500).send({ message: 'Error writing to file' });
@@ -247,6 +249,29 @@ app.post('/dhcp/save', function(req, res) {
             res.send({ message: 'Data saved successfully' });
         }
     });
+});
+
+
+// For handling OMAPI key generation
+//  function to return the selected algorithm
+function getAlgorithm(algorithmName) {
+    switch (algorithmName) {
+        case '1':
+            return new AESAlgorithm();
+        case '2':
+            return new RSAAlgorithm();
+        default:
+            throw new Error('Unsupported algorithm');
+    }
+}
+
+// Endpoint to generate key using selected algorithm
+app.post('/generateKey', (req, res) => {
+    const algorithmName = req.body.algorithm;
+    console.log(algorithmName);
+    const algorithm = getAlgorithm(algorithmName);
+    const key = algorithm.generateKey();
+    res.json({ key });
 });
 
 server.listen(port, HOST, () => {

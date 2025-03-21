@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./dhcp_configuration.css";
-// import axios from "axios";
+import axios from "axios";
 
 function DHCPConfiguration() {
   // useState for main blocks 
@@ -33,7 +33,7 @@ function DHCPConfiguration() {
   const [omapiport, setOmapiPort] = useState('');
   const [omapikey, setOmapikKey] = useState('');
   const [checkkey, setCheckKey] = useState('');
-  const [omapialgo, setOmapiAlgo] = useState('');
+  const [omapialgo, setOmapiAlgo] = useState('7');
 
   const [gateway, setGateway] = useState('192.168.1.1');
   const [domainname, setDomainName] = useState('');
@@ -47,16 +47,22 @@ function DHCPConfiguration() {
   const [disablepingcheck, setDisablePingCheck] = useState('');
 
   //useState for controlling submit button's functionality
+  const [isValid, setIsValid] = useState(true);
   const [issubmitbuttondisabled, setIsSubmitDisabled] = useState(true);
 
   //useEffect for controlling submit button's functionality and rendeing the updates
   useEffect(() => {
-    if (interfacechecked) {
-      setIsSubmitDisabled(false);
+    if ((interfacechecked && startIP.trim() !== '' && endIP.trim() !== '')) {
+      if (interfacechecked && isValid && isIpInSubnet(startIP, subnet, mask) && isIpInSubnet(endIP, subnet, mask)) {
+        setIsSubmitDisabled(false);
+      }
+      else {
+        setIsSubmitDisabled(true);
+      }
     } else {
       setIsSubmitDisabled(true);
     }
-  }, [interfacechecked]);
+  }, [interfacechecked, startIP, endIP, subnet, mask, isValid]);
 
 
 
@@ -66,31 +72,31 @@ function DHCPConfiguration() {
       Bootp_enable: bootpchecked,
       Deny_unknown_clients: isclientaccept,
       Ignore_client_identifier: isignclientname,
-      Subnet:subnet,
-      Subnet_mask:mask,
+      Subnet: subnet,
+      Subnet_mask: mask,
       // Subnet_range:subnet_range,
-      StartIP:startIP,
-      EndIP:endIP,
-      Wins1:wins1,
-      Wins2:wins2,
-      Dns0:dns0,
-      Dns1:dns1,
-      Dns2:dns2,
-      Dns3:dns3,
-      Omapi_port:omapiport,
-      Omapi_key:omapikey,
-      Omapi_enable_algo:checkkey,
-      Omapi_algorithm:omapialgo,
-      Gateway:gateway,
-      Domain_name:domainname,
-      Domain_search_list:domainsearchlist,
-      Default_lease_time:defaultleasetime,
-      Maximum_lease_time:maxleasetime,
-      Failover_peer_Ip:failoverpeerip,
-      Static_arp_entries_enable:enablestaticarp,
-      Dhcp_lease_time_format_UTC_to_Local_enable:enablechangetimeformat,
-      Dhcp_lease_monitoring_stats_enable:enablestaticticsgraph,
-      Ping_check_disable:disablepingcheck
+      StartIP: startIP,
+      EndIP: endIP,
+      Wins1: wins1,
+      Wins2: wins2,
+      Dns0: dns0,
+      Dns1: dns1,
+      Dns2: dns2,
+      Dns3: dns3,
+      Omapi_port: omapiport,
+      Omapi_key: omapikey,
+      Omapi_enable_algo: checkkey,
+      Omapi_algorithm: omapialgo,
+      Gateway: gateway,
+      Domain_name: domainname,
+      Domain_search_list: domainsearchlist,
+      Default_lease_time: defaultleasetime,
+      Maximum_lease_time: maxleasetime,
+      Failover_peer_Ip: failoverpeerip,
+      Static_arp_entries_enable: enablestaticarp,
+      Dhcp_lease_time_format_UTC_to_Local_enable: enablechangetimeformat,
+      Dhcp_lease_monitoring_stats_enable: enablestaticticsgraph,
+      Ping_check_disable: disablepingcheck
     };
 
     //  Send data to backend using Fetch API
@@ -105,6 +111,60 @@ function DHCPConfiguration() {
       .then(data => console.log(data))
       .catch(error => console.error('Error:', error));
   }
+
+  // Function to convert an IP address to binary
+  function ipToBinary(ip) {
+    return ip.split('.')
+      .map(octet => parseInt(octet, 10).toString(2).padStart(8, '0'))
+      .join('.');
+  }
+
+  // Function to convert a binary IP back to dotted decimal format
+  // function binaryToIp(binaryIp) {
+  //   return binaryIp.split('.')
+  //     .map(binaryOctet => parseInt(binaryOctet, 2))
+  //     .join('.');
+  // }
+
+  // Function to perform bitwise AND operation on two IPs
+  function bitwiseAnd(ip1, ip2) {
+    const binaryIp1 = ipToBinary(ip1).split('.');
+    const binaryIp2 = ipToBinary(ip2).split('.');
+
+    const andResult = binaryIp1.map((octet, index) => {
+      // Perform AND operation on each octet
+      return (parseInt(octet, 2) & parseInt(binaryIp2[index], 2)).toString(2).padStart(8, '0');
+    });
+
+    return andResult.join('.');
+  }
+
+  // Function to check if an IP is in a subnet
+  function isIpInSubnet(ip, subnetIp, subnetMask) {
+    const andResult = bitwiseAnd(ip, subnetMask); // Perform AND operation between IP and subnet mask
+    const networkAddress = bitwiseAnd(subnetIp, subnetMask); // Get the network address of the subnet
+
+    return andResult === networkAddress;
+  }
+
+  //' Handle key Genration
+  const handleGenerateKey = async () => {
+    if (checkkey && omapialgo) {
+      try {
+        const response = await axios.post('http://10.31.38.228:5000/generateKey', { omapialgo });
+        setOmapikKey(response.data.key);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+ // Handle Generate key
+  useEffect(() => {
+    if (checkkey && omapialgo) {
+      handleGenerateKey();
+    }
+  }, [checkkey, omapialgo]);
 
   return (
     <div className="dhcp_container">
@@ -209,11 +269,20 @@ function DHCPConfiguration() {
               <br></br><br></br>
               <label htmlFor="startIP">From</label>
               <br></br>
-              <input type="text" name="startIP" value={startIP} onChange={(e) => setStartIP(e.target.value)} ></input>
+              <input type="text" name="startIP" value={startIP} onChange={(e) => {
+                const pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
+                setStartIP(e.target.value);
+                setIsValid((pattern.test(e.target.value) && e.target.value.trim() !== '') || (e.target.value.trim() === ''));
+              }}></input>
+
               <br></br><br></br>
               <label htmlFor="endIP">To</label>
               <br></br>
-              <input type="text" name="endIP" value={endIP} onChange={(e) => setEndIP(e.target.value)} ></input>
+              <input type="text" name="endIP" value={endIP} onChange={(e) => {
+                const pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
+                setEndIP(e.target.value);
+                setIsValid(pattern.test(e.target.value) && e.target.value.trim() !== '');
+              }} ></input>
             </div>
 
             <div className="dhcp_add_btn">
@@ -277,7 +346,7 @@ function DHCPConfiguration() {
 
             <div className="dhcp_text">
               <label htmlFor="omapi_port">OMAPI Port</label>
-              <input type="text" name="omapi_port" placeholder="OMAPI Port" value={omapiport} onChange={(e) => setOmapiPort
+              <input type="text" name="omapi_port" placeholder="OMAPI Port  e.g,7911" value={omapiport} onChange={(e) => setOmapiPort
                 (e.target.value)}></input>
             </div>
 
@@ -294,9 +363,13 @@ function DHCPConfiguration() {
             <div className="dhcp_select">
               <label htmlFor="Algorithm_names">Key Algorithm</label>
               <select name="Algorithm_names" value={omapialgo} onChange={(e) => setOmapiAlgo(e.target.value)}>
-                <option value="1">Algorithm 1</option>
-                <option value="2">Algorithm 2</option>
-                <option value="3">Algorithm 3</option>
+                <option value="1">HMAC-MD5 (legacy default)</option>
+                <option value="2">HMAC-SHA1</option>
+                <option value="3">HAMC-SHA224</option>
+                <option value="4">HAMC-SHA224</option>
+                <option value="5">HAMC-SHA256 (current bind9 default)</option>
+                <option value="6">HAMC-SHA384</option>
+                <option value="7">HAMC-SHA512</option>
               </select>
             </div>
           </div>
