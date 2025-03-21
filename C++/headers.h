@@ -89,20 +89,6 @@ struct connection_info
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 
-class Firewall
-{
-private:
-    char command[150];
-    struct epoll_event events[MAX_EVENTS];
-    void createTable();
-    void createPortSets();
-    void createIPSets();
-    void createChains();
-    void initialRules();
-
-public:
-};
-
 class QR
 {
 public:
@@ -131,7 +117,6 @@ private:
 
     std::string getPublicInterface();
     std::string getEndPoint();
-    std::string compressData(std::string &);
     std::uint16_t getAvailableID();
     std::uint16_t generateClientConfiguration(std::string &, std::string &);
     std::string prepareIP(std::uint16_t);

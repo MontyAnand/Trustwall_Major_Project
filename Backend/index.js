@@ -5,6 +5,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const cors = require('cors');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
@@ -114,81 +115,164 @@ app.use(bodyParser.json());
 
 // Example in-memory storage for demonstration purposes
 let dhcpConfig = {
-    lan: '',
-    bootp: '',
-    clientAccept: '',
-    denyClient: '',
-    ignoreClientID: '',
-    subnet: '',
-    netmask: '',
-    startIP: '',
-    endIP: ''
+  
 };
 
 // API endpoint to save DHCP configuration
-app.post('/dhcp/save',upload.none(), (req, res) => {
-    try {
-        dhcpConfig = req.body;
-        console.log(req.body);
-        const dhcp_conf_filePath = "/home/po/Desktop/a.txt";
-        // fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
-        //     if (err) {
-        //         console.error(err);
-        //         return res.status(500).send('Error saving configuration');
-        //     }
-        //     res.status(200).send('DHCP configuration updated successfully!');
-        // });
-        res.status(200).send("Dekhiye Sujiit   Data aa rhha hai...");
-    }
-    catch (error) {
-        console.error('Error saving DHCP config:', error);
-        res.status(500).send({ message: 'Failed to save DHCP configuration' });
-    }
+// app.post('/dhcp/save', (req, res) => {
+//     try {
+//         dhcpConfig = req.body;
+//         console.log(req.body);
+//         // const dhcp_conf_filePath = "/home/po/Desktop/a.txt";
+//         // fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
+//         //     if (err) {
+//         //         console.error(err);
+//         //         return res.status(500).send('Error saving configuration');
+//         //     }
+//         //     res.status(200).send('DHCP configuration updated successfully!');
+//         // });
+//         res.status(200).send("Dekhiye Sujiit   Data aa rhha hai...");
+//     }
+//     catch (error) {
+//         console.error('Error saving DHCP config:', error);
+//         res.status(500).send({ message: 'Failed to save DHCP configuration' });
+//     }
 
-});
+// });
 
-// API endpoint to apply DHCP configuration
+
+
+// Formatting data for writing to configuration file
 
 function generateDhcpConfig(config) {
     return `
+# Glabal parameters
+option domain-name "example.org";
+option domain-name-servers ns1.example.org, ns2.example.org;
+default-lease-time 600;
+max-lease-time 7200;
 
-# DHCP Server Configuration
-subnet ${config.subnet} netmask ${config.netmask} {
-range ${config.startIP} ${config.endIP};
-option routers ${config.defaultGateway};
-option domain-name-servers ${config.dnsServer1} , ${config.dnsServer2};
-option domain-name ${config.domainName};
-option ntp-servers ${config.ntpServer};
-default-lease-time ${config.defaultLeaseTime};
-max-lease-time ${config.maxLeaseTime};
+# Subnet Declarations
+subnet ${config.Subnet} netmask ${config.Subnet_mask} {
+    deny bootp;
+    option subnet-mask ${config.Subnet_mask};
+#    option broadcast-address 192.168.1.255
+    option routers ${config.Gateway}
+    range ${config.StartIP} ${config.EndIP};
 }
+
+# Host DEeclarations
+host myhost {
+    hardware ethernet 00:A0:78:8E:9E:AA;
+    fixed-address 192.168.1.50
+}
+
+# Group Declarations
+group {
+    option routers 192.168.1.254;
+    option subnet-mask 255.255.255.0;
+    host apex {
+        option host-name "apex.example.com";
+        hardware ethernet 00:A0:78:8E:9E:AA;
+        fixed-address 192.168.1.4;
+    }
+    host raleigh {
+        option host-name "raleigh.example.com";
+        hardware ethernet 00:A1:DD:74:C3:F2;
+        fixed-address 192.168.1.6;
+    }
+}
+
+# Pool Declarations
+subnet 10.0.0.0 netmask 255.255.255.0 {
+    pool {
+        range 10.0.0.100 10.0.0.150;
+        option routers 10.0.0.254;
+    }
+    pool {
+        range 10.0.0.200 10.0.0.220;
+        option routers 10.0.0.1;
+    }
+}
+
+# PXE Boot Options
+option PXE.discovery-control code 6 = unsigned integer 8;
+option PXE.boot-server code 8 = {
+    unsigned integer 16, unsigned integer 8, ip-address
+};
+
+# Dynamic DNS Updates
+ddns-update-style none;
+ddns-updates off;
+
+
 `;
 }
 
-app.post('/dhcp/apply', (req, res) => {
-    try {
-        // Logic to apply the configuration goes here
-        // For demonstration, just log the config
-        console.log('Applying DHCP configuration:', dhcpConfig);
+// app.post('/dhcp/apply', (req, res) => {
+//     try {
+//         // Logic to apply the configuration goes here
+//         // For demonstration, just log the config
+//         console.log('Applying DHCP configuration:', dhcpConfig);
 
-        const configContent = generateDhcpConfig(dhcpConfig);
+//         const configContent = generateDhcpConfig(dhcpConfig);
 
-        // Save configuration file
-        const dhcp_conf_filePath = "/etc/dhcp/check.conf";
-        fs.appendFile(dhcp_conf_filePath, configContent, (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send('Error saving configuration');
-            }
-            // res.status(200).send('DHCP configuration updated successfully!');
-        });
-        res.status(200).send({ message: 'DHCP configuration applied successfully' });
-    } catch (error) {
-        console.error('Error applying DHCP config:', error);
-        res.status(500).send({ message: 'Failed to apply DHCP configuration' });
-    }
+//         // Save configuration file
+//         const dhcp_conf_filePath = "/etc/dhcp/check.conf";
+//         fs.appendFile(dhcp_conf_filePath, configContent, (err) => {
+//             if (err) {
+//                 console.error(err);
+//                 return res.status(500).send('Error saving configuration');
+//             }
+//             // res.status(200).send('DHCP configuration updated successfully!');
+//         });
+//         res.status(200).send({ message: 'DHCP configuration applied successfully' });
+//     } catch (error) {
+//         console.error('Error applying DHCP config:', error);
+//         res.status(500).send({ message: 'Failed to apply DHCP configuration' });
+//     }
+// });
+
+
+// Define the backend route
+app.post('/dhcp/save', function(req, res) {
+    const data = req.body;
+
+    // Write data to a file
+    const configContent = generateDhcpConfig(dhcpConfig);
+    fs.writeFile('/etc/dhcp/check.conf', configContent, function(err) {
+        if (err) {
+            console.error('Error writing to file:', err);
+            res.status(500).send({ message: 'Error writing to file' });
+        } else {
+            console.log('Data saved to file');
+            res.send({ message: 'Data saved successfully' });
+        }
+    });
 });
 
+
+// For handling OMAPI key generation
+//  function to return the selected algorithm
+function getAlgorithm(algorithmName) {
+    switch (algorithmName) {
+        case '1':
+            return new AESAlgorithm();
+        case '2':
+            return new RSAAlgorithm();
+        default:
+            throw new Error('Unsupported algorithm');
+    }
+}
+
+// Endpoint to generate key using selected algorithm
+app.post('/generateKey', (req, res) => {
+    const algorithmName = req.body.algorithm;
+    console.log(algorithmName);
+    const algorithm = getAlgorithm(algorithmName);
+    const key = algorithm.generateKey();
+    res.json({ key });
+});
 
 server.listen(port, HOST, () => {
     console.log(`Server running at http://${HOST}:${port}`);
