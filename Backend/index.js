@@ -53,6 +53,9 @@ io.on('connection', (socket) => {
     socket.on('execute-command', (data) => {
         tcpClient.executeCommand(data, socket.id);
     });
+    socket.on('interface-list-request', ()=>{
+        tcpClient.interfaceListRequest(socket.id);
+    });
 });
 
 app.use(express.json());
@@ -115,7 +118,7 @@ app.use(bodyParser.json());
 
 // Example in-memory storage for demonstration purposes
 let dhcpConfig = {
-  
+
 };
 
 // API endpoint to save DHCP configuration
@@ -235,12 +238,12 @@ ddns-updates off;
 
 
 // Define the backend route
-app.post('/dhcp/save', function(req, res) {
+app.post('/dhcp/save', function (req, res) {
     const data = req.body;
 
     // Write data to a file
     const configContent = generateDhcpConfig(dhcpConfig);
-    fs.writeFile('/etc/dhcp/check.conf', configContent, function(err) {
+    fs.writeFile('/etc/dhcp/check.conf', configContent, function (err) {
         if (err) {
             console.error('Error writing to file:', err);
             res.status(500).send({ message: 'Error writing to file' });
@@ -253,13 +256,14 @@ app.post('/dhcp/save', function(req, res) {
 
 
 // For handling OMAPI key generation
+
 //  function to return the selected algorithm
 function getAlgorithm(algorithmName) {
     switch (algorithmName) {
         case '1':
-            return new AESAlgorithm();
+            return "sujit1";
         case '2':
-            return new RSAAlgorithm();
+            return "sujit2";
         default:
             throw new Error('Unsupported algorithm');
     }
@@ -267,11 +271,13 @@ function getAlgorithm(algorithmName) {
 
 // Endpoint to generate key using selected algorithm
 app.post('/generateKey', (req, res) => {
-    const algorithmName = req.body.algorithm;
-    console.log(algorithmName);
-    const algorithm = getAlgorithm(algorithmName);
-    const key = algorithm.generateKey();
-    res.json({ key });
+    try {
+        const algorithmName = req.body.omapialgo;
+        const algorithm = getAlgorithm(algorithmName);
+        res.status(200).send({algorithm});
+    } catch (error) {
+        res.status(500).send("Error in generation of key");
+    }
 });
 
 server.listen(port, HOST, () => {
