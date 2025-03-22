@@ -17,7 +17,7 @@ function DHCPConfiguration() {
   const [isdenyclient, setIsDenyClient] = useState(true);
   const [isignclientname, setIsIgnClientname] = useState(true);
 
-  const [subnet, setSubnet] = useState('192.168.1.1');
+  const [subnet, setSubnet] = useState('192.168.1.0');
   const [mask, setMask] = useState('255.255.255.0');
   const [subnet_range, setSubnetRange] = useState('192.168.1.1-192.168.1.254');
   const [startIP, setStartIP] = useState('');
@@ -100,7 +100,7 @@ function DHCPConfiguration() {
     };
 
     //  Send data to backend using Fetch API
-    fetch('http://10.31.38.228:5000/dhcp/save', {
+    fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -151,8 +151,8 @@ function DHCPConfiguration() {
   const handleGenerateKey = async () => {
     if (checkkey && omapialgo) {
       try {
-        const response = await axios.post('http://10.31.38.228:5000/generateKey', { omapialgo });
-        setOmapikKey(response.data.key);
+        const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/generateKey`, { omapialgo });
+        setOmapikKey(response.data.algorithm);
       } catch (error) {
         console.error(error);
       }
@@ -163,6 +163,9 @@ function DHCPConfiguration() {
   useEffect(() => {
     if (checkkey && omapialgo) {
       handleGenerateKey();
+    }
+    else if(!checkkey){
+      setOmapikKey('');
     }
   }, [checkkey, omapialgo]);
 
