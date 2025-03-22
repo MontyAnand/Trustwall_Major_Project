@@ -11,6 +11,7 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <set>
 #include <stdexcept>
 #include <iterator>
 #include <cassert>
@@ -28,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ifaddrs.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -192,6 +194,14 @@ public:
     static void executeScriptFile(std::string, int);
 };
 
+class Interface
+{
+public:
+    static std ::string getInterfaceListJSON();
+    static std ::string getLANInterface();
+    static std ::string getWANInterface();
+};
+
 class Server
 {
 private:
@@ -236,6 +246,7 @@ private:
     void handleServiceListRequest(int);
     void handleCPUStatusRequest(int);
     void manageServiceRequest(std::string);
+    void handleInterfaceRequest(std::string,int);
 
 public:
     Server();

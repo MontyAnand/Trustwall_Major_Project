@@ -53,6 +53,9 @@ io.on('connection', (socket) => {
     socket.on('execute-command', (data) => {
         tcpClient.executeCommand(data, socket.id);
     });
+    socket.on('interface-list-request', ()=>{
+        tcpClient.interfaceListRequest(socket.id);
+    });
 });
 
 app.use(express.json());

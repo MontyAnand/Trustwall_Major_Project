@@ -171,7 +171,11 @@ void Server::processPacket(char *buffer, int fd)
     }
     case 15:
     {
-        Executor::executeCommand(buffer,fd);
+        Executor::executeCommand(buffer, fd);
+    }
+    case 18:
+    {
+        handleInterfaceRequest(buffer, fd);
     }
     default:
         break;
@@ -285,36 +289,61 @@ void Server::handleCPUStatusRequest(int fd)
     return;
 }
 
-void Server::manageServiceRequest(std::string req){
-    try{
+void Server::handleInterfaceRequest(std::string buffer, int fd)
+{
+    if (buffer.length() < 2)
+        return;
+    uint8_t ID = static_cast<uint8_t>(buffer[1]);
+    std::string data = Interface::getInterfaceListJSON();
+    uint8_t flag = 19;
+    std::vector<uint8_t> byteArray;
+    byteArray.push_back(flag);
+    byteArray.push_back(ID);
+    byteArray.insert(byteArray.end(), data.begin(), data.end());
+    send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
+}
+
+void Server::manageServiceRequest(std::string req)
+{
+    try
+    {
         json obj = json::parse(req.substr(1));
         std::string service = obj.at("service");
         int operation = obj.at("operation");
-        switch (operation){
-            case 0: {
-                SystemdServiceManager::startService(service);
-                break;
-            }
-            case 1: {
-                SystemdServiceManager::stopService(service);
-                break;
-            }
-            case 2: {
-                SystemdServiceManager::restartService(service);
-                break;
-            }
-            case 3: {
-                SystemdServiceManager::enableService(service);
-                break;
-            }
-            case 4: {
-                SystemdServiceManager::disableService(service);
-                break;
-            }
-            default: break;
+        switch (operation)
+        {
+        case 0:
+        {
+            SystemdServiceManager::startService(service);
+            break;
         }
-
-    }catch (const std::exception& e) {
+        case 1:
+        {
+            SystemdServiceManager::stopService(service);
+            break;
+        }
+        case 2:
+        {
+            SystemdServiceManager::restartService(service);
+            break;
+        }
+        case 3:
+        {
+            SystemdServiceManager::enableService(service);
+            break;
+        }
+        case 4:
+        {
+            SystemdServiceManager::disableService(service);
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    catch (const std::exception &e)
+    {
         std::cerr << "Error during Service Management request handling " << e.what() << '\n';
     }
     return;
@@ -383,21 +412,22 @@ void Server::continuousMonitoring()
     }
 }
 
-void Server::watchNetworkTraffic (){
+void Server::watchNetworkTraffic()
+{
     std::map<std::string, std::vector<unsigned long>> prev_traffic = HealthMonitor::getNetworkStats();
-    while(running){
+    while (running)
+    {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         json data = json::array();
         std::map<std::string, std::vector<unsigned long>> curr_traffic = HealthMonitor::getNetworkStats();
-        for(auto &p : curr_traffic){
-            data.push_back({
-                {"interface", p.first},
-                {"RX", (double)((p.second)[0] - prev_traffic[p.first][0])/1024.0},
-                {"TX", (double)((p.second)[1] - prev_traffic[p.first][1])/1024.0}
-            });
+        for (auto &p : curr_traffic)
+        {
+            data.push_back({{"interface", p.first},
+                            {"RX", (double)((p.second)[0] - prev_traffic[p.first][0]) / 1024.0},
+                            {"TX", (double)((p.second)[1] - prev_traffic[p.first][1]) / 1024.0}});
         }
         std::string message = data.dump();
-        broadcastMessage(message,6);
+        broadcastMessage(message, 6);
         prev_traffic = curr_traffic;
     }
 }
@@ -440,7 +470,8 @@ Server::~Server()
         healthMonitorThread.join();
     }
 
-    if(networkTrafficThread.joinable()){
+    if (networkTrafficThread.joinable())
+    {
         networkTrafficThread.join();
     }
 }

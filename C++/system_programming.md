@@ -30,9 +30,10 @@ JSON DATA => |service name|operation| => operation: {0:start,1:stop,2:restart,3:
 Command Execution Request => |1 byte (flag) |1 byte (Client ID) |1 byte (length of the command) | Command | => flag = 15
 
 comand Execution Response => |1 byte (flag)|1 byte (Client ID)| Response | => flag = 16
-Command Execution End => |1 byte (flag)|| 1 byte (Client ID)| Responnse | => flag = 17
 
-Shell Script Execution Request => |1 byte (flag) | 1 byte (Client ID) | 1 byte (length of the script filename) | Script filename |  
+Interface Request => |1 byte (flag)| 1 byte (Client ID)| => flag = 18
+
+Interface Response => |1 byte (flag)| 1 Byte (Client ID)| Response JSON | => flag = 19
 
 Dependencies:
 1. Wireguard
