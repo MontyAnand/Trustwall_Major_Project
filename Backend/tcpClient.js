@@ -60,6 +60,9 @@ module.exports.client = class TcpClient extends EventEmitter {
                 case 16: {
                     this.handleCommandExecutionResult(data);
                 }
+                case 19: {
+                    this.handleInterfaceResult(data);
+                }
                 default: break;
             }
         });
@@ -125,18 +128,37 @@ module.exports.client = class TcpClient extends EventEmitter {
         const length = data.length;
         // console.log(length);
         const commandBuffer = Buffer.from(data, 'utf-8');
-        const indexBuffer = Buffer.from([index & 0xFF]); 
+        const indexBuffer = Buffer.from([index & 0xFF]);
         const lengthBuffer = Buffer.from([length & 0xFF]);
-        const buffer = Buffer.concat([Buffer.from([15]), indexBuffer,lengthBuffer, commandBuffer]);
+        const buffer = Buffer.concat([Buffer.from([15]), indexBuffer, lengthBuffer, commandBuffer]);
         // console.log(buffer.toString());
+        this.client.write(buffer);
+    }
+
+    interfaceListRequest(socketID) {
+        const index = ClientIDMap.indexOf(socketID);
+        const indexBuffer = Buffer.from([index & 0xFF]);
+        const buffer = Buffer.concat([Buffer.from([18]), indexBuffer]);
         this.client.write(buffer);
     }
 
     handleCommandExecutionResult(data) {
         const index = data.readUInt8(1);
         const socketID = ClientIDMap[index];
-        const result = data.slice(2,data.length).toString();
-        this.io.to(socketID).emit('command-execution-result',result);
+        const result = data.slice(2, data.length).toString();
+        this.io.to(socketID).emit('command-execution-result', result);
+    }
+
+    handleInterfaceResult(data) {
+        const index = data.readUInt8(1);
+        const socketID = ClientIDMap[index];
+        const result = data.slice(2, data.length).toString();
+        try {
+            const jsonData = JSON.parse(result);
+            this.io.to(socketID).emit('interface-list', jsonData);
+        } catch (error) {
+            // console.log("Interface : ", error);
+        }
     }
 
     handleFilescanResult(data) {

@@ -11,6 +11,7 @@ import NetworkTrafficChart from "./pages/Network_Traffic"
 import CommandInterface from "./pages/Terminal"
 import Suricata from "./pages/Suricata"
 import DHCPConfiguration from "./pages/dhcp_configuration";
+import Interfcae from "./pages/Interface";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>
             <Route path="/terminal" element={<CommandInterface/>}/>
             <Route path="/DHCP-Configuration" element={<DHCPConfiguration/>}/>
+            <Route path="/interface" element={<Interfcae/>}/>
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
