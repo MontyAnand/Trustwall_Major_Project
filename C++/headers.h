@@ -200,6 +200,10 @@ public:
     static std ::string getInterfaceListJSON();
     static std ::string getLANInterface();
     static std ::string getWANInterface();
+    static void changeInterfaceConfiguration(const char* , int , int);
+    static void changeLANInterface(std::string &);
+    static void changeWANInterface(std::string &);
+    static void changeIPAddress(const std::string &, const std::string &, int );
 };
 
 class Server
@@ -237,7 +241,7 @@ private:
     void addToOutputEventLoop(int);
 
     void startNodeServer(std::string);
-    void processPacket(char *, int);
+    void processPacket(char *, int, int);
     void watchNetworkTraffic();
 
     void handleFilescan();

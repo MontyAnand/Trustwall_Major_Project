@@ -56,6 +56,9 @@ io.on('connection', (socket) => {
     socket.on('interface-list-request', ()=>{
         tcpClient.interfaceListRequest(socket.id);
     });
+    socket.on('change-interface-configuration',(data)=>{
+        tcpClient.changeInterfaceConfiguration(data);
+    });
 });
 
 app.use(express.json());
