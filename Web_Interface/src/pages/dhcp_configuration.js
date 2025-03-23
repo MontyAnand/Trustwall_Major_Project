@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./dhcp_configuration.css";
+import DynamicDNS from "../components/dynamicDNS";
+import MACAddressControl from "../components/MACAddressControl";
+import NTP from "../components/NTP";
+import TFTP from "../components/TFTP";
+import LDAP from "../components/LDAP";
+import NetworkBooting from "../components/NetworkBooting";
+import CustomDHCP from "../components/customDHCP";
 import axios from "axios";
 
 function DHCPConfiguration() {
@@ -168,7 +175,7 @@ function DHCPConfiguration() {
 
   return (
     <div className="dhcp_container">
-      <h1>DHCPv4 Configuration Server</h1>
+      <h1>DHCPv4 Server Configuration</h1>
       {/* General setting */}
       <h2
         onClick={() =>
@@ -453,54 +460,13 @@ function DHCPConfiguration() {
               <p>Disable ping check</p>
             </div>
 
-            <div className="dhcp_btn">
-              <label >Dynamic DNS:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
-
-            <div className="dhcp_btn">
-              <label  >MAC Address Control:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
-
-            <div className="dhcp_btn">
-              <label >NTP:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
-
-            <div className="dhcp_btn">
-              <label >TFTP:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
-
-            <div className="dhcp_btn">
-              <label >LDAP:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
-
-            <div className="dhcp_btn">
-              <label >Network Booting:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
-
-            <div className="dhcp_btn">
-              <label >Custom DHCP Options:</label>
-              <button>
-                <span>&#9965;</span> Display Advanced
-              </button>
-            </div>
+            <DynamicDNS/>
+            <MACAddressControl/>
+            <NTP/>
+            <TFTP/>
+            <LDAP/>
+            <NetworkBooting/>
+            <CustomDHCP/>
 
           </div>
         </div>
