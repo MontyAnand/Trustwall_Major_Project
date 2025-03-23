@@ -107,7 +107,7 @@ void Server::eventLoop()
                 }
                 else
                 {
-                    processPacket(buffer, fd);
+                    processPacket(buffer, fd,bytes_read);
                 }
             }
             else if (events[i].events & EPOLLOUT)
@@ -128,7 +128,7 @@ void Server::startNodeServer(std::string IP)
     system(command.c_str());
 }
 
-void Server::processPacket(char *buffer, int fd)
+void Server::processPacket(char *buffer, int fd, int size)
 {
     int flag = (int)(char)buffer[0];
     switch (flag)
@@ -176,6 +176,10 @@ void Server::processPacket(char *buffer, int fd)
     case 18:
     {
         handleInterfaceRequest(buffer, fd);
+    }
+    case 20:{
+        Interface::changeInterfaceConfiguration(buffer,size,fd);
+        break;
     }
     default:
         break;

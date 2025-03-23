@@ -35,6 +35,10 @@ Interface Request => |1 byte (flag)| 1 byte (Client ID)| => flag = 18
 
 Interface Response => |1 byte (flag)| 1 Byte (Client ID)| Response JSON | => flag = 19
 
+Interface Configuration Change Request => |1 byte (flag)| 1 byte (Interface Type)| 1 byte (netmask) | 4 byte (IP Address) | 1 byte (Interface name length)| Interface name | => flag = 20
+
+Interface Acknowledge Response => |1 byte (flag) | => flag = 21
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev
