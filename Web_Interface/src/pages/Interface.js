@@ -6,8 +6,23 @@ const InterfaceTable = () => {
     const { socket } = useSocket();
     const [interfaces, setInterfaces] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedInterface, setSelectedInterface] = useState(null);
-    const [formData, setFormData] = useState({ ip: "", netmask: "", type: "" });
+    const [formData, setFormData] = useState({ if: "", ip: "", netmask: "", type: "" });
+
+    const ipToBigEndian = (ip) => {
+        const parts = ip.split(".").map(Number);
+        return ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3])>>>0;
+    };
+
+    const countBits = (netmask) => {
+        return netmask
+            .split('.')                           // Split into octets
+            .map(octet => parseInt(octet, 10))    // Convert each octet to integer
+            .map(num => num.toString(2))          // Convert to binary
+            .join('')                             // Join all binary strings
+            .split('')                            // Convert to an array of characters
+            .filter(bit => bit === '1')           // Filter only '1' bits
+            .length;                              // Count them
+    }
 
     useEffect(() => {
         if (socket) {
@@ -21,15 +36,20 @@ const InterfaceTable = () => {
             setInterfaces(data);
         });
 
+        socket.on('interface-ack', ()=>{
+            socket.emit("interface-list-request");
+        });
+
         return () => {
             socket.off("interface-list");
+            socket.off("interface-list-request");
         };
     }, [socket]);
 
     // Open modal and set initial values
     const showModal = (record) => {
-        setSelectedInterface(record);
         setFormData({
+            if: record.if, // Include interface name
             ip: record.ip,
             netmask: record.netmask,
             type: record.type === 0 ? "0" : record.type === 1 ? "1" : ""
@@ -45,6 +65,18 @@ const InterfaceTable = () => {
     // Handle form submission
     const handleSubmit = () => {
         alert(`Updated Data: ${JSON.stringify(formData)}`);
+        if (!socket) {
+            alert("Not connected to UTM !!!");
+            setIsModalVisible(false);
+            return;
+        }
+        const data = {
+            if: formData.if,
+            ip: ipToBigEndian(formData.ip),
+            netmask: countBits(formData.netmask),
+            type: Number(formData.type)
+        };
+        socket.emit('change-interface-configuration', data);
         setIsModalVisible(false);
     };
 
@@ -53,7 +85,7 @@ const InterfaceTable = () => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    // Define columns for the table
+    // Define table columns
     const columns = [
         { title: "Interface", dataIndex: "if", key: "if" },
         { title: "IP Address", dataIndex: "ip", key: "ip" },
@@ -88,6 +120,9 @@ const InterfaceTable = () => {
 
             {/* Modal Form */}
             <Modal title="Edit Interface" open={isModalVisible} onCancel={handleCancel} onOk={handleSubmit}>
+                <label>Interface:</label>
+                <Input value={formData.if} disabled />
+
                 <label>IP Address:</label>
                 <Input value={formData.ip} onChange={(e) => handleChange("ip", e.target.value)} />
 
