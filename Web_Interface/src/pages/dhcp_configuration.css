@@ -40,7 +40,7 @@ margin: 0;
 .dhcp_general_container{
     display:flex;
     flex-direction: column;
-    width: 50%;
+    width: 85%;
     align-items: center;
     justify-content: center;
 }
@@ -111,7 +111,7 @@ margin: 0;
 .dhcp_primary_container{
     display:flex;
     flex-direction: column;
-    width: 50%;
+    width: 85%;
     align-items: center;
     justify-content: center;
 }
@@ -143,9 +143,10 @@ input[type="number"]::-webkit-inner-spin-button {
     font-weight: bold;
 } 
  .dhcp_add_btn{
-    /* display: flex; */
-    /* flex-direction: column; */
-    width:50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    width:100%;
 }
 .dhcp_add_btn label{
     padding-bottom: 20px;
@@ -175,7 +176,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .dhcp_server_container{
     display:flex;
     flex-direction: column;
-    width: 50%;
+    width: 85%;
     align-items: center;
     justify-content: center;
 }
@@ -184,7 +185,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .dhcp_omapi_container{
     display:flex;
     flex-direction: column;
-    width: 50%;
+    width: 85%;
     align-items: center;
     justify-content: center;
 }
@@ -200,11 +201,14 @@ input[type="number"]::-webkit-inner-spin-button {
 .dhcp_omapi_container .dhcp_checkbox p{
     display: block;
 }
+.dhcp_container p {
+    text-align: center;
+}
 /* other DHCP Setting */
 .dhcp_other_container{
     display:flex;
     flex-direction: column;
-    width: 50%;
+    width: 85%;
     align-items: center;
     justify-content: center;
 }
@@ -278,4 +282,64 @@ input[type="number"]::-webkit-inner-spin-button {
 .dhcp_save_btn:disabled {
     opacity: 0.5; 
     cursor: not-allowed; 
+}
+/* Component styling */
+.dhcp_comp_container{
+    width: 100%;
+    margin: 20px 50px;
+}
+.dhcp_comp_container label{
+    display: inline-block;
+    margin-top: 24px;
+} 
+.dhcp_comp_internal_container{
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+}
+.dhcp_comp_container button{
+    margin-left: 30px;
+    margin-bottom: 20px;
+    padding: 18px 21px;
+    border-radius: 10px;
+    border:none;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 3px 4px 10px grey;
+    background-image: linear-gradient(to right bottom,rgb(33, 216, 216),rgb(80, 80, 176));
+    font-weight: bold;
+    float:right;
+    width: 31%;
+    text-align: center;
+}
+.internal_custom_dhcp_container{
+    display: flex;
+    flex-direction:row;
+    gap: 40px;
+}
+.internal_custom_dhcp_container input[type="text"]{
+    width: 85%;
+    margin:15px 0;
+}
+.internal_custom_dhcp_container input[type="number"]{
+    width: 85%;
+    margin:15px 0;
+}
+.internal_custom_dhcp_container .dhcp_number{
+   margin-bottom: 25px;
+}
+.internal_custom_dhcp_container button{
+    margin-top: 33px;
+    width: 100%;
+}
+.dhcp_delete_btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dhcp_delete_btn button{
+    background-color: #208237;
 }
