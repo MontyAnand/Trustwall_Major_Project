@@ -39,6 +39,9 @@ Interface Configuration Change Request => |1 byte (flag)| 1 byte (Interface Type
 
 Interface Acknowledge Response => |1 byte (flag) | => flag = 21
 
+LAN Interface Details Request => |1 byte (flag)| => flag = 22
+LAN Interface Details Response => |1 byte (flag)| JSON data | => flag = 23
+
 Dependencies:
 1. Wireguard
 2. nlohmann-json3-dev

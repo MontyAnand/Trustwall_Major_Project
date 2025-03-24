@@ -115,7 +115,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
             changeWANInterface(result.interfaceName);
 
         uint8_t ack = 21;
-        send(fd,&ack,1,0);
+        send(fd, &ack, 1, 0);
     }
     catch (const std::exception &e)
     {
@@ -230,4 +230,108 @@ std::string Interface::getInterfaceListJSON()
 
     freeifaddrs(ifaddr); // Free allocated memory
     return data.dump();  // Pretty-print JSON output
+}
+
+std::string Interface::getGateway(const std::string &iface)
+{
+    std::ifstream file("/proc/net/route");
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open /proc/net/route" << std::endl;
+        return "";
+    }
+    std::string line;
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string interfaceName, destination, gateway, flags;
+
+        if (!(iss >> interfaceName >> destination >> gateway >> flags))
+            continue;
+
+        if (interfaceName == iface && destination == "00000000")
+        { // Default route for the given interface
+            unsigned int gwHex;
+            std::stringstream ss;
+            ss << std::hex << gateway;
+            ss >> gwHex;
+
+            struct in_addr gwAddr;
+            gwAddr.s_addr = gwHex;
+            return inet_ntoa(gwAddr);
+        }
+    }
+
+    return "";
+}
+
+std::string Interface::getLANInterfaceDetails()
+{
+    std::string iface = getLANInterface();
+    std::string IP = "";
+    std::string nm = "";
+    std::string bip = "";
+    std::string gip = "";
+
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd == -1)
+    {
+        perror("Socket creation failed");
+        json data = {
+            {"IP", IP},
+            {"nm", nm},
+            {"bip", bip},
+            {"gip", gip}
+        } ;
+        return data.dump();
+    }
+
+    struct ifreq ifr;
+    strncpy(ifr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
+
+    // Get IP Address
+    if (ioctl(fd, SIOCGIFADDR, &ifr) == 0)
+    {
+        struct sockaddr_in *ip = (struct sockaddr_in *)&ifr.ifr_addr;
+        std::cout << "IP Address: " << inet_ntoa(ip->sin_addr) << std::endl;
+        IP = inet_ntoa(ip->sin_addr);
+    }
+    else
+    {
+        perror("Failed to get IP Address");
+    }
+
+    // Get Netmask
+    if (ioctl(fd, SIOCGIFNETMASK, &ifr) == 0)
+    {
+        struct sockaddr_in *netmask = (struct sockaddr_in *)&ifr.ifr_netmask;
+        std::cout << "Netmask: " << inet_ntoa(netmask->sin_addr) << std::endl;
+        nm = inet_ntoa(netmask->sin_addr);
+    }
+    else
+    {
+        perror("Failed to get Netmask");
+    }
+
+    // Get Broadcast Address
+    if (ioctl(fd, SIOCGIFBRDADDR, &ifr) == 0)
+    {
+        struct sockaddr_in *bcast = (struct sockaddr_in *)&ifr.ifr_broadaddr;
+        std::cout << "Broadcast IP: " << inet_ntoa(bcast->sin_addr) << std::endl;
+        bip = inet_ntoa(bcast->sin_addr);
+    }
+    else
+    {
+        perror("Failed to get Broadcast IP");
+    }
+    close(fd);
+
+    gip = getGateway(iface);
+
+    json data = {
+        {"IP", IP},
+        {"nm", nm},
+        {"bip", bip},
+        {"gip", gip}};
+    return data.dump();
 }

@@ -104,6 +104,13 @@ app.post('/upload', upload.single('file'), getFilename, (req, res) => {
     res.status(200).json({ message: 'File uploaded successfully', file: req.file.filename });
 });
 
+app.get('/lanInfo',(req,res)=>{
+    tcpClient.sendLANDetailsRequest();
+    tcpClient.once('lan-interface-details',(data)=>{
+        res.status(200).send(data);
+    });
+});
+
 // firewall endpoints
 app.use('/firewall', firewall_routes);
 app.use('/firewall', firewall_zone_routes);
