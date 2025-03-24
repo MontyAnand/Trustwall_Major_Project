@@ -329,7 +329,8 @@ std::string Interface::getLANInterfaceDetails()
     gip = getGateway(iface);
 
     json data = {
-        {"IP", IP},
+        {"if",iface},
+        {"ip", IP},
         {"nm", nm},
         {"bip", bip},
         {"gip", gip}};
