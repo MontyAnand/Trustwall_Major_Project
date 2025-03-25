@@ -1,2 +1,4 @@
 node_modules
 a.out
+*.qr
+*.conf
