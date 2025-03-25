@@ -7,6 +7,7 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cors = require('cors');
+const os=require('os');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
@@ -265,26 +266,80 @@ app.post('/dhcp/save', function (req, res) {
 });
 
 
+
+
+// This is for interface data
+// Allow frontend to access this API (CORS)
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+});
+
+
+app.get('/network-info', async (req, res) => {
+    const interfaces = os.networkInterfaces();
+    let activeInterface = null;
+
+    // Find the first non-internal IPv4 interface
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                activeInterface = iface;
+                break;
+            }
+        }
+        if (activeInterface) break;
+    }
+
+    let gatewayIP = null;
+    try {
+        const gatewayModule = await import('default-gateway');
+        const result = await gatewayModule.v4(); 
+        gatewayIP = result.gateway;
+    } catch (err) {
+        gatewayIP = 'Not available';
+    }
+
+    res.json({
+        ip: activeInterface?.address || 'Not available',
+        netmask: activeInterface?.netmask || 'Not available',
+        broadcast: getBroadcastAddress(activeInterface),
+        gateway: gatewayIP
+    });
+});
+
+function getBroadcastAddress(iface) {
+    if (!iface) return 'Not available';
+    const ipParts = iface.address.split('.').map(Number);
+    const maskParts = iface.netmask.split('.').map(Number);
+    const broadcastParts = ipParts.map((ip, i) => (ip & maskParts[i]) | (~maskParts[i] & 255));
+    return broadcastParts.join('.');
+}
+
+
+
 // For handling OMAPI key generation
 
 //  function to return the selected algorithm
 function getAlgorithm(algorithmName) {
     switch (algorithmName) {
         case '1':
-            return "sujit1";
+            return "md5";
         case '2':
-            return "sujit2";
+            return "sha1";
         default:
             throw new Error('Unsupported algorithm');
     }
 }
-
 // Endpoint to generate key using selected algorithm
 app.post('/generateKey', (req, res) => {
+    const key="sujit";
     try {
         const algorithmName = req.body.omapialgo;
         const algorithm = getAlgorithm(algorithmName);
-        res.status(200).send({algorithm});
+        const hmac_key=crypto.createHmac(algorithm,key);
+        console.log(hmac_key);
+        res.status(200).send({hmac_key});
     } catch (error) {
         res.status(500).send("Error in generation of key");
     }
