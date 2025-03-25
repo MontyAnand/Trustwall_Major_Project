@@ -1,4 +1,4 @@
-.container{
+.sidebar-container{
     display:flex;
     position: fixed; 
     top: 0; 
@@ -8,20 +8,20 @@
     color:white;
     z-index: 100;
 }
-.box{
+.sidebar-box{
     display:flex;
     /* flex-direction: row-reverse; */
     justify-content: space-between;
 }
-.box li{
+.sidebar-box li{
     list-style: none;
     padding: 12px 23px;
 }
-.box li a{
+.sidebar-box li a{
     text-decoration: none;
     color:white;
     font-size:17px;
 }
-.heading{
+.sidebar-heading{
     padding: 12px 23px;
 }

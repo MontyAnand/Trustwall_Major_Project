@@ -337,8 +337,7 @@ app.post('/generateKey', (req, res) => {
     try {
         const algorithmName = req.body.omapialgo;
         const algorithm = getAlgorithm(algorithmName);
-        const hmac_key=crypto.createHmac(algorithm,key);
-        console.log(hmac_key);
+        const hmac_key=crypto.createHmac(algorithm,key).digest('hex');
         res.status(200).send({hmac_key});
     } catch (error) {
         res.status(500).send("Error in generation of key");

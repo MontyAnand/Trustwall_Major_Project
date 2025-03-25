@@ -211,13 +211,25 @@ function DHCPConfiguration() {
 
 
   // Fetch data from backend on mount
+  // useEffect(() => {
+  //   fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/network-info`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setSubnet(binaryToIp(bitwiseAnd(data.ip,data.netmask)));
+  //       setMask(data.netmask);
+  //       setGateway(data.gateway);
+  //     })
+  //     .catch((err) => {
+  //       console.error('Failed to fetch network info:', err);
+  //     });
+  // }, []);
   useEffect(() => {
-    fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/network-info`)
+    fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/laninfo`)
       .then((res) => res.json())
       .then((data) => {
-        setSubnet(binaryToIp(bitwiseAnd(data.ip,data.netmask)));
-        setMask(data.netmask);
-        setGateway(data.gateway);
+        setSubnet(binaryToIp(bitwiseAnd(data.ip,data.nm)));
+        setMask(data.nm);
+        setGateway(data.gip);
       })
       .catch((err) => {
         console.error('Failed to fetch network info:', err);
@@ -232,6 +244,7 @@ function DHCPConfiguration() {
     }
   }, [subnet,mask]);
 
+ 
   return (
     <div className="dhcp_container">
       <h1>DHCPv4 Server Configuration</h1>
