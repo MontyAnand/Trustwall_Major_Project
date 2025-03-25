@@ -19,10 +19,10 @@ function DHCPConfiguration() {
 
   //useState for all form elements
   const [interfacechecked, setInterfaceChecked] = useState(true);
-  const [bootpchecked, setBootpChecked] = useState(true);
-  const [isclientaccept, setIsClientAccept] = useState(2);
-  const [isdenyclient, setIsDenyClient] = useState(true);
-  const [isignclientname, setIsIgnClientname] = useState(true);
+  const [bootpchecked, setBootpChecked] = useState(false);
+  const [isclientaccept, setIsClientAccept] = useState(0);
+  const [isdenyclient, setIsDenyClient] = useState(false);
+  const [isignclientname, setIsIgnClientname] = useState(false);
 
   const [subnet, setSubnet] = useState('192.168.1.0');
   const [mask, setMask] = useState('255.255.255.0');
@@ -127,11 +127,11 @@ function DHCPConfiguration() {
   }
 
   // Function to convert a binary IP back to dotted decimal format
-  // function binaryToIp(binaryIp) {
-  //   return binaryIp.split('.')
-  //     .map(binaryOctet => parseInt(binaryOctet, 2))
-  //     .join('.');
-  // }
+  function binaryToIp(binaryIp) {
+    return binaryIp.split('.')
+      .map(binaryOctet => parseInt(binaryOctet, 2))
+      .join('.');
+  }
 
   // Function to perform bitwise AND operation on two IPs
   function bitwiseAnd(ip1, ip2) {
@@ -159,22 +159,78 @@ function DHCPConfiguration() {
     if (checkkey && omapialgo) {
       try {
         const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/generateKey`, { omapialgo });
-        setOmapikKey(response.data.algorithm);
+        setOmapikKey(response.data.hmac_key);
       } catch (error) {
         console.error(error);
       }
     }
   };
 
- // Handle Generate key
+  // Handle possible Subnet range
+  const calculateSubnetRange = () => {
+    function ipToLong(ip) {
+      return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
+    }
+
+    function longToIp(long) {
+      return [
+        (long >>> 24) & 255,
+        (long >>> 16) & 255,
+        (long >>> 8) & 255,
+        long & 255
+      ].join('.');
+    }
+
+    const ipLong = ipToLong(subnet);
+    const maskLong = ipToLong(mask);
+
+    const network = ipLong & maskLong;
+    const broadcast = network | (~maskLong >>> 0);
+
+    const firstUsable = network + 1;
+    const lastUsable = broadcast - 1;
+
+    if (lastUsable <= firstUsable) {
+      return "No usable IPs in this subnet";
+    }
+
+    return `${longToIp(firstUsable)} - ${longToIp(lastUsable)}`;
+  }
+
+
+  // Handle Generate key
   useEffect(() => {
     if (checkkey && omapialgo) {
       handleGenerateKey();
     }
-    else if(!checkkey){
+    else if (!checkkey) {
       setOmapikKey('');
     }
   }, [checkkey, omapialgo]);
+
+
+
+  // Fetch data from backend on mount
+  useEffect(() => {
+    fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/network-info`)
+      .then((res) => res.json())
+      .then((data) => {
+        setSubnet(binaryToIp(bitwiseAnd(data.ip,data.netmask)));
+        setMask(data.netmask);
+        setGateway(data.gateway);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch network info:', err);
+      });
+  }, []);
+
+  // Recalculate subnet range when subnet or mask changes
+  useEffect(() => {
+    if (subnet && mask) {
+      const range = calculateSubnetRange(subnet, mask);
+      setSubnetRange(range);
+    }
+  }, [subnet,mask]);
 
   return (
     <div className="dhcp_container">
@@ -261,12 +317,12 @@ function DHCPConfiguration() {
 
             <div className="dhcp_text">
               <label htmlFor="subnet">Subnet: </label>
-              <input type="text" name="subnet" value={subnet} onChange={(e) => setSubnet(e.target.value)} readOnly></input>
+              <input type="text" name="subnet" value={subnet} onChange={(e) => setSubnet(e.target.value)}></input>
             </div>
 
             <div className="dhcp_text">
               <label htmlFor="mask" >Subnet Mask: </label>
-              <input type="text" name="mask" value={mask} onChange={(e) => setMask(e.target.value)} readOnly></input>
+              <input type="text" name="mask" value={mask} onChange={(e) => setMask(e.target.value)} ></input>
             </div>
 
             <div className="dhcp_text">
@@ -402,7 +458,7 @@ function DHCPConfiguration() {
 
             <div className="dhcp_text">
               <label htmlFor="gateway">Gateway:</label>
-              <input type="text" name="gateway" value={gateway} onChange={(e) => setGateway(e.target.value)} readOnly></input>
+              <input type="text" name="gateway" value={gateway} onChange={(e) => setGateway(e.target.value)}></input>
             </div>
 
             <div className="dhcp_text">
@@ -463,13 +519,13 @@ function DHCPConfiguration() {
               <p>Disable ping check</p>
             </div>
 
-            <DynamicDNS/>
-            <MACAddressControl/>
-            <NTP/>
-            <TFTP/>
-            <LDAP/>
-            <NetworkBooting/>
-            <CustomDHCP/>
+            <DynamicDNS />
+            <MACAddressControl />
+            <NTP />
+            <TFTP />
+            <LDAP />
+            <NetworkBooting />
+            <CustomDHCP />
 
           </div>
         </div>
