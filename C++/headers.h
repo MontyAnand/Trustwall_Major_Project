@@ -200,10 +200,13 @@ public:
     static std ::string getInterfaceListJSON();
     static std ::string getLANInterface();
     static std ::string getWANInterface();
+    static std::string getLANInterfaceDetails();
+    static std::string getGateway(const std::string &);
     static void changeInterfaceConfiguration(const char* , int , int);
     static void changeLANInterface(std::string &);
     static void changeWANInterface(std::string &);
     static void changeIPAddress(const std::string &, const std::string &, int );
+
 };
 
 class Server
@@ -247,6 +250,7 @@ private:
     void handleFilescan();
     void handleVPNRequest();
     void continuousMonitoring();
+    void handleLANInterfaceDetailsRequest(int);
     void handleServiceListRequest(int);
     void handleCPUStatusRequest(int);
     void manageServiceRequest(std::string);

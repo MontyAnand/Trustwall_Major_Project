@@ -181,9 +181,23 @@ void Server::processPacket(char *buffer, int fd, int size)
         Interface::changeInterfaceConfiguration(buffer,size,fd);
         break;
     }
+    case 22:{
+        handleLANInterfaceDetailsRequest(fd);
+        break;
+    }
     default:
         break;
     }
+}
+
+void Server::handleLANInterfaceDetailsRequest(int fd){
+    std::string data = Interface::getLANInterfaceDetails();
+    std::vector<uint8_t> byteArray;
+    uint8_t flag = 23;
+    byteArray.push_back(flag);
+    byteArray.insert(byteArray.end(), data.begin(), data.end());
+    send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
 }
 
 void Server::handleFilescan()

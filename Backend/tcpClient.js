@@ -69,6 +69,10 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.broadcastInterfaceACK();
                     break;
                 }
+                case 23: {
+                    this.handleLANInterfaceDetails(data);
+                    break;
+                }
                 default: break;
             }
         });
@@ -126,6 +130,11 @@ module.exports.client = class TcpClient extends EventEmitter {
         const jsonString = JSON.stringify(data);
         const jsonBuffer = Buffer.from(jsonString, 'utf-8');
         const buffer = Buffer.concat([Buffer.from([14]), jsonBuffer]);
+        this.client.write(buffer);
+    }
+
+    sendLANDetailsRequest(){
+        const buffer = Buffer.from([22]);
         this.client.write(buffer);
     }
 
@@ -239,6 +248,16 @@ module.exports.client = class TcpClient extends EventEmitter {
             stream.on("end", () => {
                 this.io.to(socketID).emit('vpn-data-completed');
             });
+        }
+    }
+
+    handleLANInterfaceDetails(data){
+        const jsonString = data.subarray(1).toString('utf-8');
+        try{
+            const jsonData = JSON.parse(jsonString);
+            this.emit('lan-interface-details',jsonData);
+        }catch(error){
+            this.emit('lan-interface-details',{'error':error});
         }
     }
 

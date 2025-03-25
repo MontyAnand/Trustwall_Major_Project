@@ -1,48 +1,93 @@
-// #include <iostream>
-// #include <ifaddrs.h>
-// #include <arpa/inet.h>
-// #include <netinet/in.h>
-// #include <cstring>
+#include <iostream>
+#include <cstring>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <fstream>
+#include <sstream>
 
-// int main() {
-//     struct ifaddrs *ifaddr, *ifa;
-//     char ip[INET_ADDRSTRLEN];
-//     char netmask[INET_ADDRSTRLEN];
+void getInterfaceDetails(const std::string &iface) {
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd == -1) {
+        perror("Socket creation failed");
+        return;
+    }
 
-//     // Retrieve the list of network interfaces
-//     if (getifaddrs(&ifaddr) == -1) {
-//         perror("getifaddrs");
-//         return 1;
-//     }
+    struct ifreq ifr;
+    strncpy(ifr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
 
-//     // Loop through the linked list
-//     for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
-//         if (ifa->ifa_addr == nullptr) continue;
+    // Get IP Address
+    if (ioctl(fd, SIOCGIFADDR, &ifr) == 0) {
+        struct sockaddr_in *ip = (struct sockaddr_in *)&ifr.ifr_addr;
+        std::cout << "IP Address: " << inet_ntoa(ip->sin_addr) << std::endl;
+    } else {
+        perror("Failed to get IP Address");
+    }
 
-//         // Check for IPv4 address
-//         if (ifa->ifa_addr->sa_family == AF_INET) {
-//             struct sockaddr_in *addr = (struct sockaddr_in *)ifa->ifa_addr;
-//             struct sockaddr_in *mask = (struct sockaddr_in *)ifa->ifa_netmask;
+    // Get Netmask
+    if (ioctl(fd, SIOCGIFNETMASK, &ifr) == 0) {
+        struct sockaddr_in *netmask = (struct sockaddr_in *)&ifr.ifr_netmask;
+        std::cout << "Netmask: " << inet_ntoa(netmask->sin_addr) << std::endl;
+    } else {
+        perror("Failed to get Netmask");
+    }
 
-//             // Convert address to string
-//             inet_ntop(AF_INET, &addr->sin_addr, ip, INET_ADDRSTRLEN);
-//             inet_ntop(AF_INET, &mask->sin_addr, netmask, INET_ADDRSTRLEN);
+    // Get Broadcast Address
+    if (ioctl(fd, SIOCGIFBRDADDR, &ifr) == 0) {
+        struct sockaddr_in *bcast = (struct sockaddr_in *)&ifr.ifr_broadaddr;
+        std::cout << "Broadcast IP: " << inet_ntoa(bcast->sin_addr) << std::endl;
+    } else {
+        perror("Failed to get Broadcast IP");
+    }
 
-//             std::cout << "Interface: " << ifa->ifa_name << std::endl;
-//             std::cout << "  IPv4 Address: " << ip << std::endl;
-//             std::cout << "  Netmask: " << netmask << std::endl;
-//         }
-//     }
+    close(fd);
+}
 
-//     // Free memory
-//     freeifaddrs(ifaddr);
-//     return 0;
-// }
+// Get Default Gateway from /proc/net/route
+std::string getGateway(const std::string &iface) {
+    std::ifstream file("/proc/net/route");
+    if (!file.is_open()) {
+        std::cerr << "Failed to open /proc/net/route" << std::endl;
+        return "";
+    }
 
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string interfaceName, destination, gateway, flags;
 
-#include "headers.h"
+        if (!(iss >> interfaceName >> destination >> gateway >> flags))
+            continue;
 
-int main (){
-    std::cout << Interface::getInterfaceListJSON() << std::endl;
+        if (interfaceName == iface && destination == "00000000") { // Default route for the given interface
+            unsigned int gwHex;
+            std::stringstream ss;
+            ss << std::hex << gateway;
+            ss >> gwHex;
+
+            struct in_addr gwAddr;
+            gwAddr.s_addr = gwHex;
+            return inet_ntoa(gwAddr);
+        }
+    }
+
+    return "";
+}
+
+int main() {
+    std::string interface = "enp0s8"; // Change to your interface name
+
+    std::cout << "Interface: " << interface << std::endl;
+    getInterfaceDetails(interface);
+
+    std::string gateway = getGateway(interface);
+    if (!gateway.empty()) {
+        std::cout << "Gateway IP: " << gateway << std::endl;
+    } else {
+        std::cout << "Failed to retrieve Gateway IP" << std::endl;
+    }
+
     return 0;
 }
