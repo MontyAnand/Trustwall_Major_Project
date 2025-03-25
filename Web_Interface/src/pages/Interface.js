@@ -64,7 +64,6 @@ const InterfaceTable = () => {
 
     // Handle form submission
     const handleSubmit = () => {
-        alert(`Updated Data: ${JSON.stringify(formData)}`);
         if (!socket) {
             alert("Not connected to UTM !!!");
             setIsModalVisible(false);
