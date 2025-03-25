@@ -1,89 +1,43 @@
-import Sidebar from "../components/Sidebar";
-import { useState } from "react";
-import "./Firewall.css"; // Import CSS file
+import { Splitter, SplitterPanel } from "primereact/splitter";
+import { ScrollPanel } from "primereact/scrollpanel";
+import { Configuration } from '../components/firewall/configuration';
+import { TabPanel, TabView } from "primereact/tabview";
 
-function Firewall() {
-  const [port, setPort] = useState("");
-  const [ip, setIp] = useState("");
-  const [proxy, setProxy] = useState("");
-  const [allowNetwork, setAllowNetwork] = useState(false);
-  const [terminalCommand, setTerminalCommand] = useState("");
-  const [output, setOutput] = useState("");
-
-  // Handle terminal command execution (Simulation)
-  const executeCommand = () => {
-    if (!terminalCommand.trim()) {
-      alert("Enter a command to execute.");
-      return;
-    }
-    setOutput(`$ ${terminalCommand}\nExecuted successfully!`);
-    setTerminalCommand("");
-  };
-
-  return (
-    <>
-      <Sidebar />
-      <div className="firewall-container">
-        <h1 className="firewall-title">🛡️ Firewall</h1>
-
-        <div className="firewall-content">
-          {/* Left Side: Manual Entry for Ports, IPs, Proxy */}
-          <div className="manual-input">
-            <h2>Manual Configuration</h2>
-
-            <label>Port:</label>
-            <input
-              type="text"
-              value={port}
-              onChange={(e) => setPort(e.target.value)}
-              placeholder="Enter port number"
-            />
-
-            <label>IP Address:</label>
-            <input
-              type="text"
-              value={ip}
-              onChange={(e) => setIp(e.target.value)}
-              placeholder="Enter IP address"
-            />
-
-            <label>Proxy:</label>
-            <input
-              type="text"
-              value={proxy}
-              onChange={(e) => setProxy(e.target.value)}
-              placeholder="Enter proxy"
-            />
-
-            {/* Allow or Block Checkbox */}
-            <div className="allow-block">
-              <input
-                type="checkbox"
-                checked={allowNetwork}
-                onChange={() => setAllowNetwork(!allowNetwork)}
-              />
-              <span>{allowNetwork ? "Allow Network" : "Block Network"}</span>
-            </div>
-          </div>
-
-          {/* Right Side: Linux Terminal Simulation */}
-          <div className="terminal">
-            <h2>Linux Terminal</h2>
-            <div className="terminal-screen">
-              <pre>{output || "$ Waiting for command..."}</pre>
-            </div>
-            <input
-              type="text"
-              value={terminalCommand}
-              onChange={(e) => setTerminalCommand(e.target.value)}
-              placeholder="Enter Linux command"
-            />
-            <button onClick={executeCommand}>Execute</button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+const Firewall = () => {
+    return (
+        <Splitter style={{height: '100vh', width: '100vw'}}>
+            <SplitterPanel size={10} minSize={5}>
+                <Splitter style={{height: '100%', width: '100%'}} layout="vertical">
+                    <SplitterPanel size={50} minSize={30} style={{overflow: 'hidden'}}>
+                        <ScrollPanel style={{ height: '100%', width: '100%' }}>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui quasi ratione aperiam architecto dolorum beatae, incidunt quam, ipsa eum sit blanditiis dicta quae laboriosam voluptas, iure necessitatibus consequatur. Quas excepturi iure repudiandae quae id nesciunt, velit nobis assumenda culpa doloremque, ut temporibus quisquam animi ipsam distinctio et minima corrupti modi iusto dolor aspernatur deleniti quis praesentium! Dolorem perspiciatis, cupiditate velit temporibus unde nulla porro praesentium et repellat. Sed provident eaque saepe porro reprehenderit nam iure quidem obcaecati voluptatem, natus, nobis in cum unde, modi accusantium vitae. Recusandae fugit distinctio molestiae quas animi, pariatur ut nemo! Modi aliquid ullam saepe eligendi velit, quaerat dolor corrupti unde, aut necessitatibus ut ipsam, voluptas ex! Quis mollitia aspernatur cupiditate error labore aperiam. Sapiente aliquam nemo soluta nesciunt obcaecati dolorem asperiores rerum ea unde aut esse eum non facilis, cupiditate, nulla, reprehenderit minima tempore error fugit tempora? Eaque quae non recusandae tempore. Provident dolorum, natus amet placeat sed nam asperiores nemo? In quia facere reiciendis dolorum, tempore rem minus dolores vitae dolorem maxime excepturi praesentium mollitia placeat architecto nam dolore maiores. Doloremque perferendis ipsum veritatis temporibus voluptate minus asperiores dolores, dicta non accusantium eligendi, quibusdam porro. Eius molestiae tempore labore, voluptas consequatur, dignissimos ea temporibus sunt pariatur ex obcaecati. Ratione molestias delectus officiis accusamus perspiciatis libero voluptatum non incidunt ipsa beatae impedit tempora consequuntur, quia exercitationem itaque voluptate cumque nemo odio mollitia ut eos natus! Explicabo cumque, architecto iusto delectus id ex nobis reiciendis expedita laboriosam, voluptatem incidunt dicta rem, tempore soluta. Delectus perspiciatis debitis repellat voluptatem nam, libero in voluptate aperiam praesentium asperiores dolor mollitia explicabo veritatis molestias eius iste pariatur officia quod ipsum sapiente minima, odit deserunt? Possimus eligendi aspernatur commodi. Corrupti, cupiditate magnam exercitationem nulla ea quae? Beatae quo eos, excepturi sed repellat natus sequi quos earum suscipit facilis ipsa? Quo nostrum eos nam unde sequi minima sit aut itaque ut! Ducimus minus, quibusdam quia similique magnam repellendus doloribus perspiciatis itaque voluptatum! Ab sunt voluptas quod dolores incidunt, quo facere eligendi veniam magnam? Obcaecati doloribus eaque vitae odit atque? Hic minima explicabo accusamus culpa quaerat quod eveniet est nulla, asperiores voluptatem, consequatur, facere recusandae ipsam fugit. Voluptatem saepe nam, sit quisquam deleniti a! Rerum delectus ut voluptatibus incidunt praesentium dolorum aliquam quisquam necessitatibus ullam et nostrum dolorem iure veritatis debitis aliquid, accusantium officia nemo eaque beatae minima, perferendis iste voluptatum. Quisquam commodi eveniet sunt eius nulla, sequi laudantium, ullam officiis nostrum beatae itaque id neque adipisci esse saepe fugit corrupti magnam? Animi provident inventore adipisci expedita necessitatibus! Doloremque quam fugiat atque tenetur repudiandae fuga dolor eveniet pariatur praesentium perspiciatis, molestiae amet, magni error hic dignissimos similique laudantium consequatur, cumque illum itaque rerum! Mollitia exercitationem cumque similique laboriosam tempora modi suscipit accusantium veritatis unde iusto magnam sunt reprehenderit iste aspernatur debitis obcaecati officia incidunt, laborum voluptatibus quis velit. Odio harum aut ullam velit laborum enim quibusdam incidunt, at iure rerum nisi soluta vel maxime voluptatibus consectetur laboriosam pariatur architecto, sed temporibus ab vitae inventore. Impedit iure voluptatem, ea doloribus ad debitis quidem perspiciatis.
+                        </ScrollPanel>
+                    </SplitterPanel>
+                    <SplitterPanel size={50} minSize={30} style={{overflow: 'hidden'}}>
+                        <ScrollPanel style={{ height: '100%', width: '100%' }}>
+                            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Veritatis adipisci officia quae molestiae est debitis ea qui provident nesciunt? Fugiat, doloribus commodi maiores quaerat itaque expedita aperiam dignissimos vitae ut dolores sunt adipisci laborum, eveniet quidem, placeat officiis! Quo natus ab doloremque repellat cumque quasi voluptatibus, maxime molestiae aut, eaque sunt ipsa dignissimos quis recusandae? Magnam sit nihil accusamus corrupti. Harum iste recusandae officiis praesentium aliquam esse nemo eos qui nihil veritatis, vero sequi, dolorum, necessitatibus exercitationem saepe magnam in debitis est. Inventore in vitae modi dolores ipsa. Soluta, voluptatibus quos, ad aperiam nulla qui impedit illum minima neque repellendus sunt optio? Delectus voluptatibus eaque soluta eos est quisquam non nemo. Voluptatibus libero, officia accusamus enim porro consectetur alias odit pariatur suscipit laboriosam quaerat quis temporibus, rerum nobis quia, necessitatibus dolorum tenetur vel magni doloremque distinctio laudantium quo modi. Optio suscipit quasi repellat eveniet quo laboriosam laborum ab amet corrupti, vero ratione odio consectetur temporibus quos iusto ex sint a animi eum quia et delectus sunt id! Consequuntur, harum laboriosam magnam nisi aspernatur praesentium doloremque, itaque sunt distinctio possimus totam, delectus nihil ullam nam unde explicabo a veritatis dignissimos veniam labore nemo repellendus beatae? Temporibus sequi vero suscipit at tempora cupiditate. Modi, accusamus numquam debitis quisquam reiciendis quae impedit dolorum voluptas expedita, dolorem quaerat alias incidunt? Fugit quaerat tempore soluta consequuntur sunt nemo doloremque quidem, sapiente excepturi illum dicta magni. Labore aperiam minus exercitationem iste beatae odio quibusdam accusamus, earum esse ratione voluptas asperiores! Provident consectetur necessitatibus in accusamus, eveniet cupiditate nisi eligendi fuga deleniti, suscipit dolor magnam dolorum inventore neque reiciendis odio, consequatur repellat. Quaerat totam ex dignissimos voluptates vel maiores, rerum quisquam inventore eum eius animi cupiditate deserunt numquam voluptatem ad cumque dicta exercitationem fuga? Magni cumque sint voluptas tenetur quaerat quod commodi fuga quasi, minima consectetur corporis excepturi possimus nulla eaque laudantium? At in repudiandae, veniam reiciendis enim consequuntur vero ratione cum minus mollitia nostrum consectetur ipsam laborum qui ab ad numquam, exercitationem nesciunt facere ipsa non nihil magni officiis? Consequatur, quam. Fuga ullam officiis, commodi cumque asperiores doloremque distinctio qui nam odio, deleniti quidem molestias quod unde non dicta quia exercitationem modi deserunt et dolore sint quam! Vero ducimus numquam nam odio eum dolorum natus officiis neque, quas quis labore nobis pariatur, similique id nisi qui at incidunt! Neque, tempore. Optio, mollitia soluta cum harum quos unde quaerat molestias est! Eligendi porro dignissimos vitae ipsum possimus, provident deleniti nisi distinctio esse illo pariatur repellat culpa saepe dolores iure necessitatibus alias sequi commodi. Perspiciatis dolores deserunt accusantium obcaecati expedita quam qui reprehenderit sit magnam corporis aut dolorem recusandae atque temporibus, velit facilis, ex, perferendis nam accusamus voluptate quae. Aspernatur a, laborum, voluptatibus voluptatum corporis libero maxime voluptate modi debitis dolorum voluptatem qui soluta repellat aut unde dignissimos rerum. Neque inventore veniam cupiditate fugiat doloremque earum velit voluptas nostrum aliquam odio libero, tempore reiciendis culpa, iure sit est magni pariatur veritatis excepturi quidem voluptatem? Eum, accusantium fugiat excepturi eos velit dignissimos omnis veniam et cumque animi exercitationem numquam!
+                        </ScrollPanel>
+                    </SplitterPanel>
+                </Splitter>
+            </SplitterPanel>
+            <SplitterPanel size={90} minSize={80}>
+                    <TabView style={{height: '100%', width: '100%'}}>
+                        <TabPanel header='Zones'>
+                            <Configuration msg={'A firewalld zones defines the level of trust for network connections, interfaces and source addresses bound to that zone.The zone combines services, ports, protocols, masquerading, port/packet forwarding, icmp filters and rich rules.The zone can be bound to interfaces and source addresses'} name={'Zones'}/>
+                        </TabPanel>
+                        <TabPanel header='Policies'>
+                            <Configuration msg={'A firewalld policies defines the level of trust for network connections, interfaces and source addresses bound to that zone.The zone combines services, ports, protocols, masquerading, port/packet forwarding, icmp filters and rich rules.The zone can be bound to interfaces and source addresses'} name={'Policies'}/>
+                        </TabPanel>
+                        <TabPanel header='Services'>
+                            <Configuration msg={'A firewald services is a combination of ports, protocols, modules and destination addresses'} name={'Services'}/>
+                        </TabPanel>
+                        <TabPanel header='IPsets'>
+                            <Configuration msg={'An IPset is used to create white or black lists and is able to store for example IP addresses, port numbers or mac addresses'} name={'IPsets'}/>
+                        </TabPanel>
+                    </TabView>
+            </SplitterPanel>
+        </Splitter>
+    );
 }
 
 export default Firewall;
