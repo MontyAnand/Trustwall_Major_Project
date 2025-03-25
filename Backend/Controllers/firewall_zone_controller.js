@@ -28,7 +28,7 @@ module.exports.setDefaultZone = (req, res) => {
 }
 
 module.exports.getActiveZones = (req, res) => {
-    runCommand('sudo firewall-cmd --get-active-zones', res);
+    runCommand('sudo firewall-cmd --get-active-zones | awk "NR % 2 == 1"', res);
 }
 
 module.exports.loadDefaultSettingsZone = (req, res) => {
@@ -164,40 +164,40 @@ module.exports.listInterfaces = (req, res) => {
 }
 
 module.exports.queryInterface = (req, res) => {
-    const { zone, interface } = req.body;
-    const cmd = `sudo firewall-cmd --permanent --zone=${zone} --query-interface=${interface}`;
+    const { zone, Interface } = req.body;
+    const cmd = `sudo firewall-cmd --permanent --zone=${zone} --query-interface=${Interface}`;
     runCommand(cmd, res);
     req.body.reload = 'reload';
     reloadFirewall(req, res);
 }
 
 module.exports.addInterface = (req, res) => {
-    const { zone, interface } = req.body;
-    const cmd = `sudo firewall-cmd --permanent --zone=${zone} --add-interface=${interface}`;
+    const { zone, Interface } = req.body;
+    const cmd = `sudo firewall-cmd --permanent --zone=${zone} --add-interface=${Interface}`;
     runCommand(cmd, res);
     req.body.reload = 'reload';
     reloadFirewall(req, res);
 }
 
 module.exports.changeInterface = (req, res) => {
-    const { zone, interface } = req.body;
-    const cmd = `sudo firewall-cmd --permanent --zone=${zone} --change-interface=${interface}`;
+    const { zone, Interface } = req.body;
+    const cmd = `sudo firewall-cmd --permanent --zone=${zone} --change-interface=${Interface}`;
     runCommand(cmd, res);
     req.body.reload = 'reload';
     reloadFirewall(req, res);
 }
 
 module.exports.removeInterface = (req, res) => {
-    const { interface } = req.body;
-    const cmd = `sudo firewall-cmd --permanent --remove-interface=${interface}`;
+    const { Interface } = req.body;
+    const cmd = `sudo firewall-cmd --permanent --remove-interface=${Interface}`;
     runCommand(cmd, res);
     req.body.reload = 'reload';
     reloadFirewall(req, res);
 }
 
 module.exports.getZoneOfInterface = (req, res) => {
-    const { interface } = req.body;
-    const cmd = `sudo firewall-cmd --get-zone-of-interface=${interface}`;
+    const { Interface } = req.body;
+    const cmd = `sudo firewall-cmd --get-zone-of-interface=${Interface}`;
     runCommand(cmd, res);
 }
 
