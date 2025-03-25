@@ -20,7 +20,7 @@ function App() {
         {/* <Sidebar /> */}
         <div className="flex-1 p-4">
           <Routes>
-            {/* <Route path="/" element={<Login />} /> */}
+            <Route path="/" element={<Login />} />
             <Route path="/suricata" element={<Suricata />} />
             {<Route path="/services" element={<ServiceTable/>}/> }
             <Route path="/cpu-info" element={<CPUInfo/>}/>
