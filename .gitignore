@@ -1,4 +1,5 @@
 node_modules
 a.out
-*.qr
-*.conf
+**/*.qr
+**/*.conf
+qrcode.png
