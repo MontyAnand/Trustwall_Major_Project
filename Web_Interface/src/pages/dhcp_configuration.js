@@ -40,7 +40,7 @@ function DHCPConfiguration() {
   const [omapiport, setOmapiPort] = useState('');
   const [omapikey, setOmapikKey] = useState('');
   const [checkkey, setCheckKey] = useState('');
-  const [omapialgo, setOmapiAlgo] = useState('7');
+  const [omapialgo, setOmapiAlgo] = useState('1');
 
   const [gateway, setGateway] = useState('192.168.1.1');
   const [domainname, setDomainName] = useState('');
@@ -52,26 +52,11 @@ function DHCPConfiguration() {
   const [enablechangetimeformat, setEnableChangeTimeFormat] = useState('');
   const [enablestaticticsgraph, setEnableStaticticsGraph] = useState('');
   const [disablepingcheck, setDisablePingCheck] = useState('');
+  const [pingtimeout,setPingTimeOut]=useState('2');
 
   //useState for controlling submit button's functionality
   const [isValid, setIsValid] = useState(true);
   const [issubmitbuttondisabled, setIsSubmitDisabled] = useState(true);
-
-  //useEffect for controlling submit button's functionality and rendeing the updates
-  useEffect(() => {
-    if ((interfacechecked && startIP.trim() !== '' && endIP.trim() !== '')) {
-      if (interfacechecked && isValid && isIpInSubnet(startIP, subnet, mask) && isIpInSubnet(endIP, subnet, mask)) {
-        setIsSubmitDisabled(false);
-      }
-      else {
-        setIsSubmitDisabled(true);
-      }
-    } else {
-      setIsSubmitDisabled(true);
-    }
-  }, [interfacechecked, startIP, endIP, subnet, mask, isValid]);
-
-
 
   function handleSubmit() {
     const data = {
@@ -103,7 +88,8 @@ function DHCPConfiguration() {
       Static_arp_entries_enable: enablestaticarp,
       Dhcp_lease_time_format_UTC_to_Local_enable: enablechangetimeformat,
       Dhcp_lease_monitoring_stats_enable: enablestaticticsgraph,
-      Ping_check_disable: disablepingcheck
+      Ping_check_disable: disablepingcheck,
+      Ping_check_timeout:pingtimeout
     };
 
     //  Send data to backend using Fetch API
@@ -197,6 +183,20 @@ function DHCPConfiguration() {
     return `${longToIp(firstUsable)} - ${longToIp(lastUsable)}`;
   }
 
+  //useEffect for controlling submit button's functionality and rendeing the updates
+  useEffect(() => {
+    if ((interfacechecked && startIP.trim() !== '' && endIP.trim() !== '')) {
+      if (interfacechecked && isValid && isIpInSubnet(startIP, subnet, mask) && isIpInSubnet(endIP, subnet, mask)) {
+        setIsSubmitDisabled(false);
+      }
+      else {
+        setIsSubmitDisabled(true);
+      }
+    } else {
+      setIsSubmitDisabled(true);
+    }
+  }, [interfacechecked, startIP, endIP, subnet, mask, isValid]);
+
 
   // Handle Generate key
   useEffect(() => {
@@ -209,25 +209,11 @@ function DHCPConfiguration() {
   }, [checkkey, omapialgo]);
 
 
-
-  // Fetch data from backend on mount
-  // useEffect(() => {
-  //   fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/network-info`)
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setSubnet(binaryToIp(bitwiseAnd(data.ip,data.netmask)));
-  //       setMask(data.netmask);
-  //       setGateway(data.gateway);
-  //     })
-  //     .catch((err) => {
-  //       console.error('Failed to fetch network info:', err);
-  //     });
-  // }, []);
   useEffect(() => {
     fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/laninfo`)
       .then((res) => res.json())
       .then((data) => {
-        setSubnet(binaryToIp(bitwiseAnd(data.ip,data.nm)));
+        setSubnet(binaryToIp(bitwiseAnd(data.ip, data.nm)));
         setMask(data.nm);
         setGateway(data.gip);
       })
@@ -242,9 +228,16 @@ function DHCPConfiguration() {
       const range = calculateSubnetRange(subnet, mask);
       setSubnetRange(range);
     }
-  }, [subnet,mask]);
+  }, [subnet, mask]);
 
- 
+  // Ignore denied clients
+  useEffect(() => {
+    if (failoverpeerip.trim!=='' && isValid){
+      setIsDenyClient(false);
+    }
+  }, [failoverpeerip,isValid]);
+
+
   return (
     <div className="dhcp_container">
       <h1>DHCPv4 Server Configuration</h1>
@@ -287,8 +280,8 @@ function DHCPConfiguration() {
               <label htmlFor="client_accept">Deny Unknown Clients:</label>
               <select name="client_accept" value={isclientaccept} onChange={(e) => setIsClientAccept(e.target.value)} >
                 <option value="0">Allow all clients</option>
-                <option value="1">Allow all clients from any interface</option>
-                <option value="2">Allow clients from only this interface</option>
+                <option value="1">Allow known clients from any interface</option>
+                <option value="2">Allow known clients from only this interface</option>
               </select>
             </div>
 
@@ -306,7 +299,7 @@ function DHCPConfiguration() {
                 <input type="checkbox" name="ign_client_name" checked={isignclientname} onChange={(e) => setIsIgnClientname(e.target.checked)} ></input>
               </div>
               <p>
-                Do not record a unique nameentifier(Uname) in client <br></br>
+                Do not record a unique identifier (UID) in client <br></br>
                 lease data if present in client DHCP request
               </p>
             </div>
@@ -373,6 +366,7 @@ function DHCPConfiguration() {
               >
                 <span>&#43;</span> Add Address Pool
               </button>
+
             </div>
 
           </div>
@@ -496,7 +490,11 @@ function DHCPConfiguration() {
 
             <div className="dhcp_text">
               <label htmlFor="failover_ip">Failover peer IP:</label>
-              <input type="text" name="failover_ip" placeholder="192.168.x.x" value={failoverpeerip} onChange={(e) => setFailOverPeerIp(e.target.value)}></input>
+              <input type="text" name="failover_ip" placeholder="192.168.x.x" value={failoverpeerip} onChange={(e) => {
+                setFailOverPeerIp(e.target.value)
+                const pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
+                setIsValid((pattern.test(e.target.value) && e.target.value.trim() !== '') || (e.target.value.trim() === ''));
+                }}></input>
             </div>
 
             <div className="dhcp_checkbox">
@@ -531,7 +529,15 @@ function DHCPConfiguration() {
               </div>
               <p>Disable ping check</p>
             </div>
-
+            
+            {disablepingcheck?
+            <div className="dhcp_text">
+              <div>
+                <label htmlFor="ping_timeout">Ping Timeout:</label>
+                <input type="number" name="ping_timeout" placeholder="value in seconds" value={pingtimeout} onChange={(e)=>setPingTimeOut(e.target.value)}/>
+              </div>
+            </div>:<></>
+            }
             <DynamicDNS />
             <MACAddressControl />
             <NTP />

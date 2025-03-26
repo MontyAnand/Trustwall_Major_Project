@@ -128,32 +128,6 @@ app.use('/firewall', firewall_icmptype_routes);
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Example in-memory storage for demonstration purposes
-// let dhcpConfig = {
-
-// };
-
-// API endpoint to save DHCP configuration
-// app.post('/dhcp/save', (req, res) => {
-//     try {
-//         dhcpConfig = req.body;
-//         console.log(req.body);
-//         // const dhcp_conf_filePath = "/home/po/Desktop/a.txt";
-//         // fs.appendFile(dhcp_conf_filePath, generateDhcpConfig(dhcpConfig), (err) => {
-//         //     if (err) {
-//         //         console.error(err);
-//         //         return res.status(500).send('Error saving configuration');
-//         //     }
-//         //     res.status(200).send('DHCP configuration updated successfully!');
-//         // });
-//         res.status(200).send("Dekhiye Sujiit   Data aa rhha hai...");
-//     }
-//     catch (error) {
-//         console.error('Error saving DHCP config:', error);
-//         res.status(500).send({ message: 'Failed to save DHCP configuration' });
-//     }
-
-// });
 
 // Function to generate DHCP configuration
 function generateDhcpConfig(data) {
@@ -185,8 +159,49 @@ ddns-update-style none;
 # have to hack syslog.conf to complete the redirection).
 #log-facility local7;\n`);
 
+    if (data.Omapi_port && data.Omapi_key) {
+        configLines.push(`
+# Enable OMAPI on port ${data.Omapi_port}
+omapi-port ${data.Omapi_port};
+
+# Optional: Secure with authentication key
+key omapi_key {
+    algorithm HMAC-MD5;
+    secret "${data.Omapi_key}";
+};
+
+`);
+    }
+
+    if (data.Dhcp_lease_time_format_UTC_to_Local_enable) {
+        configLines.push(`db-time-format local;`);
+    }
+
+    if (data.Bootp_enable) {
+        configLines.push(`ignore bootp;`);
+    }
+
+    if (data.Deny_unknown_clients) {
+        configLines.push(`deny unknown-clients;`);
+    }
+
+    if (data.Ignore_client_identifier) {
+        configLines.push(`ignore client-updates;`);
+    }
+
+    if (data.Static_arp_entries_enable) {
+        configLines.push(`option arp-cache-timeout 0;`);
+    }
+
+    if (data.Ping_check_disable) {
+        configLines.push(`ping-check false;`);
+        configLines.push(`ping-timeout ${data.Ping_check_timeout};`)
+    }
+
     if (data.Subnet && data.Subnet_mask) {
-        configLines.push(`\n\n`);
+        configLines.push(`\n
+# Subnet Specific Configuration
+`);
 
         configLines.push(`subnet ${data.Subnet} netmask ${data.Subnet_mask} {`);
 
@@ -202,38 +217,18 @@ ddns-update-style none;
         }
 
         if (data.Domain_search_list) {
-            configLines.push(`  option domain-search ${data.Domain_search_list};`);
+            configLines.push(`  option domain-search "${data.Domain_search_list}";`);
         }
 
         if (data.Gateway) {
             configLines.push(`  option routers ${data.Gateway};`);
         }
 
-        if (data.Bootp_enable) {
-            configLines.push(`  allow bootp;`);
-        }
-
         if (data.Wins1 || data.Wins2) {
             configLines.push(`  option netbios-name-servers ${data.Wins1 ? data.Wins1 : ''} ${data.Wins2 ? ', ' + data.Wins2 : ''};`);
         }
 
-        if(data.Omapi_port && data.Omapi_key){
-            configLines(`# Enable OMAPI on port ${Omapi_port}
-                        omapi-port ${Omapi_port};
 
-                        # Optional: Secure with authentication key
-                        key omapi_key {
-                            algorithm HMAC-MD5;
-                            secret "${Omapi_key}";
-                        };
-                        
-                        control-agent {
-                            key omapi_key;
-                            allow lease-query;
-                        }
-            `);
-        }
-        
         if (data.Default_lease_time) {
             configLines.push(`  default-lease-time ${data.Default_lease_time};`);
         }
@@ -248,115 +243,24 @@ ddns-update-style none;
     return configLines.join("\n");
 }
 
-// Formatting data for writing to configuration file
-
-// function generateDhcpConfig(config) {
-//     return `
-// # Glabal parameters
-// option domain-name "example.org";
-// option domain-name-servers ns1.example.org, ns2.example.org;
-// default-lease-time 600;
-// max-lease-time 7200;
-
-// # Subnet Declarations
-// subnet ${config.Subnet} netmask ${config.Subnet_mask} {
-//     deny bootp;
-//     option subnet-mask ${config.Subnet_mask};
-// #    option broadcast-address 192.168.1.255
-//     option routers ${config.Gateway}
-//     range ${config.StartIP} ${config.EndIP};
-// }
-
-// # Host DEeclarations
-// host myhost {
-//     hardware ethernet 00:A0:78:8E:9E:AA;
-//     fixed-address 192.168.1.50
-// }
-
-// # Group Declarations
-// group {
-//     option routers 192.168.1.254;
-//     option subnet-mask 255.255.255.0;
-//     host apex {
-//         option host-name "apex.example.com";
-//         hardware ethernet 00:A0:78:8E:9E:AA;
-//         fixed-address 192.168.1.4;
-//     }
-//     host raleigh {
-//         option host-name "raleigh.example.com";
-//         hardware ethernet 00:A1:DD:74:C3:F2;
-//         fixed-address 192.168.1.6;
-//     }
-// }
-
-// # Pool Declarations
-// subnet 10.0.0.0 netmask 255.255.255.0 {
-//     pool {
-//         range 10.0.0.100 10.0.0.150;
-//         option routers 10.0.0.254;
-//     }
-//     pool {
-//         range 10.0.0.200 10.0.0.220;
-//         option routers 10.0.0.1;
-//     }
-// }
-
-// # PXE Boot Options
-// option PXE.discovery-control code 6 = unsigned integer 8;
-// option PXE.boot-server code 8 = {
-//     unsigned integer 16, unsigned integer 8, ip-address
-// };
-
-// # Dynamic DNS Updates
-// ddns-update-style none;
-// ddns-updates off;
-
-
-// `;
-// }
-
-// app.post('/dhcp/apply', (req, res) => {
-//     try {
-//         // Logic to apply the configuration goes here
-//         // For demonstration, just log the config
-//         console.log('Applying DHCP configuration:', dhcpConfig);
-
-//         const configContent = generateDhcpConfig(dhcpConfig);
-
-//         // Save configuration file
-//         const dhcp_conf_filePath = "/etc/dhcp/check.conf";
-//         fs.appendFile(dhcp_conf_filePath, configContent, (err) => {
-//             if (err) {
-//                 console.error(err);
-//                 return res.status(500).send('Error saving configuration');
-//             }
-//             // res.status(200).send('DHCP configuration updated successfully!');
-//         });
-//         res.status(200).send({ message: 'DHCP configuration applied successfully' });
-//     } catch (error) {
-//         console.error('Error applying DHCP config:', error);
-//         res.status(500).send({ message: 'Failed to apply DHCP configuration' });
-//     }
-// });
-
 
 // Define the backend route
 app.post('/dhcp/save', function (req, res) {
     const data = req.body;
     console.log(data);
     // Write data to a file
+    const dhcpFilePath="/etc/dhcp/check.conf";
     const dhcpConfig = generateDhcpConfig(data);
-    fs.writeFile('/etc/dhcp/check.conf', dhcpConfig, function (err) {
+    fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
         if (err) {
             console.error('Error writing to file:', err);
             res.status(500).send({ message: 'Error writing to file' });
         } else {
-            console.log('Data saved to file');
-            res.send({ message: 'Data saved successfully' });
+            console.log('DHCP configuration Data is saved to a file location ',dhcpFilePath);
+            res.send({ message: 'DHCP Data is saved successfully.' });
         }
     });
 });
-
 
 
 
@@ -368,6 +272,7 @@ app.use((req, res, next) => {
 });
 
 
+<<<<<<< HEAD
 // app.get('/network-info', async (req, res) => {
 //     const interfaces = os.networkInterfaces();
 //     let activeInterface = null;
@@ -410,6 +315,8 @@ app.use((req, res, next) => {
 
 
 
+=======
+>>>>>>> 20a4ec5 (DHCP changes done now a temporary config perfectly working)
 // For handling OMAPI key generation
 
 //  function to return the selected algorithm
