@@ -272,51 +272,6 @@ app.use((req, res, next) => {
 });
 
 
-<<<<<<< HEAD
-// app.get('/network-info', async (req, res) => {
-//     const interfaces = os.networkInterfaces();
-//     let activeInterface = null;
-
-//     // Find the first non-internal IPv4 interface
-//     for (const name of Object.keys(interfaces)) {
-//         for (const iface of interfaces[name]) {
-//             if (iface.family === 'IPv4' && !iface.internal) {
-//                 activeInterface = iface;
-//                 break;
-//             }
-//         }
-//         if (activeInterface) break;
-//     }
-
-//     let gatewayIP = null;
-//     try {
-//         const gatewayModule = await import('default-gateway');
-//         const result = await gatewayModule.v4();
-//         gatewayIP = result.gateway;
-//     } catch (err) {
-//         gatewayIP = 'Not available';
-//     }
-
-//     res.json({
-//         ip: activeInterface?.address || 'Not available',
-//         netmask: activeInterface?.netmask || 'Not available',
-//         broadcast: getBroadcastAddress(activeInterface),
-//         gateway: gatewayIP
-//     });
-// });
-
-// function getBroadcastAddress(iface) {
-//     if (!iface) return 'Not available';
-//     const ipParts = iface.address.split('.').map(Number);
-//     const maskParts = iface.netmask.split('.').map(Number);
-//     const broadcastParts = ipParts.map((ip, i) => (ip & maskParts[i]) | (~maskParts[i] & 255));
-//     return broadcastParts.join('.');
-// }
-
-
-
-=======
->>>>>>> 20a4ec5 (DHCP changes done now a temporary config perfectly working)
 // For handling OMAPI key generation
 
 //  function to return the selected algorithm
