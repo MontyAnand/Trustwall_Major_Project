@@ -6,7 +6,7 @@ const DynamicDNS = () => {
 
   const [enableddns, setEnableDDNS] = useState(false);
   const [ddnsdomain,setDDNSDomain]=useState('');
-  const [enableDDNSHostname,setEnableHostName]=useState('false');
+  const [enableDDNSHostname,setEnableHostName]=useState(false);
   const [primaryDDNSserver,setPrimaryDDNsServer]=useState('');
   const [secondaryDDNSserver,setSecondaryDDNSServer]=useState('');
   const [ddnsdomainkey,setDDNSDomainKey]=useState('');
