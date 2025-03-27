@@ -5,15 +5,29 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from "./Contexts/authContex"
 import { SocketProvider } from "./Contexts/socketContex"
+import { PrimeReactProvider } from 'primereact/api'
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';        
+import 'primeflex/primeflex.css';
+import { Provider } from 'react-redux';
+import store from './store';
+import { ToastProvider } from './Contexts/toastContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <SocketProvider>
-        <App />
-      </SocketProvider>
-    </AuthProvider>
+    <Provider store={store}>
+      <PrimeReactProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </PrimeReactProvider>
+    </Provider>
   </React.StrictMode>
 );
 

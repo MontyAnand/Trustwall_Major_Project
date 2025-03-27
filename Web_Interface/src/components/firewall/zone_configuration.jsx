@@ -1,0 +1,85 @@
+import { ScrollPanel } from "primereact/scrollpanel";
+import { TabPanel, TabView } from "primereact/tabview";
+import { Services } from "./services";
+import { Ports } from "./ports";
+import { Protocols } from "./protocols";
+import { Sourceports } from "./sourceports";
+import { Portforwarding } from "./portforwarding";
+import { Interface } from "./interfaces";
+import { Masquerading } from "./masquerading";
+import { ICMPTypes } from "./icmptypes";
+import { Source } from "./sources";
+import { useSelector } from "react-redux";
+import { addForwardPort, addICMPBlock, addInterface, addMasquerade, addPort, addProtocol, addService, addSource, addSourcePort, listForwardPorts, listICMPBlocks, listInterfaces, listPorts, listProtocols, listServices, listSourcePorts, listSources, queryMasquerade, removeForwardPort, removeICMPBlock, removeInterface, removeMasquerade, removePort, removeProtocol, removeService, removeSource, removeSourcePort } from "../../Actions/firewall/zone_actions";
+
+export const Zoneconfiguration = () => {
+
+    const { zoneServicesList, zoneICMPTypesList, selectedZone, interfaces, sources, services, ports, protocols, sourcePorts, icmpBlocks, forwardPorts, masquerading, isLoading, error } = useSelector(state => state.zone);
+
+    const zoneServices = {};
+    zoneServicesList.forEach(zoneService => {
+        const Service = zoneService.service;
+        zoneServices[Service] = services.some(({ service }) => service === Service);
+    });
+
+    const zoneICMPTypes = {};
+    zoneICMPTypesList.forEach(zoneICMPType => {
+        const icmpType = zoneICMPType.icmptype;
+        zoneICMPTypes[icmpType] = icmpBlocks.some(({ icmptype }) => icmptype === icmpType);
+    }) 
+
+    return (
+        <TabView style={{ height: '100%', width: '100%'}}>
+            <TabPanel header='Services'>
+                <ScrollPanel style={{ height: '60vh', width: '100%'}}>
+                    <Services servicesList={zoneServicesList} services={zoneServices} selectedItem={selectedZone} get={listServices} add={addService} remove={removeService}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Ports'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Ports ports={ports} selectedItem={selectedZone} get={listPorts} add={addPort} remove={removePort}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Protocols'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Protocols protocols={protocols} selectedItem={selectedZone} get={listProtocols} add={addProtocol} remove={removeProtocol}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Source Ports'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Sourceports sourcePorts={sourcePorts} selectedItem={selectedZone} get={listSourcePorts} add={addSourcePort} remove={removeSourcePort}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Masquerading'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Masquerading selectedItem={selectedZone} isMasquerading={masquerading} get={queryMasquerade} add={addMasquerade} remove={removeMasquerade}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Port Forwarding'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Portforwarding forwardPorts={forwardPorts} selectedItem={selectedZone} get={listForwardPorts} add={addForwardPort} remove={removeForwardPort}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='ICMP Filters'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <ICMPTypes icmpTypesList={zoneICMPTypesList} icmpTypes={zoneICMPTypes} selectedItem={selectedZone} get={listICMPBlocks} add={addICMPBlock} remove={removeICMPBlock}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Rich Rules'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <b>Zone</b> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tempora aliquid enim modi cum sequi porro quas sed cupiditate nam aliquam asperiores ea rem, perferendis doloremque exercitationem dicta blanditiis maiores nemo aut laboriosam vero placeat beatae. Non odio id magni fugiat unde ea optio quos amet laudantium similique aliquam ullam quasi, quibusdam laboriosam! At quod animi reprehenderit voluptatem quae nobis eveniet quasi? Veritatis ratione odit fuga amet quas sequi. Mollitia repudiandae laudantium quidem tempora pariatur blanditiis aut, beatae dolorum culpa odit ipsa explicabo ratione itaque accusamus, harum, repellendus totam hic repellat ab ad magnam. Reprehenderit facilis sapiente voluptate minus itaque consectetur provident ipsam vitae? Ex doloremque ratione impedit temporibus accusantium a eos nostrum iusto, voluptates neque voluptatum magnam, laboriosam explicabo deleniti vel magni fugiat natus repellat facere nihil architecto soluta, esse error quae! Rem fugiat mollitia soluta laborum dolor adipisci tempore labore ea veritatis rerum totam provident quidem, a aspernatur. Nesciunt, dolorum doloremque corrupti recusandae hic maxime rerum ullam facere culpa aperiam voluptates molestias nobis ea vitae sapiente cumque suscipit quisquam reprehenderit molestiae eius architecto, doloribus autem deserunt. Exercitationem mollitia voluptatibus illo incidunt dolorem vitae iusto sint, error magnam rerum dignissimos odit sit suscipit ratione dolorum officia saepe! Natus numquam suscipit autem, placeat aliquid dignissimos voluptate sunt obcaecati porro quia temporibus consequuntur pariatur dolore quo officiis eius magnam corrupti quibusdam modi qui voluptates illo. Porro officia, officiis nobis accusantium iste dolorum consequuntur nostrum dolor eius? Dolore maxime aut velit asperiores natus excepturi nihil vel ad quisquam cupiditate sequi dicta eum nulla rerum consequatur iusto, architecto sint autem, numquam reiciendis! Voluptas placeat mollitia sed fugit quia repellat officia consectetur, cumque, nesciunt sunt tempora vitae incidunt iure nulla beatae suscipit enim esse asperiores eveniet distinctio perspiciatis. Magnam nihil, nemo expedita corporis harum, porro eveniet facere asperiores nam eos possimus architecto ipsum quod itaque, modi rem. Reiciendis saepe esse, minima exercitationem id inventore vero aspernatur molestias, recusandae eligendi corporis numquam repudiandae nisi? Minus quam deleniti reiciendis aperiam. Illo facilis inventore sapiente? Repudiandae fugiat pariatur labore tenetur neque nihil laboriosam vitae enim. Iure magni corrupti vero modi animi libero nam nostrum suscipit quia ipsa vitae voluptas recusandae eum, eaque incidunt perspiciatis, nihil, enim at adipisci tempora aliquam? Corporis aut modi error voluptate, nam velit rerum omnis expedita illo, quia fuga exercitationem, cumque dolore provident repudiandae inventore sed! Autem aperiam ut quam. Impedit dignissimos rem quaerat molestiae voluptate beatae aspernatur consequatur exercitationem omnis quod earum sit dolore perferendis ipsa asperiores, nobis quae, voluptatibus a repellendus? Repellat sed natus consequuntur eum debitis, inventore aspernatur obcaecati nemo eligendi alias minus ea sequi. Eius tempore asperiores id impedit facilis ut dolorem quas temporibus. Fugit, unde! Autem placeat magnam nostrum, eveniet expedita ex doloremque veritatis harum incidunt. Quaerat reiciendis eos veritatis culpa, illum quasi ullam? Reiciendis harum similique, sed minus modi adipisci aperiam saepe, cupiditate fuga est quidem repudiandae hic. Deserunt eaque beatae saepe quidem enim sunt recusandae vel quia temporibus alias explicabo a commodi consequatur voluptatem dolor fugit, debitis neque molestias assumenda asperiores? Suscipit animi amet ab. Consequuntur, odio aliquid doloribus labore magnam voluptatibus. Velit dicta fugiat, omnis maxime doloremque consequatur? Laborum officia illo, itaque numquam culpa voluptatem quasi praesentium molestias est quae accusamus eveniet minus maiores nemo nesciunt mollitia animi velit cupiditate accusantium temporibus. Impedit repellendus aliquid fuga maiores tempora accusamus autem eaque? Consequatur ipsa quis libero! Quod quae dicta consectetur consequuntur nisi quis id ipsum culpa laborum voluptatem? Perspiciatis asperiores aut doloremque, soluta quidem impedit, quos quaerat adipisci mollitia vero blanditiis accusantium hic, debitis aliquam. Expedita sapiente tenetur illum corrupti nihil sint asperiores esse incidunt modi inventore dicta molestiae, soluta tempore alias nesciunt, numquam pariatur odit aspernatur id! Ullam id maxime nesciunt unde soluta velit minima, sequi reiciendis quod magni architecto tempore alias adipisci molestias? Hic iste odio, inventore error neque omnis esse! Debitis vero aspernatur tempore, ullam ea excepturi sunt beatae nisi odio atque vel ab consequatur possimus natus obcaecati soluta explicabo adipisci exercitationem provident! Obcaecati modi mollitia similique quibusdam minus assumenda laudantium eligendi animi illum ad incidunt doloribus voluptatem in, architecto unde cum quo commodi, numquam excepturi ipsam? Magni, sint ullam ex et praesentium porro aliquid molestias explicabo deserunt. Minima nobis, nemo consectetur dolor perferendis doloremque fuga, voluptates ratione porro eaque ducimus maiores repudiandae culpa fugit atque facilis recusandae ipsum necessitatibus quibusdam mollitia? Fugit dolore quaerat quam ea! Voluptates cum, asperiores corrupti odio expedita repudiandae dolorum autem error! Id voluptas sint eos tempora cumque aliquid, nihil asperiores velit veritatis iste minima eaque laboriosam fuga rerum molestias suscipit officiis cupiditate quia aperiam consequuntur blanditiis pariatur illum, ex perferendis. Alias magni earum hic ipsum suscipit eius corporis expedita, porro eligendi animi voluptatem in vel obcaecati distinctio consequatur commodi debitis culpa accusantium nostrum perferendis ea! Vitae voluptas, soluta repudiandae reiciendis adipisci quam facilis, placeat iure itaque excepturi commodi, aliquam culpa nesciunt deserunt quod debitis maxime ipsam! Recusandae, sunt eligendi rerum accusantium quisquam iste illo, saepe similique, necessitatibus consequatur odit ut dolorum! Hic eius illum possimus ipsam veniam neque delectus quidem ducimus quia reiciendis quibusdam, quas, explicabo similique ab nam quis maiores dolores nesciunt. Adipisci autem ut nam perferendis distinctio ab officia architecto nostrum aperiam ipsum doloribus temporibus rem libero iusto quisquam ad tempora nulla, modi accusamus. Asperiores ab dicta natus dolore exercitationem inventore ratione illum laudantium, odio minima in vero nesciunt eligendi molestiae modi laboriosam, excepturi ipsum maxime explicabo reprehenderit debitis? Labore earum, sit rem enim maxime repellat iure reiciendis possimus obcaecati, cumque aperiam aspernatur autem, libero natus dicta inventore deserunt atque quos vitae? Voluptatibus exercitationem placeat earum, adipisci perspiciatis aliquid rerum molestias, eaque aspernatur nesciunt possimus deleniti? Natus dolores possimus ad perferendis ut quisquam facere eum nam tempore autem blanditiis corporis laudantium exercitationem eius vitae qui facilis expedita iste obcaecati vel earum, temporibus, cupiditate, deserunt suscipit. Esse tempore quam sint maxime nisi commodi sequi aperiam, consequatur voluptate vero id tenetur suscipit autem, quaerat provident inventore aliquid, fugiat laudantium deleniti. Cupiditate voluptatibus sit dolores! Veritatis quas quos obcaecati! Aliquam reiciendis nihil distinctio, placeat neque dicta quasi! Recusandae, distinctio nihil iste cupiditate necessitatibus placeat dignissimos id excepturi libero temporibus.
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Interfaces'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Interface interfaces={interfaces} selectedItem={selectedZone} get={listInterfaces} add={addInterface} remove={removeInterface}/>
+                </ScrollPanel>
+            </TabPanel>
+            <TabPanel header='Sources'>
+                <ScrollPanel style={{ height: '80vh', width: '100%'}}>
+                    <Source sources={sources} selectedItem={selectedZone} get={listSources} add={addSource} remove={removeSource}/>
+                </ScrollPanel>
+            </TabPanel>
+        </TabView>
+    );
+}
