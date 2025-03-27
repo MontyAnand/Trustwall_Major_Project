@@ -1,11 +1,31 @@
 .dashboard_container{
-    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+    background-color:#12121C;
+    color:white;
+    width: 100vw;
 }
 .dashboard_inner_container{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* grid-template-areas: []; */
-    grid-gap: 1.5rem;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 40%;
+}
+
+.dashboard_container .change_btn{
+    padding: 15px 56px;
+    border:none;
+    margin-bottom: 30px;
+    box-shadow: 3px 4px 7px gray;
+    border-radius: 10px;
+    font-size: 16px;
+}
+.dashboard_container .change_btn:hover{
+    background-color: white;
 }
 
 /* Memory-container related CSS */
@@ -15,36 +35,54 @@
     text-align: center;
     /* transform: "translateX(-50%)", */
 }
-.Mem_container,.Disk_container,.IncTraffic_container,.OutTraffic_container{
+.Disk_container,.Network_Traffic_Container{
     margin-left: 40px;
     margin-bottom: 40px;
-    box-shadow: 4px 6px 10px grey;
     border-radius: 10px;
     padding-bottom: 30px;
+    width: 100%;
+}
+.Mem_container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 40px;
+    margin-bottom: 40px;
+    border-radius: 10px;
+    padding-bottom: 30px;
+    width: 100%;
+    margin-top: -350px;
 }
 .mem_piechart{
     display: flex;
     justify-content: center;
     align-items: center;
-    /* transform: scale(0.7);
-    transform-origin: center;  */
+    height: 350px;
+    width: 50%;
+    margin-left:-90px;
 }
 
 /* Disk Info container */
-.Disk_container h2{
+.Disk_container h1{
     text-align: center;
+    margin-bottom: 50px;
 }
 .Disk_container{
-    margin-right: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 .Disk_inner_container{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 20px;
+    grid-gap:40px;
 }
 .Disk_box p{
     text-align: center;
     font-weight: bold;
+    margin-bottom: 20px;
 }
 
 /* Active_Connections_container */
@@ -56,12 +94,11 @@
     font-family: sans-serif;
 }
 .Active_connections_container{
-    box-shadow: 4px 6px 10px grey;
     height: 100%;
-    margin-left: 40px;
-    /* margin-bottom: 80px; */
+    margin-left: -10px;
     border-radius: 10px;
-    padding: 20px 20px;
+    padding: 20px 50px;
+    color:black;
 }
 .Active_connections_container table{
     height: 100%;
@@ -89,7 +126,8 @@ thead{
     background-color: grey;
 }
 .Active_connections_text{
-    padding-bottom: 14px;
+    color:white;
+    padding-bottom: 30px;
     text-align: center;
 }
 .Table_row_content:nth-last-child(1){
@@ -97,4 +135,8 @@ thead{
 }
 .Table_row_content:nth-last-child(6){
     border-left: 1.5px solid rgb(167, 163, 163);
+}
+.dashboard_combined_container{
+    display:flex;
+    width:100vw;
 }

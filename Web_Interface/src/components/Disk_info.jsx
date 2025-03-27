@@ -27,18 +27,6 @@ const DiskInfo = () => {
         };
     }, [socket]);
 
-    // // It has to be received from server-side first place should be the disk name and 2nd one is the actual value 
-    // const disk_info=[
-    //     ["Disk1",73],
-    //     ["Disk2",61],
-    //     ["Disk3",57],
-    //     ["Disk4",81]
-    // ];
-    // for(let i=0;i<disk_info.length;i++)
-    // {
-    //     diskName.push(disk_info[i][0]);
-    //     diskValue.push(disk_info[i][1]);
-    // }
     const options = {
         legend: {
             position: "bottom",
@@ -54,8 +42,8 @@ const DiskInfo = () => {
     let data = [];
 
     return (
-        <div className='Disk_container'>
-            <h2>Disk Information</h2>
+        <div id="Disk_container" className='Disk_container'>
+            <h1>Disk Information</h1>
             <div className='Disk_inner_container'>
                 {diskName.map((row, rowIndex) => (
                     data = [
@@ -65,7 +53,7 @@ const DiskInfo = () => {
                     ],
                     <div className='Disk_box'>
                         <p>{row}</p>
-                        <Chart chartType='PieChart' data={data} options={options} width={"100%"} height={"200px"} />
+                        <Chart chartType='PieChart' data={data} options={options} width={"350px"} height={"350px"} />
                     </div>
                 ))}
             </div>
