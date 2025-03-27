@@ -173,29 +173,40 @@ key omapi_key {
 `);
     }
 
-    if (data.Dhcp_lease_time_format_UTC_to_Local_enable) {
+    if (data.Dhcp_lease_time_format_UTC_to_Local_enable===true) {
+        configLines.push(`# This will change time format from UTC to Local in DHCP lease file`);
         configLines.push(`db-time-format local;`);
+        configLines.push(`\n`);
     }
 
-    if (data.Bootp_enable) {
+    if (data.Bootp_enable===true) {
+        configLines.push(`# This will ignore all BOOTP queries coming to the server`);
         configLines.push(`ignore bootp;`);
+        configLines.push(`\n`);
     }
 
-    if (data.Deny_unknown_clients) {
+    if (data.Deny_unknown_clients===1) {
+        configLines.push(`# This will not allow any Unknown DHCP clients from any interface`);
         configLines.push(`deny unknown-clients;`);
+        configLines.push(`\n`);
     }
 
-    if (data.Ignore_client_identifier) {
+    if (data.Ignore_client_identifier===true) {
+        configLines.push(`# This will not record any UID for a specific client, only record MAC address in client's lease data`);
         configLines.push(`ignore client-updates;`);
+        configLines.push(`\n`);
     }
 
-    if (data.Static_arp_entries_enable) {
+    if (data.Static_arp_entries_enable===true) {
+        configLines.push(`# This will force the system to keep static ARP entries.Clients must mactch ARP entries to get a IP`);
         configLines.push(`option arp-cache-timeout 0;`);
+        configLines.push(`\n`);
     }
 
-    if (data.Ping_check_disable) {
+    if (data.Ping_check_disable===true) {
+        configLines.push(`# This will disable ping check for a  IP address `);
         configLines.push(`ping-check false;`);
-        configLines.push(`ping-timeout ${data.Ping_check_timeout};`)
+        configLines.push(`ping-timeout ${data.Ping_check_timeout};`);
     }
 
     if (data.Subnet && data.Subnet_mask) {
