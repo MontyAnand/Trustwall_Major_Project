@@ -1,4 +1,4 @@
-.login_container{
+ .login_container{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,7 +12,7 @@
     padding: 25px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    /* background-image: linear-gradient(to top, #143D60 0%, #27667B 100%); */
+   
     background-color: white;
     text-align: center;
   }
@@ -66,7 +66,6 @@
   .password-content{
     z-index:2;
     height: 30px;
-    width:30px;
     padding-right: 10px;
     cursor:pointer;
     opacity: 0.4;
@@ -82,7 +81,6 @@
     align-items: center;
   }
   .form-internal-container img{
-    width: 20px;
     height: 20px;
     margin: auto 0;
     padding-left: 15px;
@@ -93,4 +91,4 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-webkit-contacts-auto-fill-button,
 input[type="password"]::-webkit-credentials-auto-fill-button {
     display: none;
-}
+} 
