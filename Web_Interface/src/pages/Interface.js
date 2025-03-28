@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Input, Select } from "antd";
 import { useSocket } from "../Contexts/socketContex";
+import axios from "axios";
 
 const InterfaceTable = () => {
     const { socket } = useSocket();
@@ -29,6 +30,19 @@ const InterfaceTable = () => {
             socket.emit("interface-list-request");
         }
     }, [socket]);
+
+    useEffect(() => {
+        const fetchInterfaces = async () => {
+          try {
+            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/interfaces`);
+            setInterfaces(response.data);
+          } catch (err) {
+            alert(err.message);
+          }
+        };
+    
+        fetchInterfaces(); // Call the async function
+      }, []);
 
     useEffect(() => {
         if (!socket) return;

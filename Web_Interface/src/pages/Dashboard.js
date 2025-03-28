@@ -1,9 +1,11 @@
 import Sidebar from "../components/Sidebar";
 import MemoryInfo from "../components/Memory_info";
 import DiskInfo from "../components/Disk_info";
-// import IncomingTraffic from "../components/Incoming_net_traffic";
-// import OutgoingTraffic from "../components/Outgoing_net_traffic";
+import NetworkTrafficCharts from "./Network_Traffic";
+import CPUInfo from "../components/CPU_info";
 import ActiveConnections from "./Active_connections";
+import React,{useState} from "react";
+
 import './dashboard.css'
 
 export default function Dashboard() {
@@ -11,13 +13,15 @@ export default function Dashboard() {
         <>
             <Sidebar />
             <div className="dashboard_container">
-                <h2>Dashboard</h2>
+                {/* <h2>Dashboard</h2> */}
                 <div className="dashboard_inner_container">
-                    <MemoryInfo />
-                    <DiskInfo />
-                    {/* <IncomingTraffic />
-                    <OutgoingTraffic /> */}
-                    <ActiveConnections />
+                    <NetworkTrafficCharts/>
+                    <CPUInfo/>
+                    <DiskInfo/>
+                    <div className="dashboard_combined_container">
+                    <MemoryInfo/>
+                    <ActiveConnections/>
+                    </div>
                 </div>
             </div>
         </>

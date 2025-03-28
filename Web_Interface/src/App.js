@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ServiceTable from "./pages/ServiceList";
 import CPUInfo from "./components/CPU_info";
 import NetworkTrafficChart from "./pages/Network_Traffic"
-import CommandInterface from "./pages/Terminal"
+import LinuxTerminal from "./pages/Terminal"
 import Suricata from "./pages/Suricata"
 import DHCPConfiguration from "./pages/dhcp_configuration";
 import Interface from "./pages/Interface";
@@ -25,7 +25,7 @@ function App() {
             {<Route path="/services" element={<ServiceTable/>}/> }
             <Route path="/cpu-info" element={<CPUInfo/>}/>
             <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>
-            <Route path="/terminal" element={<CommandInterface/>}/>
+            <Route path="/terminal" element={<LinuxTerminal/>}/>
             <Route path="/DHCP-Configuration" element={<DHCPConfiguration/>}/>
             <Route path="/firewall" element={<Firewall />} />
             <Route path="/interface" element={<Interface/>}/>
