@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background-color: #0A192F;
+    /* background-color: #0A192F; */
     color:rgb(255, 255, 255);
 }
 .cpu_internal_container{
@@ -34,6 +34,6 @@
     justify-content: center;
     width: 500px;
 }
-h1{
+/* h1{
     color: rgb(173, 166, 166);
-}
+} */

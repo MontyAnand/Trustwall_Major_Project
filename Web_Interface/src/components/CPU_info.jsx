@@ -45,7 +45,7 @@ const CPUInfo = () => {
         <div className="cpu_container">
             <h1>CPU Data</h1>
             {cleanedData.length > 0 ? (
-                <div className="cpu_internal_container">
+                <div id="cpu_internal_container" className="cpu_internal_container">
                     {cleanedData.map((cdata, index) => (
                         <div className="cpu_box" key={index}>
                             <h3 className="cpu_name">{cpuNames[index]}</h3>

@@ -8,8 +8,8 @@ const MemoryInfo = () => {
     const [memoryUsage, setMemoryUsage] = useState(0);
     const [data, setData] = useState([
         ["memoryUsage", "percentage"],
-        ["Used", 0],
-        ["Free", 100]
+        ["Used Memory", 0],
+        ["Free Memory", 100]
     ]);
 
     useEffect(() => {
@@ -20,8 +20,8 @@ const MemoryInfo = () => {
             setData(
                 [
                     ["memoryUsage", "percentage"],
-                    ["Used", memoryUsage],
-                    ["Free", 100 - memoryUsage]
+                    ["Used Memory", memoryUsage],
+                    ["Free Memory", 100 - memoryUsage]
                 ]
             );
         });
@@ -40,10 +40,10 @@ const MemoryInfo = () => {
     };
 
     return (
-        <div className='Mem_container'>
-            <div className='mem_text'> <h2>Memory Usage</h2></div>
+        <div id="Mem_container" className='Mem_container'>
+            <div className='mem_text'> <h1>Memory Usage</h1></div>
             <div className="mem_piechart" >
-                <Chart chartType='PieChart' data={data} options={options} width={"100%"} height={"200px"} />
+                <Chart chartType='PieChart' data={data} options={options} width={"120%"} height={"300px"} />
             </div>
         </div>
     );

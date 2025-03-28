@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
 import { useSocket } from "../Contexts/socketContex";
+import Sidebar from "../components/Sidebar";
 
 const LinuxTerminal = () => {
     const terminalRef = useRef(null);
@@ -79,7 +80,12 @@ const LinuxTerminal = () => {
         socket.emit("execute-command", command.trim());
     };
 
-    return <div ref={terminalRef} style={{ width: "100%", height: "100vh", backgroundColor: "black" }} />;
+    return (
+        <>
+            <Sidebar/>
+            <div ref={terminalRef} style={{ width: "100%", height: "100vh", backgroundColor: "black", marginTop:"58px"}} />
+        </>
+    ); 
 };
 
 export default LinuxTerminal;

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Chart } from "react-google-charts";
 import { useSocket } from "../Contexts/socketContex";
+
+import './dashboard.css'
+
 // Function to generate chart options dynamically
 const getChartOptions = (interfaceName) => ({
   title: `Traffic for ${interfaceName}`,
@@ -63,9 +66,12 @@ const NetworkTrafficCharts = () => {
     return () => socket.off("network-traffic");
   }, [socket]);
 
+
+  // backgroundColor: "#12121C"
+  
   return (
-    <div style={{ padding: "20px", backgroundColor: "#12121C", minHeight: "100vh" }}>
-      <h1 style={{ color: "#EAEAEA", textAlign: "center" }}>Real-Time Network Traffic</h1>
+    <div id="Network_Traffic_Container" style={{ padding: "20px", minHeight: "100vh",width: '100vw' }}>
+      <h1 style={{ color: "#EAEAEA", textAlign: "center", margin:"20px 0"}}>Real-Time Network Traffic</h1>
       {Object.keys(data).map((iface) => (
         <div
           key={iface}

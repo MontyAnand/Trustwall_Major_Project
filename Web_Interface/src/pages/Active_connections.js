@@ -16,8 +16,8 @@ const ActiveConnections = () => {
 
     return (
         <>
-            <div className="Active_connections_container">
-                <div className="Active_connections_text"><h2>Number of Active Connections</h2></div>
+            <div id="Active_connections_container" className="Active_connections_container">
+                <div className="Active_connections_text"><h1>Number of Active Connections</h1></div>
                 <div className="Active_connections_table">
                     <table>
                         <thead>
