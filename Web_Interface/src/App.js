@@ -18,7 +18,7 @@ function App() {
     <Router>
       <div className="flex">
         {/* <Sidebar /> */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-4" style={{padding:'0'}}>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/suricata" element={<Suricata />} />
