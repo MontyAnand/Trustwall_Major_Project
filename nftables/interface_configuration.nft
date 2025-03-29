@@ -8,8 +8,8 @@ table ip nat {
     chain postrouting {
         type nat hook postrouting priority 100; policy accept;
 
-        # Apply NAT (Masquerade) on enp0s9 (public interface)
-        oifname "enp0s9" masquerade
+        # Apply NAT (Masquerade) on enp0s8 (public interface)
+        oifname "enp0s8" masquerade
     }
 }
 
@@ -18,10 +18,10 @@ table ip filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
 
-        # Allow traffic from enp0s8 to enp0s9 (forward)
-        iifname "enp0s8" oifname "enp0s9" accept
+        # Allow traffic from enp0s9 to enp0s8 (forward)
+        iifname "enp0s9" oifname "enp0s8" accept
 
-        # Allow traffic from enp0s9 to enp0s8 for established,related connections (return traffic)
-        iifname "enp0s9" oifname "enp0s8" ct state established,related accept
+        # Allow traffic from enp0s8 to enp0s9 for established,related connections (return traffic)
+        iifname "enp0s8" oifname "enp0s9" ct state established,related accept
     }
 }

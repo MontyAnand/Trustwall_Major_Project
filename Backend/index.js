@@ -113,6 +113,14 @@ app.get('/lanInfo', (req, res) => {
     });
 });
 
+
+app.get('/interfaces',(req,res)=>{
+    tcpClient.interfaceListRequest("null");
+    tcpClient.once('interface-list',(data)=>{
+        res.status(200).send(data);
+    });
+});
+
 // firewall endpoints
 app.use('/firewall', firewall_routes);
 app.use('/firewall', firewall_zone_routes);

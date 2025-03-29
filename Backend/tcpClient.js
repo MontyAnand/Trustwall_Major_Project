@@ -194,6 +194,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             const jsonData = JSON.parse(result);
             this.io.to(socketID).emit('interface-list', jsonData);
+            this.emit('interface-list',jsonData);
         } catch (error) {
             // console.log("Interface : ", error);
         }
