@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./ServiceList.css";
 import { useSocket } from "../Contexts/socketContex";
+import Sidebar from "../components/Sidebar";
 
 const ServiceTable = () => {
   const [services, setServices] = useState([]);
@@ -53,6 +54,8 @@ const ServiceTable = () => {
   };
 
   return (
+    <>
+      <Sidebar/>
     <div className="table-container">
       <table className="table">
         <thead>
@@ -107,6 +110,7 @@ const ServiceTable = () => {
         </tbody>
       </table>
     </div>
+    </>
   );
 };
 

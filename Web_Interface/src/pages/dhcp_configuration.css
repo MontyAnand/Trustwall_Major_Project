@@ -1,11 +1,14 @@
 *{
 margin: 0;
 }
+.dhcp_container{
+    margin-top: 100px;
+}
 .dhcp_container h1{
     text-align: center;
-    padding: 41px 23px;
-    background-color: #2C3930;
-    color: white;
+    /* padding: 41px 23px; */
+    /* background-color: #2C3930; */
+    color: black;
 }
 .dhcp_container label{
     font-weight: bold;
