@@ -34,9 +34,8 @@
   
   /* Style the button */
   .dropdown_comp p {
-    /* background-color:; Blue */
     color: white;
-    padding: 8px 0px;
+    padding: 4px 0px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
@@ -49,12 +48,11 @@
     left: 0;
     margin-top: 8px;
     width: 126px;
-    background-color: rgb(193, 186, 186);
-    /* border: 1px solid #ddd; */
+    background-color: #69747e;
     border:none;
     border-radius: 4px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: none; /* Initially hidden */
+    display: none; 
   }
   
   /* Style each menu item */
@@ -67,10 +65,13 @@
   
   /* Hover effect on menu items */
   .dropdown_menu a:hover {
-    background-color: #918686;
+    background-color: #5f656a;
   }
   
   /* Show the dropdown menu when hovering */
   .dropdown_comp:hover .dropdown_menu {
     display: block;
+  }
+  span{
+    margin-left:5px;
   }

@@ -7,28 +7,34 @@ function Sidebar() {
       <h2 className="sidebar-heading">TRUSTWALL</h2>
       <nav className="sidebar-navbar">
         <ul className="sidebar-box">
-        <li className="py-2"><Link to="/">Dashboard</Link></li>
+        {/* <li className="py-2"><Link to="/">Dashboard</Link></li> */}
         <li className="py-2"><Link to="/VPN">VPN</Link></li>
         <li className="py-2"><Link to="/firewall">Firewall</Link></li>
         <li className="py-2"><Link to="/interface">Interfaces</Link></li>
-          <li className="dropdown_comp">
-            <p>Services</p>
+        <li className="dropdown_comp">
+            <p>Systems<span>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/suricata" style={{color:'black',fontSize: '15px'}}>Suricata</Link>
-            <Link to="/DHCP-Configuration" style={{color:'black',fontSize: '15px'}}>DHCP Server</Link>
+            <Link to="/" style={{fontSize: '15px'}}>Signout</Link>
+            </div>
+          </li>
+          <li className="dropdown_comp">
+            <p>Services<span>&#11206;</span></p>
+            <div className="dropdown_menu">
+            <Link to="/suricata" style={{fontSize: '15px'}}>Suricata</Link>
+            <Link to="/DHCP-Configuration" style={{fontSize: '15px'}}>DHCP Server</Link>
             </div>
           </li>
           <li className="dropdown_comp" >
-            <p>Status</p>
+            <p>Status<span>&#11206;</span></p>
             <div className="dropdown_menu" >
-            <Link to="/services" style={{color:'black',fontSize: '15px'}} >Services Table</Link>
-            <Link to="/" style={{color:'black',fontSize: '15px'}}>Dashboard</Link>
+            <Link to="/services" style={{fontSize: '15px'}} >Services Table</Link>
+            <Link to="/dashboard" style={{fontSize: '15px'}}>Dashboard</Link>
             </div>
           </li>
           <li className="dropdown_comp">
-            <p>Diagnoistics</p>
+            <p>Diagnostics<span>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/antivirus" style={{color:'black',fontSize: '15px'}}>Antivirus</Link>
+            <Link to="/antivirus" style={{fontSize: '15px'}}>Antivirus</Link>
             </div>
           </li>
           
