@@ -48,6 +48,16 @@ void Interface::changeLANInterface(std::string &interface)
         file << interface;
         file.close();
     }
+    std::string wan = getWANInterface();
+    if (wan == interface)
+    {
+        wan = "";
+        changeWANInterface(wan);
+    }
+    if (wan.length() != 0)
+    {
+        Firewall::allowInterfaceForwarding(interface, wan);
+    }
 }
 void Interface::changeWANInterface(std::string &interface)
 {
@@ -57,6 +67,22 @@ void Interface::changeWANInterface(std::string &interface)
         file << interface;
         file.close();
     }
+    if (interface.length() == 0)
+    {
+        return;
+    }
+    Firewall::allowMasquerading(interface);
+    std::string lan = getLANInterface();
+    if (lan == interface)
+    {
+        lan = "";
+        changeLANInterface(lan);
+    }
+    if (lan.length() != 0)
+    {
+        Firewall::allowInterfaceForwarding(lan, interface);
+    }
+    return;
 }
 
 void Interface::changeInterfaceConfiguration(const char *data, int length, int fd)
@@ -281,8 +307,7 @@ std::string Interface::getLANInterfaceDetails()
             {"IP", IP},
             {"nm", nm},
             {"bip", bip},
-            {"gip", gip}
-        } ;
+            {"gip", gip}};
         return data.dump();
     }
 
@@ -329,7 +354,7 @@ std::string Interface::getLANInterfaceDetails()
     gip = getGateway(iface);
 
     json data = {
-        {"if",iface},
+        {"if", iface},
         {"ip", IP},
         {"nm", nm},
         {"bip", bip},

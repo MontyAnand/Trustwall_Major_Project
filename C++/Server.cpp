@@ -107,7 +107,7 @@ void Server::eventLoop()
                 }
                 else
                 {
-                    processPacket(buffer, fd,bytes_read);
+                    processPacket(buffer, fd, bytes_read);
                 }
             }
             else if (events[i].events & EPOLLOUT)
@@ -177,11 +177,13 @@ void Server::processPacket(char *buffer, int fd, int size)
     {
         handleInterfaceRequest(buffer, fd);
     }
-    case 20:{
-        Interface::changeInterfaceConfiguration(buffer,size,fd);
+    case 20:
+    {
+        Interface::changeInterfaceConfiguration(buffer, size, fd);
         break;
     }
-    case 22:{
+    case 22:
+    {
         handleLANInterfaceDetailsRequest(fd);
         break;
     }
@@ -190,7 +192,8 @@ void Server::processPacket(char *buffer, int fd, int size)
     }
 }
 
-void Server::handleLANInterfaceDetailsRequest(int fd){
+void Server::handleLANInterfaceDetailsRequest(int fd)
+{
     std::string data = Interface::getLANInterfaceDetails();
     std::vector<uint8_t> byteArray;
     uint8_t flag = 23;
@@ -450,8 +453,14 @@ void Server::watchNetworkTraffic()
     }
 }
 
+void Server::WANSetup(std::string interface)
+{
+    Interface::changeWANInterface(interface);
+}
+
 Server::Server() : running(true)
 {
+    WANSetup(vpn.getPublicInterface());
     epollFd = epoll_create1(0);
     if (epollFd == -1)
     {
