@@ -27,9 +27,9 @@ db.exec(`CREATE TABLE IF NOT EXISTS SET_INFO (
 
 // Table for representing Set
 
-module.exports.createSetTable = (setName, type) => {
+module.exports.createSetTable = ({setName, type}) => {
     let TYPE = 'TEXT';
-    if (type === 'port') {
+    if (type === 'PORT') {
         TYPE = 'INTEGER'
     }
     db.exec(`CREATE TABLE IF NOT EXISTS ${setName} (
