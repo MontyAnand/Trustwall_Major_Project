@@ -38,7 +38,7 @@ table inet SYSTEM_TABLE {
     }
 }
 
-table inet USER_TABLE {
+table ip USER_TABLE {
     chain REDIRECT {
         type nat hook prerouting priority -100; policy accept;
 

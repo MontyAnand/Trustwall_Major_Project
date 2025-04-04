@@ -11,12 +11,8 @@ const os = require('os');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
-const firewall_routes = require('./Routes/firewall_routes');
-const firewall_zone_routes = require('./Routes/firewall_zone_routes');
-const firewall_policy_routes = require('./Routes/firewall_policy_routes');
-const firewall_ipset_routes = require('./Routes/firewall_ipset_routes');
-const firewall_service_routes = require('./Routes/firewall_service_routes');
-const firewall_icmptype_routes = require('./Routes/firewall_icmptype_routes');
+
+const firewall_forward_routes = require('./Routes/firewall_forward');
 const { config } = require('process');
 
 const app = express();
@@ -122,12 +118,7 @@ app.get('/interfaces',(req,res)=>{
 });
 
 // firewall endpoints
-app.use('/firewall', firewall_routes);
-app.use('/firewall', firewall_zone_routes);
-app.use('/firewall', firewall_policy_routes);
-app.use('/firewall', firewall_ipset_routes);
-app.use('/firewall', firewall_service_routes);
-app.use('/firewall', firewall_icmptype_routes);
+app.use('/firewall', firewall_forward_routes);
 
 
 
