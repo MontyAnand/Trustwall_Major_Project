@@ -24,13 +24,13 @@ module.exports.createSet = (req, res) => {
     let command = `sudo nft add set ip USER_TABLE ${req.body.setName} `;
 
     if (req.body.type === 'IP') {
-        command = command + `{type ipv4_addr; flags interval;}`;
+        command = command + `'{type ipv4_addr; flags interval;}'`;
     }
     else if (req.body.type === 'PORT') {
-        command = command + `{ type inet_service; }`
+        command = command + `'{ type inet_service; }'`
     }
     else if (req.body.type === 'MAC') {
-        command = command + `{ type ether_addr; }`;
+        command = command + `'{ type ether_addr; }'`;
     }
     else {
         res.status(400).send({ 'error': "Invalid Type" });
@@ -94,7 +94,7 @@ module.exports.addElementToSet = (req, res) => {
         res.status(400).send({'error':"Set doesn't exists"});
         return;
     }
-    const command = `sudo nft add element ip USER_TABLE ${req.body.setName} { ${req.body.element} }`;
+    const command = `sudo nft add element ip USER_TABLE ${req.body.setName} '{ ${req.body.element} }'`;
     const success = runCommand(command);
     if(success){
         addElementIntoSet(req.body.setName, req.body.element);
@@ -118,7 +118,7 @@ module.exports.removeElementFromSet = (req, res) => {
         res.status(400).send({'error':"Set doesn't exixts"});
         return;
     }
-    const command = `sudo nft delete element ip USER_TABLE ${req.body.setName} { ${req.body.element} }`;
+    const command = `sudo nft delete element ip USER_TABLE ${req.body.setName} '{ ${req.body.element} }'`;
     const success = runCommand(command);
     if(success){
         deleteRowByPrimaryKey(req.body.setName,'ELEMENT',req.body.element);
