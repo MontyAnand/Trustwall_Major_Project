@@ -18,7 +18,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS CUSTOM_RULES (
     DPORT TEXT ,
     PROTOCOL TEXT ,
     INTERFACE TEXT ,
-    LIMIT INTEGER ,
+    RATE INTEGER ,
     UNIT TEXT ,
     BURST INTEGER ,
     ACTION TEXT
@@ -123,15 +123,15 @@ module.exports.updateMACRules = ({ ID, mac, interface, type, action }) => {
     return result.changes;
 }
 
-module.exports.addCustomRules = ({ ID, saddr_type, saddr,smask, sport_type, sport, daddr_type, daddr,dmask, dport_type, dport, protocol, interface, limit, unit, burst, action }) => {
-    const smt = db.prepare('INSERT INTO CUSTOM_RULES (ID,SADDR_TYPE,SADDR,SMASK,SPORT_TYPE,SPORT,DADDR_TYPE,DADDR,DMASK,DPORT_TYPE,DPORT,PROTOCOL,INTERFACE,LIMIT,UNIT,BURST,ACTION) VALUE (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-    const result = smt.run(ID, saddr_type, saddr, smask ,sport_type, sport, daddr_type, daddr, dmask, dport_type, dport, protocol, interface, limit, unit, burst, action);
+module.exports.addCustomRules = ({ ID, saddr_type, saddr,smask, sport_type, sport, daddr_type, daddr,dmask, dport_type, dport, protocol, interface, rate, unit, burst, action }) => {
+    const smt = db.prepare('INSERT INTO CUSTOM_RULES (ID,SADDR_TYPE,SADDR,SMASK,SPORT_TYPE,SPORT,DADDR_TYPE,DADDR,DMASK,DPORT_TYPE,DPORT,PROTOCOL,INTERFACE,RATE,UNIT,BURST,ACTION) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+    const result = smt.run(ID, saddr_type, saddr, smask ,sport_type, sport, daddr_type, daddr, dmask, dport_type, dport, protocol, interface, rate, unit, burst, action);
     return result.changes;
 }
 
-module.exports.updateCustomRules = ({ ID, saddr_type, saddr, smask,sport_type, sport, daddr_type, daddr, dmask,dport_type, dport, protocol, interface, limit, unit, burst, action }) => {
-    const smt = db.prepare('UPDATE CUSTOM_RULES SET SADDR_TYPE = ?, SADDR = ?, SMASK = ?, SPORT_TYPE = ?, SPORT = ?, DADDR_TYPE = ?, DADDR = ?, DMASK = ?, DPORT_TYPE = ?, DPORT = ?, PROTOCOL = ?, INTERFACE = ?, LIMIT = ?, UNIT = ?, BURST = ?, ACTION = ? WHERE ID = ?');
-    const result = smt.run(saddr_type, saddr,smask, sport_type, sport, daddr_type, daddr, dmask,dport_type, dport, protocol, interface, limit, unit, burst, action,ID);
+module.exports.updateCustomRules = ({ ID, saddr_type, saddr, smask,sport_type, sport, daddr_type, daddr, dmask,dport_type, dport, protocol, interface, rate, unit, burst, action }) => {
+    const smt = db.prepare('UPDATE CUSTOM_RULES SET SADDR_TYPE = ?, SADDR = ?, SMASK = ?, SPORT_TYPE = ?, SPORT = ?, DADDR_TYPE = ?, DADDR = ?, DMASK = ?, DPORT_TYPE = ?, DPORT = ?, PROTOCOL = ?, INTERFACE = ?, RATE = ?, UNIT = ?, BURST = ?, ACTION = ? WHERE ID = ?');
+    const result = smt.run(saddr_type, saddr,smask, sport_type, sport, daddr_type, daddr, dmask,dport_type, dport, protocol, interface, rate, unit, burst, action,ID);
     return result.changes;
 }
 module.exports.closeDB = () => {

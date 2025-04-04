@@ -52,13 +52,13 @@ module.exports.addCustomRule = (req, res) => {
         command = command + `${req.body.protocol} dport ${req.body.dport} `;
     }
     command = command + `iifname "${req.body.interface}" `
-    if (req.body.limit) {
-        command = command + `limit rate ${req.body.limit}/${req.body.unit} `;
+    if (req.body.rate) {
+        command = command + `limit rate ${req.body.rate}/${req.body.unit} `;
     }
     if (req.body.burst) {
-        command = command + `burst ${req.body.limit} `;
+        command = command + `burst ${req.body.burst} packets `;
     }
-    command = command + `${req.body.action} `;
+    command = command + `counter ${req.body.action} `;
     const ID = generateID();
     command = command + `comment "${ID}"`;
     const success = runCommand(command);
@@ -136,11 +136,11 @@ module.exports.updateCustomRule = (req, res) => {
         command = command + `${req.body.protocol} dport ${req.body.dport} `;
     }
     command = command + `iifname "${req.body.interface}" `
-    if (req.body.limit) {
-        command = command + `limit rate ${req.body.limit}/${req.body.unit} `;
+    if (req.body.rate) {
+        command = command + `limit rate ${req.body.rate}/${req.body.unit} `;
     }
     if (req.body.burst) {
-        command = command + `burst ${req.body.limit} `;
+        command = command + `burst ${req.body.burst} packets `;
     }
     command = command + `${req.body.action} `;
     command = command + `comment "${req.body.ID}"`;
