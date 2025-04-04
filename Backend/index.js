@@ -14,6 +14,7 @@ const { client } = require('./tcpClient');
 
 const firewall_forward_routes = require('./Routes/firewall_forward');
 const firewall_set_routes = require('./Routes/firewall_set');
+const firewall_mac_routes = require('./Routes/firewall_mac_rule');
 const { config } = require('process');
 
 const app = express();
@@ -121,6 +122,7 @@ app.get('/interfaces',(req,res)=>{
 // firewall endpoints
 app.use('/firewall', firewall_forward_routes);
 app.use('/firewall', firewall_set_routes);
+app.use('/firewall', firewall_mac_routes);
 
 
 // This part is to manage DHCP configuration

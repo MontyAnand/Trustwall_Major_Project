@@ -25,6 +25,17 @@ db.exec(`CREATE TABLE IF NOT EXISTS SET_INFO (
     TYPE TEXT
     )`);
 
+
+// Table for MAC Based rule
+
+db.exec(`CREATE TABLE IF NOT EXISTS MAC_BASED_RULES (
+    ID TEXT PRIMARY KEY ,
+    MAC TEXT ,
+    INTERFACE TEXT ,
+    TYPE INTEGER ,
+    ACTION TEXT
+    )`);
+
 // Table for representing Set
 
 module.exports.createSetTable = ({setName, type}) => {
@@ -80,6 +91,17 @@ module.exports.updateRuleToForwardTABLE = ({ID,interface,saddrType,saddr,mask,pr
     return result.changes;
 }
 
+module.exports.addMACRules = ({ID,mac,interface,type,action}) =>{
+    const smt = db.prepare(`INSERT INTO MAC_BASED_RULES (ID,MAC,INTERFACE,TYPE,ACTION) VALUES (?,?,?,?,?)`);
+    const result = smt.run(ID,mac,interface,type,action);
+    return result.changes;
+}
+
+module.exports.updateMACRules = ({ID,mac,interface,type,action}) =>{
+    const smt = db.prepare('UPDATE MAC_BASED_RULES SET MAC = ?, INTERFACE = ?, TYPE = ?, ACTION = ? WHERE ID = ?');
+    const result = smt.run(mac,interface,type,action,ID);
+    return result.changes;
+}
 module.exports.closeDB = ()=>{
     db.close();
 }

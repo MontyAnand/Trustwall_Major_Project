@@ -49,4 +49,8 @@ table ip USER_TABLE {
         type filter hook forward priority 0; policy drop;
 
     }
+
+    chain MAC_RULES {
+        type filter hook forward priority 0; policy drop;
+    }
 }
