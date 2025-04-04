@@ -15,7 +15,7 @@ module.exports.addMACRule = (req, res) => {
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
-    if (!req.body.type) {
+    if (req.body.type === undefined || req.body.type === null) {
         res.status(400).send({ 'error': "Type is required" });
         return;
     }
@@ -53,7 +53,7 @@ module.exports.updateMACRule = (req,res)=>{
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
-    if (!req.body.type) {
+    if (req.body.type === undefined || req.body.type === null) {
         res.status(400).send({ 'error': "Type is required" });
         return;
     }
