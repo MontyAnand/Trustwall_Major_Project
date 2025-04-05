@@ -1,0 +1,96 @@
+/* ForwardRuleTable.css */
+
+.table-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin: 0 5px;
+  }
+  
+  .add-btn {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .add-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .update-btn {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .update-btn:hover {
+    background-color: #e0a800;
+  }
+  
+  .delete-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c82333;
+  }
+  
+  .table-wrapper {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+  }
+  
+  .rules-table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    table-layout: fixed;
+  }
+  
+  .rules-table th,
+  .rules-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  
+  .rules-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .row:hover {
+    background-color: #f1f9ff;
+    cursor: pointer;
+  }
+  
+  .active-row {
+    background-color: #e6f7ff;
+  }
+  
+  .action-row {
+    background-color: #fafafa;
+    text-align: center;
+    padding: 10px 0;
+  }
+  
