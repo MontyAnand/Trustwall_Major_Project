@@ -2,28 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './ForwardRuleTable.css'; // Ensure CSS covers full height & width
 
-const rulesData = [
-  {
-    ID: "m947dryom5c",
-    SADDR_TYPE: 0,
-    SADDR: "172.16.0.1",
-    SMASK: 12,
-    SPORT_TYPE: 0,
-    SPORT: "80",
-    DADDR_TYPE: 0,
-    DADDR: "192.168.0.1",
-    DMASK: 24,
-    DPORT_TYPE: 0,
-    DPORT: "8080",
-    PROTOCOL: "udp",
-    INTERFACE: "enp0s9",
-    RATE: 200,
-    UNIT: "day",
-    BURST: 30,
-    ACTION: "reject"
-  }
-];
-
 export const IPRULETable = () => {
   const [rulesData, setRulesData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
