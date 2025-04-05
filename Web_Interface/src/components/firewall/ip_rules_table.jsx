@@ -25,6 +25,24 @@ export const IPRULETable = () => {
     alert("Add Rule clicked!");
   };
 
+  const deleteIPRule = async (ID) => {
+    try {
+      const response = await axios.delete(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteCustomRule`,
+        {
+          params: {
+            ID: ID
+          }
+        }
+      );
+  
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error deleting forward rule:', error);
+    }
+  };
+
+
   const displayValue = (value) =>
     value !== null && value !== undefined ? value : "-";
 
@@ -94,7 +112,7 @@ export const IPRULETable = () => {
                         ✏️ Update Rule
                       </button>
                       <button
-                        onClick={() => alert(`Delete Rule ${rule.ID}`)}
+                        onClick={() => deleteIPRule(rule.ID)}
                         className="btn delete-btn"
                       >
                         🗑️ Delete Rule

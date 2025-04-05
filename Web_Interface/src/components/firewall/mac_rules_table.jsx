@@ -18,11 +18,28 @@ export const MACRuleTable = () => {
                 alert(err.message);
             }
         };
-        fetchMACRules(); 
+        fetchMACRules();
     }, []);
 
     const handleAddRule = () => {
         alert("Add Rule clicked!");
+    };
+
+    const deleteMACRule = async (ID) => {
+        try {
+            const response = await axios.delete(
+                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteMACRule`,
+                {
+                    params: {
+                        ID: ID
+                    }
+                }
+            );
+
+            console.log('Response:', response.data);
+        } catch (error) {
+            console.error('Error deleting forward rule:', error);
+        }
     };
 
     return (
@@ -65,7 +82,7 @@ export const MACRuleTable = () => {
                                                 ✏️ Update Rule
                                             </button>
                                             <button
-                                                onClick={() => alert(`Delete Rule ${rule.ID}`)}
+                                                onClick={() => deleteMACRule(rule.ID)}
                                                 className="btn delete-btn"
                                             >
                                                 🗑️ Delete Rule

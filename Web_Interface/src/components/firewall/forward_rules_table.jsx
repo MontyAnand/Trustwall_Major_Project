@@ -10,20 +10,37 @@ export const ForwardRuleTable = () => {
 
   useEffect(() => {
     const fetchForwardRules = async () => {
-        try {
-            const response = await axios.get(
-                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getForwardRules`
-            );
-            setRulesData(response.data);
-        } catch (err) {
-            alert(err.message);
-        }
+      try {
+        const response = await axios.get(
+          `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getForwardRules`
+        );
+        setRulesData(response.data);
+      } catch (err) {
+        alert(err.message);
+      }
     };
-    fetchForwardRules(); 
-}, []);
+    fetchForwardRules();
+  }, []);
 
   const handleAddRule = () => {
     alert("Add Rule clicked!");
+  };
+
+  const deleteForwardRule = async (ID) => {
+    try {
+      const response = await axios.delete(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteForwardRule`,
+        {
+          params: {
+            ID: ID
+          }
+        }
+      );
+  
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error deleting forward rule:', error);
+    }
   };
 
   const displayValue = (value) => value !== null && value !== undefined ? value : "-";
@@ -70,7 +87,7 @@ export const ForwardRuleTable = () => {
                   <tr>
                     <td colSpan="9" className="action-row">
                       <button onClick={() => alert(`Update Rule ${rule.ID}`)} className="btn update-btn">✏️ Update Rule</button>
-                      <button onClick={() => alert(`Delete Rule ${rule.ID}`)} className="btn delete-btn">🗑️ Delete Rule</button>
+                      <button onClick={() => deleteForwardRule(rule.ID)} className="btn delete-btn">🗑️ Delete Rule</button>
                     </td>
                   </tr>
                 )}

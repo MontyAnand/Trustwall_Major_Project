@@ -33,8 +33,22 @@ export const SetList = () => {
     alert(`Add Element to Set "${setName}"`);
   };
 
-  const handleDeleteSet = (setName) => {
-    alert(`Delete Set "${setName}"`);
+  const handleDeleteSet = async (setName) => {
+    try {
+      const response = await axios.put(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteSet`,
+        { setName: setName },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+  
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error deleting set:', error);
+    }
   };
 
   const displayValue = (val) =>
