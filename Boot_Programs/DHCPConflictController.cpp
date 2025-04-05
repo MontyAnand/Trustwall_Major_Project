@@ -27,7 +27,7 @@ private:
     const string TABLE = "DHCP_TABLE";
     const string PAIR_SET = "allowed_pairs";
     const string CHAIN = "input_chain";
-    const string INTERFACE = "enp0s8";
+    const string INTERFACE = "enp0s9";
 
     set<IP_MAC> parsedPair;
     vector<IP_MAC> getNewPairs();

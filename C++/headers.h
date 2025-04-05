@@ -117,7 +117,6 @@ private:
 
     std::map<std::string, std::uint16_t> record;
 
-    std::string getPublicInterface();
     std::string getEndPoint();
     std::uint16_t getAvailableID();
     std::uint16_t generateClientConfiguration(std::string &, std::string &);
@@ -137,6 +136,7 @@ private:
 public:
     VPN();
     std::string getIP();
+    std::string getPublicInterface();
     std::uint16_t acceptConnectionRequest();
     ~VPN();
 };
@@ -202,11 +202,17 @@ public:
     static std ::string getWANInterface();
     static std::string getLANInterfaceDetails();
     static std::string getGateway(const std::string &);
-    static void changeInterfaceConfiguration(const char* , int , int);
+    static void changeInterfaceConfiguration(const char *, int, int);
     static void changeLANInterface(std::string &);
     static void changeWANInterface(std::string &);
-    static void changeIPAddress(const std::string &, const std::string &, int );
+    static void changeIPAddress(const std::string &, const std::string &, int);
+};
 
+class Firewall
+{   public: 
+    static void flushChain (std::string , std::string);
+    static void allowMasquerading(std::string);
+    static void allowInterfaceForwarding(std::string, std::string);
 };
 
 class Server
@@ -254,7 +260,8 @@ private:
     void handleServiceListRequest(int);
     void handleCPUStatusRequest(int);
     void manageServiceRequest(std::string);
-    void handleInterfaceRequest(std::string,int);
+    void handleInterfaceRequest(std::string, int);
+    void WANSetup(std::string);
 
 public:
     Server();

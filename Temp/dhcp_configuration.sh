@@ -1,0 +1,1 @@
+sudo ip addr add 172.16.0.1/12 dev enp0s9 && sudo systemctl restart isc-dhcp-server
