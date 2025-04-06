@@ -1,47 +1,78 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './ForwardRuleTable.css'; // Ensure CSS covers full height & width
+import './ForwardRuleTable.css';
+import { UpdateIPRuleForm } from "./ip_rule_update_form";
+
+const newForm = {
+  SADDR_TYPE: "IP",
+  SADDR: "",
+  SMASK: "",
+  SPORT_TYPE: "Port",
+  SPORT: "",
+  DADDR_TYPE: "IP",
+  DADDR: "",
+  DMASK: "",
+  DPORT_TYPE: "Port",
+  DPORT: "",
+  PROTOCOL: "",
+  INTERFACE: "",
+  RATE: "",
+  UNIT: "Second",
+  BURST: "",
+  ACTION: "accept",
+};
 
 export const IPRULETable = () => {
   const [rulesData, setRulesData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [editRule, setEditRule] = useState(null);
+  const [newRule, setNewRule] = useState(false);
 
   useEffect(() => {
     const fetchIPRules = async () => {
-        try {
-            const response = await axios.get(
-                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getCustomRules`
-            );
-            setRulesData(response.data);
-        } catch (err) {
-            alert(err.message);
-        }
+      try {
+        const response = await axios.get(
+          `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getCustomRules`
+        );
+        setRulesData(response.data);
+      } catch (err) {
+        alert(err.message);
+      }
     };
-    fetchIPRules(); 
-}, []);
+    fetchIPRules();
+  }, []);
 
   const handleAddRule = () => {
-    alert("Add Rule clicked!");
+    setNewRule(true);
   };
 
   const deleteIPRule = async (ID) => {
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteCustomRule`,
-        {
-          params: {
-            ID: ID
-          }
-        }
+        { params: { ID } }
       );
-  
-      console.log('Response:', response.data);
+      setRulesData(prev => prev.filter(rule => rule.ID !== ID));
     } catch (error) {
-      console.error('Error deleting forward rule:', error);
+      console.error('Error deleting rule:', error);
     }
   };
 
+  const updateIPRule = async (updatedRule) => {
+    try {
+      const response = await axios.put(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateCustomRule`,
+        updatedRule
+      );
+      const updatedList = rulesData.map(rule =>
+        rule.ID === updatedRule.ID ? updatedRule : rule
+      );
+      setRulesData(updatedList);
+      setEditRule(null);
+    } catch (error) {
+      console.error("Error updating rule:", error);
+    }
+  };
 
   const displayValue = (value) =>
     value !== null && value !== undefined ? value : "-";
@@ -106,7 +137,7 @@ export const IPRULETable = () => {
                   <tr>
                     <td colSpan="17" className="action-row">
                       <button
-                        onClick={() => alert(`Update Rule ${rule.ID}`)}
+                        onClick={() => setEditRule(rule)}
                         className="btn update-btn"
                       >
                         ✏️ Update Rule
@@ -125,6 +156,21 @@ export const IPRULETable = () => {
           </tbody>
         </table>
       </div>
+
+      {editRule && (
+        <UpdateIPRuleForm
+          rule={editRule}
+          onCancel={() => setEditRule(null)}
+          onSubmit={updateIPRule}
+        />
+      )}
+      {newRule && (
+        <UpdateIPRuleForm
+          rule={newForm}
+          onCancel={() => setNewRule(false)}
+          onSubmit={updateIPRule}
+        />
+      )}
     </div>
   );
 };

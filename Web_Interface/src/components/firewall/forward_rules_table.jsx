@@ -1,29 +1,43 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './ForwardRuleTable.css'; // Custom CSS file for styling
+import './ForwardRuleTable.css';
+import { RedirectRuleForm } from "./forward_rule_update_form";
 
+const newForm = {
+  INTERFACE: "",
+  SADDR_TYPE: "IP",
+  SADDR: "",
+  SMASK: "",
+  PROTOCOL: "",
+  DPORT: "",
+  REDIRECT_IP: "",
+  REDIRECT_PORT: "",
+};
 
 export const ForwardRuleTable = () => {
   const [rulesData, setRulesData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [selectedRule, setSelectedRule] = useState(null);
+  const [newRule, setNewRule] = useState(false);
 
   useEffect(() => {
-    const fetchForwardRules = async () => {
-      try {
-        const response = await axios.get(
-          `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getForwardRules`
-        );
-        setRulesData(response.data);
-      } catch (err) {
-        alert(err.message);
-      }
-    };
     fetchForwardRules();
   }, []);
 
+  const fetchForwardRules = async () => {
+    try {
+      const response = await axios.get(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getForwardRules`
+      );
+      setRulesData(response.data);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   const handleAddRule = () => {
-    alert("Add Rule clicked!");
+    setNewRule(true);
   };
 
   const deleteForwardRule = async (ID) => {
@@ -31,24 +45,49 @@ export const ForwardRuleTable = () => {
       const response = await axios.delete(
         `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteForwardRule`,
         {
-          params: {
-            ID: ID
-          }
+          params: { ID }
         }
       );
-  
-      console.log('Response:', response.data);
+      console.log("Deleted:", response.data);
+      fetchForwardRules();
     } catch (error) {
-      console.error('Error deleting forward rule:', error);
+      console.error("Error deleting forward rule:", error);
     }
   };
 
-  const displayValue = (value) => value !== null && value !== undefined ? value : "-";
+  const handleUpdateClick = (rule) => {
+    setSelectedRule(rule);
+    setShowUpdateForm(true);
+  };
+
+  const handleFormClose = () => {
+    setShowUpdateForm(false);
+    setSelectedRule(null);
+  };
+
+  const handleFormSubmit = async (updatedRule) => {
+    try {
+      const response = await axios.put(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateForwardRule`,
+        updatedRule
+      );
+      console.log("Updated:", response.data);
+      fetchForwardRules();
+      handleFormClose();
+    } catch (error) {
+      console.error("Error updating rule:", error);
+    }
+  };
+
+  const displayValue = (value) =>
+    value !== null && value !== undefined ? value : "-";
 
   return (
     <div className="table-container">
       <div className="header-section">
-        <button onClick={handleAddRule} className="btn add-btn">➕ Add Rule</button>
+        <button onClick={handleAddRule} className="btn add-btn">
+          ➕ Add Rule
+        </button>
       </div>
 
       <div className="table-wrapper">
@@ -70,8 +109,12 @@ export const ForwardRuleTable = () => {
             {rulesData.map((rule, index) => (
               <React.Fragment key={rule.ID}>
                 <tr
-                  onClick={() => setSelectedRow(selectedRow === index ? null : index)}
-                  className={selectedRow === index ? "row active-row" : "row"}
+                  onClick={() =>
+                    setSelectedRow(selectedRow === index ? null : index)
+                  }
+                  className={
+                    selectedRow === index ? "row active-row" : "row"
+                  }
                 >
                   <td>{displayValue(rule.ID)}</td>
                   <td>{displayValue(rule.INTERFACE)}</td>
@@ -86,8 +129,18 @@ export const ForwardRuleTable = () => {
                 {selectedRow === index && (
                   <tr>
                     <td colSpan="9" className="action-row">
-                      <button onClick={() => alert(`Update Rule ${rule.ID}`)} className="btn update-btn">✏️ Update Rule</button>
-                      <button onClick={() => deleteForwardRule(rule.ID)} className="btn delete-btn">🗑️ Delete Rule</button>
+                      <button
+                        onClick={() => handleUpdateClick(rule)}
+                        className="btn update-btn"
+                      >
+                        ✏️ Update Rule
+                      </button>
+                      <button
+                        onClick={() => deleteForwardRule(rule.ID)}
+                        className="btn delete-btn"
+                      >
+                        🗑️ Delete Rule
+                      </button>
                     </td>
                   </tr>
                 )}
@@ -96,6 +149,21 @@ export const ForwardRuleTable = () => {
           </tbody>
         </table>
       </div>
+
+      {showUpdateForm && selectedRule && (
+        <RedirectRuleForm
+          rule={selectedRule}
+          onCancel={handleFormClose}
+          onSubmit={handleFormSubmit}
+        />
+      )}
+      {newRule && (
+        <RedirectRuleForm
+          rule={newForm}
+          onCancel={() => setNewRule(false)}
+          onSubmit={handleFormSubmit}
+        />
+      )}
     </div>
   );
 };
