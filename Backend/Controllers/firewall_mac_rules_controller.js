@@ -24,10 +24,10 @@ module.exports.addMACRule = (req, res) => {
         return;
     }
     let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.interface}" ether saddr `;
-    if (req.body.type === 1) {
+    if (req.body.type === "SET") {
         command = command + `@${req.body.mac} `;
     }
-    else if (req.body.type === 0) {
+    else if (req.body.type === "MAC") {
         command = command + `${req.body.mac} `;
     }
     const ID = generateID();
@@ -77,10 +77,10 @@ module.exports.updateMACRule = (req,res)=>{
         return;
     }
     let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.interface}" ether saddr `;
-    if (req.body.type === 1) {
+    if (req.body.type === "SET") {
         command = command + `@${req.body.mac} `;
     }
-    else if (req.body.type === 0) {
+    else if (req.body.type === "MAC") {
         command = command + `${req.body.mac} `;
     }
     command = command + `comment "${req.body.ID}"`;
