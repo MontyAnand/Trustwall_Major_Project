@@ -15,50 +15,50 @@ module.exports.addCustomRule = (req, res) => {
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
-    if (!req.body.action) {
+    if (!req.body.ACTION) {
         res.status(400).send({ 'error': "Action is required" });
         return;
     }
-    if (!req.body.smask) {
-        req.body.smask = 32;
+    if (!req.body.SMASK) {
+        req.body.SMASK = 32;
     }
-    if (!req.body.dmask) {
-        req.body.dmask = 32;
+    if (!req.body.DMASK) {
+        req.body.DMASK = 32;
     }
     let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES `;
     if (req.body.SADDR_TYPE === "SET") {
         command = command + `ip saddr @${req.body.SADDR} `;
     }
     else if (req.body.SADDR_TYPE === "IP") {
-        command = command + `ip saddr ${req.body.SADDR}/${req.body.smask} `
+        command = command + `ip saddr ${req.body.SADDR}/${req.body.SMASK} `
     }
-    if (req.body.sport_type === "SET") {
-        command = command + `${req.body.protocol} sport @${req.body.sport} `;
+    if (req.body.SPORT_TYPE === "SET") {
+        command = command + `${req.body.PROTOCOL} sport @${req.body.SPORT} `;
     }
-    else if (req.body.sport_type === "PORT") {
-        command = command + `${req.body.protocol} sport ${req.body.sport} `;
+    else if (req.body.SPORT_TYPE === "PORT") {
+        command = command + `${req.body.PROTOCOL} sport ${req.body.SPORT} `;
     }
 
-    if (req.body.daddr_type === "SET") {
-        command = command + `ip daddr @${req.body.daddr} `;
+    if (req.body.DADDR_TYPE === "SET") {
+        command = command + `ip daddr @${req.body.DADDR} `;
     }
-    else if (req.body.daddr_type === "IP") {
-        command = command + `ip daddr ${req.body.daddr}/${req.body.dmask} `
+    else if (req.body.DADDR_TYPE === "IP") {
+        command = command + `ip daddr ${req.body.DADDR}/${req.body.DMASK} `
     }
-    if (req.body.dport_type === "SET") {
-        command = command + `${req.body.protocol} dport @${req.body.sport} `;
+    if (req.body.DPORT_TYPE === "SET") {
+        command = command + `${req.body.PROTOCOL} dport @${req.body.DPORT} `;
     }
-    else if (req.body.dport_type === "PORT") {
-        command = command + `${req.body.protocol} dport ${req.body.dport} `;
+    else if (req.body.DPORT_TYPE === "PORT") {
+        command = command + `${req.body.PROTOCOL} dport ${req.body.DPORT} `;
     }
-    command = command + `iifname "${req.body.interface}" `
-    if (req.body.rate) {
-        command = command + `limit rate ${req.body.rate}/${req.body.unit} `;
+    command = command + `iifname "${req.body.INTERFACE}" `
+    if (req.body.RATE) {
+        command = command + `limit rate ${req.body.RATE}/${req.body.UNIT} `;
     }
-    if (req.body.burst) {
-        command = command + `burst ${req.body.burst} packets `;
+    if (req.body.BURST) {
+        command = command + `burst ${req.body.BURST} packets `;
     }
-    command = command + `counter ${req.body.action} `;
+    command = command + `counter ${req.body.ACTION} `;
     const ID = generateID();
     command = command + `comment "${ID}"`;
     const success = runCommand(command);
@@ -74,23 +74,23 @@ module.exports.addCustomRule = (req, res) => {
 }
 
 module.exports.updateCustomRule = (req, res) => {
-    if (!req.body.protocol) {
+    if (!req.body.PROTOCOL) {
         res.status(400).send({ 'error': "Protocol is required" });
         return;
     }
-    if (!req.body.interface) {
+    if (!req.body.INTERFACE) {
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
-    if (!req.body.action) {
+    if (!req.body.ACTION) {
         res.status(400).send({ 'error': "Action is required" });
         return;
     }
-    if (!req.body.smask) {
-        req.body.smask = 32;
+    if (!req.body.SMASK) {
+        req.body.SMASK = 32;
     }
-    if (!req.body.dmask) {
-        req.body.dmask = 32;
+    if (!req.body.DMASK) {
+        req.body.DMASK = 32;
     }
     if (!req.body.ID) {
         res.status(400).send({ 'error': 'ID is requied' });
@@ -111,38 +111,38 @@ module.exports.updateCustomRule = (req, res) => {
 
     let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES `;
     if (req.body.SADDR_TYPE === "SET") {
-        command = command + `ip saddr @${req.body.saddr} `;
+        command = command + `ip saddr @${req.body.SADDR} `;
     }
     else if (req.body.SADDR_TYPE === "IP") {
-        command = command + `ip saddr ${req.body.saddr}/${req.body.smask} `
+        command = command + `ip saddr ${req.body.SADDR}/${req.body.SMASK} `
     }
-    if (req.body.sport_type === "SET") {
-        command = command + `${req.body.protocol} sport @${req.body.sport} `;
+    if (req.body.SPORT_TYPE === "SET") {
+        command = command + `${req.body.PROTOCOL} sport @${req.body.SPORT} `;
     }
-    else if (req.body.sport_type === "PORT") {
-        command = command + `${req.body.protocol} sport ${req.body.sport} `;
+    else if (req.body.SPORT_TYPE === "PORT") {
+        command = command + `${req.body.PROTOCOL} sport ${req.body.SPORT} `;
     }
 
-    if (req.body.daddr_type === "SET") {
-        command = command + `ip daddr @${req.body.daddr} `;
+    if (req.body.DADDR_TYPE === "SET") {
+        command = command + `ip daddr @${req.body.DADDR} `;
     }
-    else if (req.body.daddr_type === "IP") {
-        command = command + `ip daddr ${req.body.daddr}/${req.body.dmask} `
+    else if (req.body.DADDR_TYPE === "IP") {
+        command = command + `ip daddr ${req.body.DADDR}/${req.body.DMASK} `
     }
-    if (req.body.dport_type === "SET") {
-        command = command + `${req.body.protocol} dport @${req.body.sport} `;
+    if (req.body.DPORT_TYPE === "SET") {
+        command = command + `${req.body.PROTOCOL} dport @${req.body.DPORT} `;
     }
-    else if (req.body.dport_type === "PORT") {
-        command = command + `${req.body.protocol} dport ${req.body.dport} `;
+    else if (req.body.DPORT_TYPE === "PORT") {
+        command = command + `${req.body.PROTOCOL} dport ${req.body.DPORT} `;
     }
-    command = command + `iifname "${req.body.interface}" `
-    if (req.body.rate) {
-        command = command + `limit rate ${req.body.rate}/${req.body.unit} `;
+    command = command + `iifname "${req.body.INTERFACE}" `
+    if (req.body.RATE) {
+        command = command + `limit rate ${req.body.RATE}/${req.body.UNIT} `;
     }
-    if (req.body.burst) {
-        command = command + `burst ${req.body.burst} packets `;
+    if (req.body.BURST) {
+        command = command + `burst ${req.body.BURST} packets `;
     }
-    command = command + `${req.body.action} `;
+    command = command + `${req.body.ACTION} `;
     command = command + `comment "${req.body.ID}"`;
 
     const success = runCommand(command);

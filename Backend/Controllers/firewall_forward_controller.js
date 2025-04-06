@@ -7,40 +7,40 @@ module.exports.getForwardRules = (req, res) => {
 }
 
 module.exports.addForwardRule = (req, res) => {
-    if (!req.body.dport) {
+    if (!req.body.DPORT) {
         res.status(400).send({ 'error': 'Destination Port is required' });
         return;
     }
-    if (!req.body.redirectedIP) {
+    if (!req.body.REDIRECT_IP) {
         res.status(400).send({ 'error': 'Redirected IP is required' });
         return;
     }
-    if (!req.body.redirectedPORT) {
+    if (!req.body.REDIRECT_PORT) {
         res.status(400).send({ 'error': 'Redirected Port is required' });
         return;
     }
-    if (!req.body.interface) {
-        res.status(400).send({ 'error': 'Inteerface is required' });
+    if (!req.body.INTERFACE) {
+        res.status(400).send({ 'error': 'Interface is required' });
         return;
     }
-    if (!req.body.protocol) {
-        req.body.protocol = 'tcp';
+    if (!req.body.PROTOCOL) {
+        req.body.PROTOCOL = 'tcp';
     }
-    if (req.body.saddrType){
-        if(!req.body.mask){
-            req.body.mask = 32;
+    if (req.body.SADDR_TYPE){
+        if(!req.body.SMASK){
+            req.body.SMASK = 32;
         }
     }
-    let command = `sudo nft add rule ip USER_TABLE REDIRECT iifname "${req.body.interface}" `;
+    let command = `sudo nft add rule ip USER_TABLE REDIRECT iifname "${req.body.INTERFACE}" `;
 
-    if (req.body.saddrType === "SET") { // if saddrType === 0 then saddr is single IP, if saddrType === 1, saddr is a Set
-        command = command + `ip saddr @${req.body.saddr} `
+    if (req.body.SADDR_TYPE === "SET") { // if SADDRType === 0 then SADDR is single IP, if SADDRType === 1, SADDR is a Set
+        command = command + `ip saddr @${req.body.SADDR} `
     }
-    else if (req.body.saddrType === "IP") {
-        command = command + `ip saddr ${req.body.saddr}/${req.body.mask} `;
+    else if (req.body.SADDR_TYPE === "IP") {
+        command = command + `ip saddr ${req.body.SADDR}/${req.body.SMASK} `;
     }
 
-    command = command + `${req.body.protocol} dport ${req.body.dport} dnat to ${req.body.redirectedIP}:${req.body.redirectedPORT} `;
+    command = command + `${req.body.PROTOCOL} dport ${req.body.DPORT} dnat to ${req.body.REDIRECT_IP}:${req.body.REDIRECT_PORT} `;
 
     const ID = generateID();
     command = command + `comment "${ID}"`;
@@ -57,15 +57,15 @@ module.exports.addForwardRule = (req, res) => {
 }
 
 module.exports.updateForwardRule = (req, res) => {
-    if (!req.body.dport) {
+    if (!req.body.DPORT) {
         res.status(400).send({ 'error': 'Destination Port is required' });
         return;
     }
-    if (!req.body.redirectedIP) {
+    if (!req.body.REDIRECT_IP) {
         res.status(400).send({ 'error': 'Redirected IP is required' });
         return;
     }
-    if (!req.body.redirectedPORT) {
+    if (!req.body.REDIRECT_PORT) {
         res.status(400).send({ 'error': 'Redirected Port is required' });
         return;
     }
@@ -73,8 +73,8 @@ module.exports.updateForwardRule = (req, res) => {
         res.status(400).send({ 'error': 'ID is requied' });
         return;
     }
-    if (!req.body.protocol) {
-        req.body.protocol = 'tcp';
+    if (!req.body.PROTOCOL) {
+        req.body.PROTOCOL = 'tcp';
     }
 
     const handle = getHandle(req.body.ID);
@@ -89,16 +89,16 @@ module.exports.updateForwardRule = (req, res) => {
         return;
     }
 
-    let command = `sudo nft add rule ip USER_TABLE REDIRECT iifname "${req.body.interface}" `;
+    let command = `sudo nft add rule ip USER_TABLE REDIRECT iifname "${req.body.INTERFACE}" `;
 
-    if (req.body.saddrType === "SET") { // if saddrType === 0 then saddr is single IP, if saddrType === 1, saddr is a Set
-        command = command + `ip saddr @${req.body.saddr} `
+    if (req.body.SADDR_TYPE === "SET") { // if SADDRType === 0 then SADDR is single IP, if SADDRType === 1, SADDR is a Set
+        command = command + `ip saddr @${req.body.SADDR} `
     }
-    else if (req.body.saddrType === "IP") {
-        command = command + `ip saddr ${req.body.saddr}/${req.body.mask} `;
+    else if (req.body.SADDR_TYPE === "IP") {
+        command = command + `ip saddr ${req.body.SADDR}/${req.body.SMASK} `;
     }
 
-    command = command + `${req.body.protocol} dport ${req.body.dport} dnat to ${req.body.redirectedIP}:${req.body.redirectedPORT} `;
+    command = command + `${req.body.PROTOCOL} dport ${req.body.DPORT} dnat to ${req.body.REDIRECT_IP}:${req.body.REDIRECT_PORT} `;
     command = command + `comment "${req.body.ID}"`;
 
     const success = runCommand(command);

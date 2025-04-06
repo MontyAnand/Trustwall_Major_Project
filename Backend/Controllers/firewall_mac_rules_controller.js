@@ -6,16 +6,17 @@ module.exports.getMACRules = (req, res) => {
     res.status(200).send(data);
 }
 
+
 module.exports.addMACRule = (req, res) => {
-    if (!req.body.mac) {
+    if (!req.body.MAC) {
         res.status(400).send({ 'error': "MAC is required" });
         return;
     }
-    if (!req.body.interface) {
+    if (!req.body.INTERFACE) {
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
-    if (req.body.type === undefined || req.body.type === null) {
+    if (req.body.TYPE === undefined || req.body.TYPE === null) {
         res.status(400).send({ 'error': "Type is required" });
         return;
     }
@@ -23,12 +24,12 @@ module.exports.addMACRule = (req, res) => {
         res.status(400).send({ 'error': "Action is required" });
         return;
     }
-    let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.interface}" ether saddr `;
-    if (req.body.type === "SET") {
-        command = command + `@${req.body.mac} `;
+    let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.INTERFACE}" ether saddr `;
+    if (req.body.TYPE === "SET") {
+        command = command + `@${req.body.MAC} `;
     }
-    else if (req.body.type === "MAC") {
-        command = command + `${req.body.mac} `;
+    else if (req.body.TYPE === "MAC") {
+        command = command + `${req.body.MAC} `;
     }
     const ID = generateID();
     command = command + `comment "${ID}"`;
@@ -45,19 +46,19 @@ module.exports.addMACRule = (req, res) => {
 }
 
 module.exports.updateMACRule = (req,res)=>{
-    if (!req.body.mac) {
+    if (!req.body.MAC) {
         res.status(400).send({ 'error': "MAC is required" });
         return;
     }
-    if (!req.body.interface) {
+    if (!req.body.INTERFACE) {
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
-    if (req.body.type === undefined || req.body.type === null) {
+    if (req.body.TYPE === undefined || req.body.TYPE === null) {
         res.status(400).send({ 'error': "Type is required" });
         return;
     }
-    if (!req.body.action) {
+    if (!req.body.ACTION) {
         res.status(400).send({ 'error': "Action is required" });
         return;
     }
@@ -76,12 +77,12 @@ module.exports.updateMACRule = (req,res)=>{
         res.status(500).send({ 'success': false });
         return;
     }
-    let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.interface}" ether saddr `;
-    if (req.body.type === "SET") {
-        command = command + `@${req.body.mac} `;
+    let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.INTERFACE}" ether saddr `;
+    if (req.body.TYPE === "SET") {
+        command = command + `@${req.body.MAC} `;
     }
-    else if (req.body.type === "MAC") {
-        command = command + `${req.body.mac} `;
+    else if (req.body.TYPE === "MAC") {
+        command = command + `${req.body.MAC} `;
     }
     command = command + `comment "${req.body.ID}"`;
     const success = runCommand(command);

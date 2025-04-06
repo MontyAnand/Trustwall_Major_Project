@@ -99,41 +99,112 @@ module.exports.getAllRows = (TABLE) => {
     return smt.all();
 }
 
-module.exports.addRuleToForwardTABLE = ({ ID, interface, saddrType, saddr, mask, protocol, dport, redirectedIP, redirectedPORT }) => {
+module.exports.addRuleToForwardTABLE = ({ ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT }) => {
     const smt = db.prepare(`INSERT INTO FORWARD (ID, INTERFACE, SADDR_TYPE, SADDR, MASK, PROTOCOL, DPORT, REDIRECTED_IP, REDIRECTED_PORT) VALUES (?,?,?,?,?,?,?,?,?)`);
-    const result = smt.run(ID, interface, saddrType, saddr, mask, protocol, dport, redirectedIP, redirectedPORT);
+    const result = smt.run(ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT);
     return result.changes;
-}
+};
 
-module.exports.updateRuleToForwardTABLE = ({ ID, interface, saddrType, saddr, mask, protocol, dport, redirectedIP, redirectedPORT }) => {
+module.exports.updateRuleToForwardTABLE = ({ ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT }) => {
     const smt = db.prepare('UPDATE FORWARD SET INTERFACE = ?, SADDR_TYPE = ?, SADDR = ?, MASK = ?, PROTOCOL = ?, DPORT = ?, REDIRECTED_IP = ?, REDIRECTED_PORT = ? WHERE ID = ?');
-    const result = smt.run(interface, saddrType, saddr, mask, protocol, dport, redirectedIP, redirectedPORT, ID);
+    const result = smt.run(INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT, ID);
     return result.changes;
-}
+};
 
-module.exports.addMACRules = ({ ID, mac, interface, type, action }) => {
-    const smt = db.prepare(`INSERT INTO MAC_BASED_RULES (ID,MAC,INTERFACE,TYPE,ACTION) VALUES (?,?,?,?,?)`);
-    const result = smt.run(ID, mac, interface, type, action);
+
+module.exports.addMACRules = ({ ID, TYPE, MAC, INTERFACE, ACTION }) => {
+    const smt = db.prepare(`INSERT INTO MAC_BASED_RULES (ID, MAC, INTERFACE, TYPE, ACTION) VALUES (?, ?, ?, ?, ?)`);
+    const result = smt.run(ID, MAC, INTERFACE, TYPE, ACTION);
     return result.changes;
-}
+};
 
-module.exports.updateMACRules = ({ ID, mac, interface, type, action }) => {
+module.exports.updateMACRules = ({ ID, TYPE, MAC, INTERFACE, ACTION }) => {
     const smt = db.prepare('UPDATE MAC_BASED_RULES SET MAC = ?, INTERFACE = ?, TYPE = ?, ACTION = ? WHERE ID = ?');
-    const result = smt.run(mac, interface, type, action, ID);
+    const result = smt.run(MAC, INTERFACE, TYPE, ACTION, ID);
     return result.changes;
-}
+};
 
-module.exports.addCustomRules = ({ ID, saddr_type, saddr,smask, sport_type, sport, daddr_type, daddr,dmask, dport_type, dport, protocol, interface, rate, unit, burst, action }) => {
-    const smt = db.prepare('INSERT INTO CUSTOM_RULES (ID,SADDR_TYPE,SADDR,SMASK,SPORT_TYPE,SPORT,DADDR_TYPE,DADDR,DMASK,DPORT_TYPE,DPORT,PROTOCOL,INTERFACE,RATE,UNIT,BURST,ACTION) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-    const result = smt.run(ID, saddr_type, saddr, smask ,sport_type, sport, daddr_type, daddr, dmask, dport_type, dport, protocol, interface, rate, unit, burst, action);
-    return result.changes;
-}
+module.exports.addCustomRules = ({
+    ID,
+    SADDR_TYPE,
+    SADDR,
+    SMASK,
+    SPORT_TYPE,
+    SPORT,
+    DADDR_TYPE,
+    DADDR,
+    DMASK,
+    DPORT_TYPE,
+    DPORT,
+    PROTOCOL,
+    INTERFACE,
+    RATE,
+    UNIT,
+    BURST,
+    ACTION
+}) => {
+    const smt = db.prepare(`INSERT INTO CUSTOM_RULES (
+      ID, SADDR_TYPE, SADDR, SMASK,
+      SPORT_TYPE, SPORT,
+      DADDR_TYPE, DADDR, DMASK,
+      DPORT_TYPE, DPORT,
+      PROTOCOL, INTERFACE,
+      RATE, UNIT, BURST,
+      ACTION
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 
-module.exports.updateCustomRules = ({ ID, saddr_type, saddr, smask,sport_type, sport, daddr_type, daddr, dmask,dport_type, dport, protocol, interface, rate, unit, burst, action }) => {
-    const smt = db.prepare('UPDATE CUSTOM_RULES SET SADDR_TYPE = ?, SADDR = ?, SMASK = ?, SPORT_TYPE = ?, SPORT = ?, DADDR_TYPE = ?, DADDR = ?, DMASK = ?, DPORT_TYPE = ?, DPORT = ?, PROTOCOL = ?, INTERFACE = ?, RATE = ?, UNIT = ?, BURST = ?, ACTION = ? WHERE ID = ?');
-    const result = smt.run(saddr_type, saddr,smask, sport_type, sport, daddr_type, daddr, dmask,dport_type, dport, protocol, interface, rate, unit, burst, action,ID);
+    const result = smt.run(
+        ID, SADDR_TYPE, SADDR, SMASK,
+        SPORT_TYPE, SPORT,
+        DADDR_TYPE, DADDR, DMASK,
+        DPORT_TYPE, DPORT,
+        PROTOCOL, INTERFACE,
+        RATE, UNIT, BURST,
+        ACTION
+    );
     return result.changes;
-}
+};
+
+module.exports.updateCustomRules = ({
+    ID,
+    SADDR_TYPE,
+    SADDR,
+    SMASK,
+    SPORT_TYPE,
+    SPORT,
+    DADDR_TYPE,
+    DADDR,
+    DMASK,
+    DPORT_TYPE,
+    DPORT,
+    PROTOCOL,
+    INTERFACE,
+    RATE,
+    UNIT,
+    BURST,
+    ACTION
+}) => {
+    const smt = db.prepare(`UPDATE CUSTOM_RULES SET
+      SADDR_TYPE = ?, SADDR = ?, SMASK = ?,
+      SPORT_TYPE = ?, SPORT = ?,
+      DADDR_TYPE = ?, DADDR = ?, DMASK = ?,
+      DPORT_TYPE = ?, DPORT = ?,
+      PROTOCOL = ?, INTERFACE = ?,
+      RATE = ?, UNIT = ?, BURST = ?, ACTION = ?
+      WHERE ID = ?`);
+
+    const result = smt.run(
+        SADDR_TYPE, SADDR, SMASK,
+        SPORT_TYPE, SPORT,
+        DADDR_TYPE, DADDR, DMASK,
+        DPORT_TYPE, DPORT,
+        PROTOCOL, INTERFACE,
+        RATE, UNIT, BURST,
+        ACTION, ID
+    );
+    return result.changes;
+};
+
 module.exports.closeDB = () => {
     db.close();
 }
