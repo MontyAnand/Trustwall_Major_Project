@@ -26,29 +26,29 @@ module.exports.addCustomRule = (req, res) => {
         req.body.dmask = 32;
     }
     let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES `;
-    if (req.body.saddr_type === 1) {
+    if (req.body.saddr_type === "SET") {
         command = command + `ip saddr @${req.body.saddr} `;
     }
-    else if (req.body.saddr_type === 0) {
+    else if (req.body.saddr_type === "IP") {
         command = command + `ip saddr ${req.body.saddr}/${req.body.smask} `
     }
-    if (req.body.sport_type === 1) {
+    if (req.body.sport_type === "SET") {
         command = command + `${req.body.protocol} sport @${req.body.sport} `;
     }
-    else if (req.body.sport_type === 0) {
+    else if (req.body.sport_type === "PORT") {
         command = command + `${req.body.protocol} sport ${req.body.sport} `;
     }
 
-    if (req.body.daddr_type === 1) {
+    if (req.body.daddr_type === "SET") {
         command = command + `ip daddr @${req.body.daddr} `;
     }
-    else if (req.body.daddr_type === 0) {
+    else if (req.body.daddr_type === "IP") {
         command = command + `ip daddr ${req.body.daddr}/${req.body.dmask} `
     }
-    if (req.body.dport_type === 1) {
+    if (req.body.dport_type === "SET") {
         command = command + `${req.body.protocol} dport @${req.body.sport} `;
     }
-    else if (req.body.dport_type === 0) {
+    else if (req.body.dport_type === "PORT") {
         command = command + `${req.body.protocol} dport ${req.body.dport} `;
     }
     command = command + `iifname "${req.body.interface}" `
@@ -110,29 +110,29 @@ module.exports.updateCustomRule = (req, res) => {
     }
 
     let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES `;
-    if (req.body.saddr_type === 1) {
+    if (req.body.saddr_type === "SET") {
         command = command + `ip saddr @${req.body.saddr} `;
     }
-    else if (req.body.saddr_type === 0) {
+    else if (req.body.saddr_type === "IP") {
         command = command + `ip saddr ${req.body.saddr}/${req.body.smask} `
     }
-    if (req.body.sport_type === 1) {
+    if (req.body.sport_type === "SET") {
         command = command + `${req.body.protocol} sport @${req.body.sport} `;
     }
-    else if (req.body.sport_type === 0) {
+    else if (req.body.sport_type === "PORT") {
         command = command + `${req.body.protocol} sport ${req.body.sport} `;
     }
 
-    if (req.body.daddr_type === 1) {
+    if (req.body.daddr_type === "SET") {
         command = command + `ip daddr @${req.body.daddr} `;
     }
-    else if (req.body.daddr_type === 0) {
+    else if (req.body.daddr_type === "IP") {
         command = command + `ip daddr ${req.body.daddr}/${req.body.dmask} `
     }
-    if (req.body.dport_type === 1) {
+    if (req.body.dport_type === "SET") {
         command = command + `${req.body.protocol} dport @${req.body.sport} `;
     }
-    else if (req.body.dport_type === 0) {
+    else if (req.body.dport_type === "PORT") {
         command = command + `${req.body.protocol} dport ${req.body.dport} `;
     }
     command = command + `iifname "${req.body.interface}" `

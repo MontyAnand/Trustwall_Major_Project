@@ -33,10 +33,10 @@ module.exports.addForwardRule = (req, res) => {
     }
     let command = `sudo nft add rule ip USER_TABLE REDIRECT iifname "${req.body.interface}" `;
 
-    if (req.body.saddrType === 1) { // if saddrType === 0 then saddr is single IP, if saddrType === 1, saddr is a Set
+    if (req.body.saddrType === "SET") { // if saddrType === 0 then saddr is single IP, if saddrType === 1, saddr is a Set
         command = command + `ip saddr @${req.body.saddr} `
     }
-    else if (req.body.saddrType === 0) {
+    else if (req.body.saddrType === "IP") {
         command = command + `ip saddr ${req.body.saddr}/${req.body.mask} `;
     }
 
@@ -91,10 +91,10 @@ module.exports.updateForwardRule = (req, res) => {
 
     let command = `sudo nft add rule ip USER_TABLE REDIRECT iifname "${req.body.interface}" `;
 
-    if (req.body.saddrType === 1) { // if saddrType === 0 then saddr is single IP, if saddrType === 1, saddr is a Set
+    if (req.body.saddrType === "SET") { // if saddrType === 0 then saddr is single IP, if saddrType === 1, saddr is a Set
         command = command + `ip saddr @${req.body.saddr} `
     }
-    else if (req.body.saddrType === 0) {
+    else if (req.body.saddrType === "IP") {
         command = command + `ip saddr ${req.body.saddr}/${req.body.mask} `;
     }
 
