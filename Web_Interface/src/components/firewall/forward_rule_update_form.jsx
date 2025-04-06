@@ -108,6 +108,7 @@ export const RedirectRuleForm = ({ rule, onSubmit, onCancel }) => {
 
                     {/* Redirected IP */}
                     <label>Redirected IP</label>
+                    
                     <input
                         type="text"
                         name="REDIRECT_IP"

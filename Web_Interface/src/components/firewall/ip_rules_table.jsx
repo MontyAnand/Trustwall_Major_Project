@@ -7,17 +7,17 @@ const newForm = {
   SADDR_TYPE: "IP",
   SADDR: "",
   SMASK: "",
-  SPORT_TYPE: "Port",
+  SPORT_TYPE: "PORT",
   SPORT: "",
   DADDR_TYPE: "IP",
   DADDR: "",
   DMASK: "",
-  DPORT_TYPE: "Port",
+  DPORT_TYPE: "PORT",
   DPORT: "",
   PROTOCOL: "",
   INTERFACE: "",
   RATE: "",
-  UNIT: "Second",
+  UNIT: "second",
   BURST: "",
   ACTION: "accept",
 };
@@ -28,17 +28,18 @@ export const IPRULETable = () => {
   const [editRule, setEditRule] = useState(null);
   const [newRule, setNewRule] = useState(false);
 
+  const fetchIPRules = async () => {
+    try {
+      const response = await axios.get(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getCustomRules`
+      );
+      setRulesData(response.data);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   useEffect(() => {
-    const fetchIPRules = async () => {
-      try {
-        const response = await axios.get(
-          `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getCustomRules`
-        );
-        setRulesData(response.data);
-      } catch (err) {
-        alert(err.message);
-      }
-    };
     fetchIPRules();
   }, []);
 
@@ -54,9 +55,10 @@ export const IPRULETable = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log('IP rule added:', response.data);
+      fetchIPRules();
+      alert('IP rule added:', JSON.stringify(response.data));
     } catch (error) {
-      console.error('Error adding IP rule:', error);
+      alert('IP rule add Error:', JSON.stringify(error.message));
     }
     setNewRule(false);
   }
@@ -67,9 +69,9 @@ export const IPRULETable = () => {
         `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/deleteCustomRule`,
         { params: { ID } }
       );
-      setRulesData(prev => prev.filter(rule => rule.ID !== ID));
+      fetchIPRules();
     } catch (error) {
-      console.error('Error deleting rule:', error);
+      alert('IP rule delete Error:', JSON.stringify(error.message));
     }
   };
 
@@ -81,9 +83,10 @@ export const IPRULETable = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log('Forward rule updated:', response.data);
+      alert('IP rule Updated:', JSON.stringify(response.data));
+      fetchIPRules();
     } catch (error) {
-      console.error('Error updating forward rule:', error);
+      alert('IP rule Update Error:', JSON.stringify(error.message));
     }
     setEditRule(null)
   };

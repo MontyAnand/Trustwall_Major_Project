@@ -49,9 +49,10 @@ export const ForwardRuleTable = () => {
         }
       });
       fetchForwardRules();
-      console.log('Forward rule added:', response.data);
+      alert('Forward rule added:', JSON.stringify(response.data));
     } catch (error) {
-      console.error('Error adding forward rule:', error);
+      alert('Error adding forward rule:', (error));
+      console.log(error);
     }
     setNewRule(false);
   }
@@ -64,10 +65,11 @@ export const ForwardRuleTable = () => {
           params: { ID }
         }
       );
-      console.log("Deleted:", response.data);
+      alert('Forward rule deleted:', JSON.stringify(response.data));
       fetchForwardRules();
     } catch (error) {
-      console.error("Error deleting forward rule:", error);
+      alert('Error deleting forward rule:', (error));
+      console.log(error);
     }
   };
 
@@ -87,10 +89,12 @@ export const ForwardRuleTable = () => {
         `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateForwardRule`,
         updatedRule
       );
-      console.log("Updated:", response.data);
       fetchForwardRules();
+      alert('Forward rule updated:', JSON.stringify(response.data));
+      console.log(response.data);
     } catch (error) {
-      console.error("Error updating rule:", error);
+      alert('Error updating forward rule:', (error));
+      console.log(error);
     }
     handleFormClose();
   };

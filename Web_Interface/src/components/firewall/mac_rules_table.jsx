@@ -44,10 +44,10 @@ export const MACRuleTable = () => {
                     params: { ID }
                 }
             );
-            console.log('Deleted:', response.data);
+            alert('Deleted:', JSON.stringify(response.data));
             fetchMACRules();
         } catch (error) {
-            console.error('Error deleting MAC rule:', error);
+            alert('Error deleting MAC rule:', JSON.stringify(error));
         }
     };
 
@@ -70,12 +70,12 @@ export const MACRuleTable = () => {
                         'Content-Type': 'application/json'
                     }
                 });
-
+                fetchMACRules();
             console.log('MAC Rule added:', response.data);
             alert(JSON.stringify(response.data));
         } catch (error) {
             console.error('Error adding MAC rule:', error);
-            alert(JSON.stringify(error));
+            alert('Error: ',JSON.stringify(error.message));
         }
         setNewRule(false);
     }
@@ -88,10 +88,10 @@ export const MACRuleTable = () => {
                     'Content-Type': 'application/json'
                 }
             });
-
-            console.log('MAC Rule updated:', response.data);
+            fetchMACRules();
+            alert('Updated:', JSON.stringify(response.data));
         } catch (error) {
-            console.error('Error updating MAC rule:', error);
+            alert('Error: ',JSON.stringify(error.message));
         }
         setShowUpdateForm(false);
         setSelectedRule(null);

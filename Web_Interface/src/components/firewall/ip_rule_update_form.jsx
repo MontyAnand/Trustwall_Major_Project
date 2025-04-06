@@ -74,7 +74,7 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
           <label>Source Address Type</label>
           <select name="SADDR_TYPE" value={form.SADDR_TYPE} onChange={handleChange}>
             <option value="IP">IP</option>
-            <option value="Set">Set</option>
+            <option value="SET">Set</option>
           </select>
 
           <label>Source Address</label>
@@ -93,7 +93,7 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
           <label>Source PORT Type</label>
           <select name="SPORT_TYPE" value={form.SPORT_TYPE} onChange={handleChange}>
             <option value="PORT">PORT</option>
-            <option value="Set">Set</option>
+            <option value="SET">Set</option>
           </select>
 
           <label>Source PORT</label>
@@ -103,7 +103,7 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
           <label>Destination Address Type</label>
           <select name="DADDR_TYPE" value={form.DADDR_TYPE} onChange={handleChange}>
             <option value="IP">IP</option>
-            <option value="Set">Set</option>
+            <option value="SET">Set</option>
           </select>
 
           <label>Destination Address</label>
@@ -122,7 +122,7 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
           <label>Destination Port Type</label>
           <select name="DPORT_TYPE" value={form.DPORT_TYPE} onChange={handleChange}>
             <option value="PORT">Port</option>
-            <option value="Set">Set</option>
+            <option value="SET">Set</option>
           </select>
 
           <label>Destination Port</label>
@@ -158,10 +158,10 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
 
           <label>Unit</label>
           <select name="UNIT" value={form.UNIT} onChange={handleChange}>
-            <option value="Second">Second</option>
-            <option value="Minute">Minute</option>
-            <option value="Hour">Hour</option>
-            <option value="Day">Day</option>
+            <option value="second">Second</option>
+            <option value="minute">Minute</option>
+            <option value="hour">Hour</option>
+            <option value="day">Day</option>
           </select>
 
           <label>Burst</label>
