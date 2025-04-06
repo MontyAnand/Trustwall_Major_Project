@@ -100,13 +100,13 @@ module.exports.getAllRows = (TABLE) => {
 }
 
 module.exports.addRuleToForwardTABLE = ({ ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT }) => {
-    const smt = db.prepare(`INSERT INTO FORWARD (ID, INTERFACE, SADDR_TYPE, SADDR, MASK, PROTOCOL, DPORT, REDIRECTED_IP, REDIRECTED_PORT) VALUES (?,?,?,?,?,?,?,?,?)`);
+    const smt = db.prepare(`INSERT INTO FORWARD (ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECTED_IP, REDIRECTED_PORT) VALUES (?,?,?,?,?,?,?,?,?)`);
     const result = smt.run(ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT);
     return result.changes;
 };
 
 module.exports.updateRuleToForwardTABLE = ({ ID, INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT }) => {
-    const smt = db.prepare('UPDATE FORWARD SET INTERFACE = ?, SADDR_TYPE = ?, SADDR = ?, MASK = ?, PROTOCOL = ?, DPORT = ?, REDIRECTED_IP = ?, REDIRECTED_PORT = ? WHERE ID = ?');
+    const smt = db.prepare('UPDATE FORWARD SET INTERFACE = ?, SADDR_TYPE = ?, SADDR = ?, SMASK = ?, PROTOCOL = ?, DPORT = ?, REDIRECTED_IP = ?, REDIRECTED_PORT = ? WHERE ID = ?');
     const result = smt.run(INTERFACE, SADDR_TYPE, SADDR, SMASK, PROTOCOL, DPORT, REDIRECT_IP, REDIRECT_PORT, ID);
     return result.changes;
 };
