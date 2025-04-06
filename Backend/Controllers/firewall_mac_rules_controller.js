@@ -20,7 +20,7 @@ module.exports.addMACRule = (req, res) => {
         res.status(400).send({ 'error': "Type is required" });
         return;
     }
-    if (!req.body.action) {
+    if (!req.body.ACTION) {
         res.status(400).send({ 'error': "Action is required" });
         return;
     }
