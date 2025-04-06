@@ -7,11 +7,11 @@ module.exports.getCustomRules = (req, res) => {
 }
 
 module.exports.addCustomRule = (req, res) => {
-    if (!req.body.protocol) {
+    if (!req.body.PROTOCOL) {
         res.status(400).send({ 'error': "Protocol is required" });
         return;
     }
-    if (!req.body.interface) {
+    if (!req.body.INTERFACE) {
         res.status(400).send({ 'error': "Interface is required" });
         return;
     }
@@ -26,11 +26,11 @@ module.exports.addCustomRule = (req, res) => {
         req.body.dmask = 32;
     }
     let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES `;
-    if (req.body.saddr_type === "SET") {
-        command = command + `ip saddr @${req.body.saddr} `;
+    if (req.body.SADDR_TYPE === "SET") {
+        command = command + `ip saddr @${req.body.SADDR} `;
     }
-    else if (req.body.saddr_type === "IP") {
-        command = command + `ip saddr ${req.body.saddr}/${req.body.smask} `
+    else if (req.body.SADDR_TYPE === "IP") {
+        command = command + `ip saddr ${req.body.SADDR}/${req.body.smask} `
     }
     if (req.body.sport_type === "SET") {
         command = command + `${req.body.protocol} sport @${req.body.sport} `;
@@ -110,10 +110,10 @@ module.exports.updateCustomRule = (req, res) => {
     }
 
     let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES `;
-    if (req.body.saddr_type === "SET") {
+    if (req.body.SADDR_TYPE === "SET") {
         command = command + `ip saddr @${req.body.saddr} `;
     }
-    else if (req.body.saddr_type === "IP") {
+    else if (req.body.SADDR_TYPE === "IP") {
         command = command + `ip saddr ${req.body.saddr}/${req.body.smask} `
     }
     if (req.body.sport_type === "SET") {
