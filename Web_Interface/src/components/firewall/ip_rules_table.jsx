@@ -61,7 +61,7 @@ export const IPRULETable = () => {
       alert('IP rule add Error:', JSON.stringify(error.message));
     }
     setNewRule(false);
-  }
+  };
 
   const deleteIPRule = async (ID) => {
     try {
@@ -88,7 +88,7 @@ export const IPRULETable = () => {
     } catch (error) {
       alert('IP rule Update Error:', JSON.stringify(error.message));
     }
-    setEditRule(null)
+    setEditRule(null);
   };
 
   const displayValue = (value) =>
@@ -124,52 +124,60 @@ export const IPRULETable = () => {
             </tr>
           </thead>
           <tbody>
-            {rulesData.map((rule, index) => (
-              <React.Fragment key={rule.ID}>
-                <tr
-                  onClick={() =>
-                    setSelectedRow(selectedRow === index ? null : index)
-                  }
-                  className={selectedRow === index ? "row active-row" : "row"}
-                >
-                  <td>{displayValue(rule.ID)}</td>
-                  <td>{displayValue(rule.SADDR_TYPE)}</td>
-                  <td>{displayValue(rule.SADDR)}</td>
-                  <td>{displayValue(rule.SMASK)}</td>
-                  <td>{displayValue(rule.SPORT_TYPE)}</td>
-                  <td>{displayValue(rule.SPORT)}</td>
-                  <td>{displayValue(rule.DADDR_TYPE)}</td>
-                  <td>{displayValue(rule.DADDR)}</td>
-                  <td>{displayValue(rule.DMASK)}</td>
-                  <td>{displayValue(rule.DPORT_TYPE)}</td>
-                  <td>{displayValue(rule.DPORT)}</td>
-                  <td>{displayValue(rule.PROTOCOL)?.toUpperCase()}</td>
-                  <td>{displayValue(rule.INTERFACE)}</td>
-                  <td>{displayValue(rule.RATE)}</td>
-                  <td>{displayValue(rule.UNIT)}</td>
-                  <td>{displayValue(rule.BURST)}</td>
-                  <td>{displayValue(rule.ACTION)}</td>
-                </tr>
-                {selectedRow === index && (
-                  <tr>
-                    <td colSpan="17" className="action-row">
-                      <button
-                        onClick={() => setEditRule(rule)}
-                        className="btn update-btn"
-                      >
-                        ✏️ Update Rule
-                      </button>
-                      <button
-                        onClick={() => deleteIPRule(rule.ID)}
-                        className="btn delete-btn"
-                      >
-                        🗑️ Delete Rule
-                      </button>
-                    </td>
+            {rulesData.length === 0 ? (
+              <tr>
+                <td colSpan="17" className="no-rules-cell">
+                  🚫 No rules found.
+                </td>
+              </tr>
+            ) : (
+              rulesData.map((rule, index) => (
+                <React.Fragment key={rule.ID}>
+                  <tr
+                    onClick={() =>
+                      setSelectedRow(selectedRow === index ? null : index)
+                    }
+                    className={selectedRow === index ? "row active-row" : "row"}
+                  >
+                    <td>{displayValue(rule.ID)}</td>
+                    <td>{displayValue(rule.SADDR_TYPE)}</td>
+                    <td>{displayValue(rule.SADDR)}</td>
+                    <td>{displayValue(rule.SMASK)}</td>
+                    <td>{displayValue(rule.SPORT_TYPE)}</td>
+                    <td>{displayValue(rule.SPORT)}</td>
+                    <td>{displayValue(rule.DADDR_TYPE)}</td>
+                    <td>{displayValue(rule.DADDR)}</td>
+                    <td>{displayValue(rule.DMASK)}</td>
+                    <td>{displayValue(rule.DPORT_TYPE)}</td>
+                    <td>{displayValue(rule.DPORT)}</td>
+                    <td>{displayValue(rule.PROTOCOL)?.toUpperCase()}</td>
+                    <td>{displayValue(rule.INTERFACE)}</td>
+                    <td>{displayValue(rule.RATE)}</td>
+                    <td>{displayValue(rule.UNIT)}</td>
+                    <td>{displayValue(rule.BURST)}</td>
+                    <td>{displayValue(rule.ACTION)}</td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
+                  {selectedRow === index && (
+                    <tr>
+                      <td colSpan="17" className="action-row">
+                        <button
+                          onClick={() => setEditRule(rule)}
+                          className="btn update-btn"
+                        >
+                          ✏️ Update Rule
+                        </button>
+                        <button
+                          onClick={() => deleteIPRule(rule.ID)}
+                          className="btn delete-btn"
+                        >
+                          🗑️ Delete Rule
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './ForwardRuleTable.css';
+import './ForwardRuleTable.css'; // assuming you're using the same CSS file
 import { MACRuleForm } from "./mac_rule_update_form";
 
 const newForm = {
@@ -48,6 +48,7 @@ export const MACRuleTable = () => {
             fetchMACRules();
         } catch (error) {
             alert('Error deleting MAC rule:', JSON.stringify(error));
+            console.log(error);
         }
     };
 
@@ -63,35 +64,37 @@ export const MACRuleTable = () => {
 
     const addNewMACRule = async (data) => {
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addMACRule`,
+            const response = await axios.post(
+                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addMACRule`,
                 data,
                 {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                fetchMACRules();
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            fetchMACRules();
             console.log('MAC Rule added:', response.data);
             alert(JSON.stringify(response.data));
         } catch (error) {
             console.error('Error adding MAC rule:', error);
-            alert('Error: ',JSON.stringify(error.message));
+            alert('Error:', JSON.stringify(error.message));
         }
         setNewRule(false);
-    }
+    };
 
     const handleFormSubmit = async (data) => {
         try {
-            const response = await axios.put(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateMACRule`,
-                data, {
-                headers: {
-                    'Content-Type': 'application/json'
+            const response = await axios.put(
+                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateMACRule`,
+                data,
+                {
+                    headers: { 'Content-Type': 'application/json' }
                 }
-            });
+            );
             fetchMACRules();
             alert('Updated:', JSON.stringify(response.data));
         } catch (error) {
-            alert('Error: ',JSON.stringify(error.message));
+            alert('Error:', JSON.stringify(error.message));
+            console.log(error);
         }
         setShowUpdateForm(false);
         setSelectedRule(null);
@@ -115,38 +118,46 @@ export const MACRuleTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {rulesData.map((rule, index) => (
-                            <React.Fragment key={rule.ID}>
-                                <tr
-                                    onClick={() => setSelectedRow(selectedRow === index ? null : index)}
-                                    className={selectedRow === index ? "row active-row" : "row"}
-                                >
-                                    <td>{rule.ID}</td>
-                                    <td>{rule.TYPE}</td>
-                                    <td>{rule.MAC}</td>
-                                    <td>{rule.INTERFACE}</td>
-                                    <td>{rule.ACTION}</td>
-                                </tr>
-                                {selectedRow === index && (
-                                    <tr>
-                                        <td colSpan="5" className="action-row">
-                                            <button
-                                                onClick={() => handleUpdateClick(rule)}
-                                                className="btn update-btn"
-                                            >
-                                                ✏️ Update Rule
-                                            </button>
-                                            <button
-                                                onClick={() => deleteMACRule(rule.ID)}
-                                                className="btn delete-btn"
-                                            >
-                                                🗑️ Delete Rule
-                                            </button>
-                                        </td>
+                        {rulesData.length === 0 ? (
+                            <tr>
+                                <td colSpan="5" className="no-rules-cell">
+                                    🚫 No rules found.
+                                </td>
+                            </tr>
+                        ) : (
+                            rulesData.map((rule, index) => (
+                                <React.Fragment key={rule.ID}>
+                                    <tr
+                                        onClick={() => setSelectedRow(selectedRow === index ? null : index)}
+                                        className={selectedRow === index ? "row active-row" : "row"}
+                                    >
+                                        <td>{rule.ID}</td>
+                                        <td>{rule.TYPE}</td>
+                                        <td>{rule.MAC}</td>
+                                        <td>{rule.INTERFACE}</td>
+                                        <td>{rule.ACTION}</td>
                                     </tr>
-                                )}
-                            </React.Fragment>
-                        ))}
+                                    {selectedRow === index && (
+                                        <tr>
+                                            <td colSpan="5" className="action-row">
+                                                <button
+                                                    onClick={() => handleUpdateClick(rule)}
+                                                    className="btn update-btn"
+                                                >
+                                                    ✏️ Update Rule
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteMACRule(rule.ID)}
+                                                    className="btn delete-btn"
+                                                >
+                                                    🗑️ Delete Rule
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

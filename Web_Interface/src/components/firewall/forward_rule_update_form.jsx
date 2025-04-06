@@ -1,12 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./form.css";
 
 export const RedirectRuleForm = ({ rule, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState(rule);
+    const [setOptions, setSetOptions] = useState([]);
+    const [interfaceOptions, setInterfaceOptions] = useState([]);
+    useEffect(() => {
+        const fetchInterfaces = async () => {
+            try {
+                const response = await axios.get(
+                    `http://${process.env.REACT_APP_SERVER_IP}:5000/interfaces`
+                );
+                setInterfaceOptions(response.data.map(data => data.if));
+            } catch (err) {
+                alert(err.message);
+            }
+        };
 
-    const interfaceOptions = ["eth0", "eth1", "wlan0"]; // Replace with real data
-    const setOptions = ["Set1", "Set2"]; // Replace with actual set names if available
+        fetchInterfaces(); // Call the async function
+    }, []);
 
+    useEffect(() => {
+        const fetchSetList = async () => {
+            try {
+                const response = await axios.get(
+                    `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getSets`
+                );
+                setSetOptions(response.data.map(data => data.NAME));
+            } catch (err) {
+                alert(err.message);
+            }
+        };
+        fetchSetList();
+    }, []);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -108,7 +135,7 @@ export const RedirectRuleForm = ({ rule, onSubmit, onCancel }) => {
 
                     {/* Redirected IP */}
                     <label>Redirected IP</label>
-                    
+
                     <input
                         type="text"
                         name="REDIRECT_IP"
