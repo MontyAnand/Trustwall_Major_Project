@@ -46,6 +46,21 @@ export const IPRULETable = () => {
     setNewRule(true);
   };
 
+  const addNewIPRule = async (data) => {
+    try {
+      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addCustomRule`,
+        data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('IP rule added:', response.data);
+    } catch (error) {
+      console.error('Error adding IP rule:', error);
+    }
+    setNewRule(false);
+  }
+
   const deleteIPRule = async (ID) => {
     try {
       await axios.delete(
@@ -58,20 +73,19 @@ export const IPRULETable = () => {
     }
   };
 
-  const updateIPRule = async (updatedRule) => {
+  const updateIPRule = async (data) => {
     try {
-      const response = await axios.put(
-        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateCustomRule`,
-        updatedRule
-      );
-      const updatedList = rulesData.map(rule =>
-        rule.ID === updatedRule.ID ? updatedRule : rule
-      );
-      setRulesData(updatedList);
-      setEditRule(null);
+      const response = await axios.put(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateCustomRule`,
+        data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Forward rule updated:', response.data);
     } catch (error) {
-      console.error("Error updating rule:", error);
+      console.error('Error updating forward rule:', error);
     }
+    setEditRule(null)
   };
 
   const displayValue = (value) =>
@@ -168,7 +182,7 @@ export const IPRULETable = () => {
         <UpdateIPRuleForm
           rule={newForm}
           onCancel={() => setNewRule(false)}
-          onSubmit={updateIPRule}
+          onSubmit={addNewIPRule}
         />
       )}
     </div>

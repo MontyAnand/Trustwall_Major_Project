@@ -40,6 +40,22 @@ export const ForwardRuleTable = () => {
     setNewRule(true);
   };
 
+  const addNewForwardRule = async (data) => {
+    try {
+      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addForwardRule`,
+        data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      fetchForwardRules();
+      console.log('Forward rule added:', response.data);
+    } catch (error) {
+      console.error('Error adding forward rule:', error);
+    }
+    setNewRule(false);
+  }
+
   const deleteForwardRule = async (ID) => {
     try {
       const response = await axios.delete(
@@ -56,8 +72,8 @@ export const ForwardRuleTable = () => {
   };
 
   const handleUpdateClick = (rule) => {
-    setSelectedRule(rule);
     setShowUpdateForm(true);
+    setSelectedRule(rule);
   };
 
   const handleFormClose = () => {
@@ -73,10 +89,10 @@ export const ForwardRuleTable = () => {
       );
       console.log("Updated:", response.data);
       fetchForwardRules();
-      handleFormClose();
     } catch (error) {
       console.error("Error updating rule:", error);
     }
+    handleFormClose();
   };
 
   const displayValue = (value) =>
@@ -161,7 +177,7 @@ export const ForwardRuleTable = () => {
         <RedirectRuleForm
           rule={newForm}
           onCancel={() => setNewRule(false)}
-          onSubmit={handleFormSubmit}
+          onSubmit={addNewForwardRule}
         />
       )}
     </div>

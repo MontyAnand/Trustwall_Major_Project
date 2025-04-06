@@ -8,7 +8,7 @@ const newForm = {
     MAC: "",
     INTERFACE: "",
     ACTION: "accept",
-  };
+};
 
 export const MACRuleTable = () => {
     const [selectedRow, setSelectedRow] = useState(null);
@@ -61,22 +61,40 @@ export const MACRuleTable = () => {
         setSelectedRule(null);
     };
 
-    const addNewMACRule = (data) =>{
-        alert(JSON.stringify(data, null, 2));
+    const addNewMACRule = async (data) => {
+        try {
+            const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addMACRule`,
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+            console.log('MAC Rule added:', response.data);
+            alert(JSON.stringify(response.data));
+        } catch (error) {
+            console.error('Error adding MAC rule:', error);
+            alert(JSON.stringify(error));
+        }
+        setNewRule(false);
     }
 
-    const handleFormSubmit = async (updatedRule) => {
+    const handleFormSubmit = async (data) => {
         try {
-            const response = await axios.put(
-                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateMACRule`,
-                updatedRule
-            );
-            console.log("Updated:", response.data);
-            fetchMACRules();
-            handleFormClose();
+            const response = await axios.put(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/updateMACRule`,
+                data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('MAC Rule updated:', response.data);
         } catch (error) {
-            console.error("Error updating rule:", error);
+            console.error('Error updating MAC rule:', error);
         }
+        setShowUpdateForm(false);
+        setSelectedRule(null);
     };
 
     return (
@@ -137,7 +155,7 @@ export const MACRuleTable = () => {
                 <MACRuleForm
                     rule={selectedRule}
                     onCancel={handleFormClose}
-                    onSubmit={addNewMACRule}
+                    onSubmit={handleFormSubmit}
                 />
             )}
             {newRule && (
