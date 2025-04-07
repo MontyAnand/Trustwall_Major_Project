@@ -507,6 +507,7 @@ void Server::WANSetup(std::string interface)
 
 Server::Server() : running(true)
 {
+    Firewall::initializeRuleset();
     WANSetup(vpn.getPublicInterface());
     epollFd = epoll_create1(0);
     if (epollFd == -1)

@@ -213,6 +213,7 @@ class Firewall
     static void flushChain (std::string , std::string);
     static void allowMasquerading(std::string);
     static void allowInterfaceForwarding(std::string, std::string);
+    static void initializeRuleset();
 };
 
 class Server

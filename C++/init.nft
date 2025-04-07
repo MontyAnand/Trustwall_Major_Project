@@ -1,0 +1,43 @@
+#!/usr/sbin/nft -f
+
+table inet SYSTEM_TABLE {
+    chain MASQUERADING {
+        type nat hook postrouting priority 100; policy accept;
+    }
+
+    chain LOCAL {
+        type filter hook input priority 0; policy drop;
+
+        # Allow all traffic from localhost (IPv4 & IPv6)
+        ip saddr 127.0.0.1 accept comment "12345"
+        ip daddr 127.0.0.1 accept
+        ip6 saddr ::1 accept
+        ip6 daddr ::1 accept
+        jump ESSENTIALS
+    }
+
+    chain ESSENTIALS {
+        #type filter hook input priority 0;
+
+        # Allow Web Interface from external
+        tcp dport { 3000, 5000 } accept
+
+        # Allow established connections
+        ct state established,related accept
+        return
+    }
+}
+
+table ip USER_TABLE {
+    chain REDIRECT {
+        type nat hook prerouting priority -100; policy accept;
+
+        # rules for Redirecting the traffic
+    }
+
+    chain CUSTOM_RULES {
+        type filter hook forward priority 0; policy drop;
+        ct state established,related accept
+
+    }
+}
