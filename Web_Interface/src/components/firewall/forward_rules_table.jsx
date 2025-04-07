@@ -42,20 +42,23 @@ export const ForwardRuleTable = () => {
 
   const addNewForwardRule = async (data) => {
     try {
-      const response = await axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addForwardRule`,
-        data, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/addForwardRule`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
       fetchForwardRules();
       alert('Forward rule added:', JSON.stringify(response.data));
     } catch (error) {
-      alert('Error adding forward rule:', (error));
+      alert('Error adding forward rule:', error.message);
       console.log(error);
     }
     setNewRule(false);
-  }
+  };
 
   const deleteForwardRule = async (ID) => {
     try {
@@ -68,7 +71,7 @@ export const ForwardRuleTable = () => {
       alert('Forward rule deleted:', JSON.stringify(response.data));
       fetchForwardRules();
     } catch (error) {
-      alert('Error deleting forward rule:', (error));
+      alert('Error deleting forward rule:', error.message);
       console.log(error);
     }
   };
@@ -93,7 +96,7 @@ export const ForwardRuleTable = () => {
       alert('Forward rule updated:', JSON.stringify(response.data));
       console.log(response.data);
     } catch (error) {
-      alert('Error updating forward rule:', (error));
+      alert('Error updating forward rule:', error.message);
       console.log(error);
     }
     handleFormClose();
@@ -126,46 +129,54 @@ export const ForwardRuleTable = () => {
             </tr>
           </thead>
           <tbody>
-            {rulesData.map((rule, index) => (
-              <React.Fragment key={rule.ID}>
-                <tr
-                  onClick={() =>
-                    setSelectedRow(selectedRow === index ? null : index)
-                  }
-                  className={
-                    selectedRow === index ? "row active-row" : "row"
-                  }
-                >
-                  <td>{displayValue(rule.ID)}</td>
-                  <td>{displayValue(rule.INTERFACE)}</td>
-                  <td>{displayValue(rule.SADDR_TYPE)}</td>
-                  <td>{displayValue(rule.SADDR)}</td>
-                  <td>{displayValue(rule.MASK)}</td>
-                  <td>{displayValue(rule.PROTOCOL)}</td>
-                  <td>{displayValue(rule.DPORT)}</td>
-                  <td>{displayValue(rule.REDIRECTED_IP)}</td>
-                  <td>{displayValue(rule.REDIRECTED_PORT)}</td>
-                </tr>
-                {selectedRow === index && (
-                  <tr>
-                    <td colSpan="9" className="action-row">
-                      <button
-                        onClick={() => handleUpdateClick(rule)}
-                        className="btn update-btn"
-                      >
-                        ✏️ Update Rule
-                      </button>
-                      <button
-                        onClick={() => deleteForwardRule(rule.ID)}
-                        className="btn delete-btn"
-                      >
-                        🗑️ Delete Rule
-                      </button>
-                    </td>
+            {rulesData.length === 0 ? (
+              <tr>
+                <td colSpan="9" className="no-rules-cell">
+                  🚫 No rules found.
+                </td>
+              </tr>
+            ) : (
+              rulesData.map((rule, index) => (
+                <React.Fragment key={rule.ID}>
+                  <tr
+                    onClick={() =>
+                      setSelectedRow(selectedRow === index ? null : index)
+                    }
+                    className={
+                      selectedRow === index ? "row active-row" : "row"
+                    }
+                  >
+                    <td>{displayValue(rule.ID)}</td>
+                    <td>{displayValue(rule.INTERFACE)}</td>
+                    <td>{displayValue(rule.SADDR_TYPE)}</td>
+                    <td>{displayValue(rule.SADDR)}</td>
+                    <td>{displayValue(rule.MASK)}</td>
+                    <td>{displayValue(rule.PROTOCOL)}</td>
+                    <td>{displayValue(rule.DPORT)}</td>
+                    <td>{displayValue(rule.REDIRECTED_IP)}</td>
+                    <td>{displayValue(rule.REDIRECTED_PORT)}</td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
+                  {selectedRow === index && (
+                    <tr>
+                      <td colSpan="9" className="action-row">
+                        <button
+                          onClick={() => handleUpdateClick(rule)}
+                          className="btn update-btn"
+                        >
+                          ✏️ Update Rule
+                        </button>
+                        <button
+                          onClick={() => deleteForwardRule(rule.ID)}
+                          className="btn delete-btn"
+                        >
+                          🗑️ Delete Rule
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))
+            )}
           </tbody>
         </table>
       </div>

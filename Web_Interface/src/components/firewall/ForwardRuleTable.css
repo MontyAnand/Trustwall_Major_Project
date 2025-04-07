@@ -1,138 +1,82 @@
-/* ForwardRuleTable.css */
-
 .table-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .header-section {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-  }
-  
-  .btn {
-    padding: 10px 16px;
-    font-size: 14px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    margin: 0 5px;
-  }
-  
-  .add-btn {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .add-btn:hover {
-    background-color: #0056b3;
-  }
-  
-  .update-btn {
-    background-color: #ffc107;
-    color: black;
-  }
-  
-  .update-btn:hover {
-    background-color: #e0a800;
-  }
-  
-  .delete-btn {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .delete-btn:hover {
-    background-color: #c82333;
-  }
-  
-  .table-wrapper {
-    flex: 1;
-    overflow: auto;
-    display: flex;
-  }
-  
-  .rules-table {
-    width: 100%;
-    height: 100%;
-    border-collapse: collapse;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    table-layout: fixed;
-  }
-  
-  .rules-table th,
-  .rules-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-  }
-  
-  .rules-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
-  
-  .row:hover {
-    background-color: #f1f9ff;
-    cursor: pointer;
-  }
-  
-  .active-row {
-    background-color: #e6f7ff;
-  }
-  
-  .action-row {
-    background-color: #fafafa;
-    text-align: center;
-    padding: 10px 0;
-  }
+  padding: 2rem;
+  background-color: #f4f7fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-  .form-container {
-    background: #fdfdfd;
-    padding: 20px;
-    border: 2px solid #e0e0e0;
-    margin-top: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .form-group input {
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-  
-  .form-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 15px;
-  }
-  
-  .btn.cancel-btn {
-    background-color: #ccc;
-    color: #000;
-  }
-  
+.header-section {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s ease;
+}
+
+.add-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.update-btn {
+  background-color: #ffc107;
+  color: #333;
+  margin-right: 10px;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.rules-table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+.rules-table th,
+.rules-table td {
+  padding: 10px 12px;
+  border: 1px solid #dee2e6;
+  text-align: center;
+}
+
+.rules-table .row {
+  background-color: #ffffff;
+}
+
+.rules-table .active-row {
+  background-color: #e8f4ff;
+}
+
+.action-row {
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.no-rules-cell {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2rem;
+  color: #888;
+  background-color: #f2f2f2;
+}
