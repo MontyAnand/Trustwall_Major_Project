@@ -18,7 +18,7 @@ const Selectivelist = ({ name }) => {
 export const Configuration = ({ msg, name }) => {
     return (
         <div style={{ height: '100%', width: '100%', overflow: 'auto' }}>
-            <Message severity='info' text={msg} className='gap-3' />
+            <Message severity='info' text={msg}  />
             <Selectivelist name={name} />
         </div>
     );

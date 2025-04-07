@@ -2,22 +2,45 @@ import React, { useState, useEffect } from "react";
 import './grid.css';
 import axios from "axios";
 
-export const GridPopup = ({ setName, onElementClick, onCancel }) => {
+export const GridPopup = ({ setName, onCancel }) => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const fetchElement = async () => {
-            try {
-                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getSetElements`, {
-                    params: { setName }
-                });
-                setData(response.data.map(item => item.ELEMENT));
-            } catch (error) {
-                console.error("Error fetching elements:", error);
-            }
-        };
         fetchElement();
     }, [setName]);
+
+    const fetchElement = async () => {
+        try {
+            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/getSetElements`, {
+                params: { setName }
+            });
+            setData(response.data.map(item => item.ELEMENT));
+        } catch (error) {
+            console.error("Error fetching elements:", error);
+        }
+    };
+
+    const onDelete = async (element) => {
+        try {
+            const response = await axios.put(
+                `http://${process.env.REACT_APP_SERVER_IP}:5000/firewall/removeElementFromSet`,
+                {
+                    setName,
+                    element
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+            fetchElement();
+            alert("Element removed successfully:", response.data);
+        } catch (error) {
+            console.error("Error removing element:", error);
+            alert("Error while removing element");
+        }
+    }
 
     return (
         <div className="grid-popup-overlay">
@@ -35,14 +58,13 @@ export const GridPopup = ({ setName, onElementClick, onCancel }) => {
                             <div
                                 key={index}
                                 className="grid-item"
-                                onClick={() => onElementClick(item)}
                             >
                                 <div className="element-text">{item}</div>
                                 <button
                                     className="delete-btn"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        alert(`Delete ${item}`);
+                                        onDelete(item);
                                     }}
                                 >
                                     🗑️ Delete
