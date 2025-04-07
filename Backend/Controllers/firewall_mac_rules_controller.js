@@ -24,7 +24,7 @@ module.exports.addMACRule = (req, res) => {
         res.status(400).send({ 'error': "Action is required" });
         return;
     }
-    let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.INTERFACE}" ether saddr `;
+    let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES iifname "${req.body.INTERFACE}" ether saddr `;
     if (req.body.TYPE === "SET") {
         command = command + `@${req.body.MAC} `;
     }
@@ -72,12 +72,12 @@ module.exports.updateMACRule = (req,res)=>{
         return;
     }
 
-    const isDeleted = deleteRule('ip', 'USER_TABLE', 'MAC_RULES', handle);
+    const isDeleted = deleteRule('ip', 'USER_TABLE', 'CUSTOM_RULES', handle);
     if (!isDeleted) {
         res.status(500).send({ 'success': false });
         return;
     }
-    let command = `sudo nft add rule ip USER_TABLE MAC_RULES iifname "${req.body.INTERFACE}" ether saddr `;
+    let command = `sudo nft add rule ip USER_TABLE CUSTOM_RULES iifname "${req.body.INTERFACE}" ether saddr `;
     if (req.body.TYPE === "SET") {
         command = command + `@${req.body.MAC} `;
     }
@@ -107,7 +107,7 @@ module.exports.deleteMACRule = (req,res)=>{
         res.status(400).send({ 'error': 'Invalid ID' });
         return;
     }
-    const isDeleted = deleteRule('ip', 'USER_TABLE', 'MAC_RULES', handle);
+    const isDeleted = deleteRule('ip', 'USER_TABLE', 'CUSTOM_RULES', handle);
     if (isDeleted) {
         deleteRowByPrimaryKey('MAC_BASED_RULES', 'ID', ID);
         res.status(200).send({ 'success': true });

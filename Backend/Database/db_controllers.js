@@ -17,7 +17,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS CUSTOM_RULES (
     DPORT_TYPE TEXT ,
     DPORT TEXT ,
     PROTOCOL TEXT ,
-    INTERFACE TEXT ,
+    INPUT_INTERFACE TEXT ,
+    OUTPUT_INTERFACE TEXT ,
     RATE INTEGER ,
     UNIT TEXT ,
     BURST INTEGER ,
@@ -137,7 +138,8 @@ module.exports.addCustomRules = ({
     DPORT_TYPE,
     DPORT,
     PROTOCOL,
-    INTERFACE,
+    INPUT_INTERFACE,
+    OUTPUT_INTERFACE,
     RATE,
     UNIT,
     BURST,
@@ -148,17 +150,17 @@ module.exports.addCustomRules = ({
       SPORT_TYPE, SPORT,
       DADDR_TYPE, DADDR, DMASK,
       DPORT_TYPE, DPORT,
-      PROTOCOL, INTERFACE,
+      PROTOCOL, INPUT_INTERFACE, OUTPUT_INTERFACE
       RATE, UNIT, BURST,
       ACTION
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`);
 
     const result = smt.run(
         ID, SADDR_TYPE, SADDR, SMASK,
         SPORT_TYPE, SPORT,
         DADDR_TYPE, DADDR, DMASK,
         DPORT_TYPE, DPORT,
-        PROTOCOL, INTERFACE,
+        PROTOCOL, INPUT_INTERFACE, OUTPUT_INTERFACE,
         RATE, UNIT, BURST,
         ACTION
     );
@@ -178,7 +180,8 @@ module.exports.updateCustomRules = ({
     DPORT_TYPE,
     DPORT,
     PROTOCOL,
-    INTERFACE,
+    INPUT_INTERFACE,
+    OUTPUT_INTERFACE,
     RATE,
     UNIT,
     BURST,
@@ -189,7 +192,7 @@ module.exports.updateCustomRules = ({
       SPORT_TYPE = ?, SPORT = ?,
       DADDR_TYPE = ?, DADDR = ?, DMASK = ?,
       DPORT_TYPE = ?, DPORT = ?,
-      PROTOCOL = ?, INTERFACE = ?,
+      PROTOCOL = ?, INPUT_INTERFACE = ?, OUTPUT_INTERFACE = ?,
       RATE = ?, UNIT = ?, BURST = ?, ACTION = ?
       WHERE ID = ?`);
 
@@ -198,7 +201,7 @@ module.exports.updateCustomRules = ({
         SPORT_TYPE, SPORT,
         DADDR_TYPE, DADDR, DMASK,
         DPORT_TYPE, DPORT,
-        PROTOCOL, INTERFACE,
+        PROTOCOL, INPUT_INTERFACE, OUTPUT_INTERFACE,
         RATE, UNIT, BURST,
         ACTION, ID
     );

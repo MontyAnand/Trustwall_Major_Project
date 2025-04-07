@@ -253,7 +253,7 @@ private:
     void processPacket(char *, int, int);
     void watchNetworkTraffic();
 
-    void handleFilescan();
+    void handleBlockingRequest();
     void handleVPNRequest();
     void continuousMonitoring();
     void handleLANInterfaceDetailsRequest(int);

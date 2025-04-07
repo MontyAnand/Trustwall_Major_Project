@@ -1,11 +1,6 @@
 #!/usr/sbin/nft -f
 
 table inet SYSTEM_TABLE {
-    chain INTERFACE_FORWARDING {
-        type filter hook forward priority 0; policy drop;
-
-    }
-
     chain MASQUERADING {
         type nat hook postrouting priority 100; policy accept;
     }
@@ -31,11 +26,6 @@ table inet SYSTEM_TABLE {
         ct state established,related accept
         return
     }
-
-    chain FORWARD {
-        type filter hook forward priority 0; policy drop;
-        ct state established,related accept
-    }
 }
 
 table ip USER_TABLE {
@@ -47,10 +37,7 @@ table ip USER_TABLE {
 
     chain CUSTOM_RULES {
         type filter hook forward priority 0; policy drop;
+        ct state established,related accept
 
-    }
-
-    chain MAC_RULES {
-        type filter hook forward priority 0; policy drop;
     }
 }

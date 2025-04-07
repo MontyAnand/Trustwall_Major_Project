@@ -11,8 +11,12 @@ module.exports.addCustomRule = (req, res) => {
         res.status(400).send({ 'error': "Protocol is required" });
         return;
     }
-    if (!req.body.INTERFACE) {
-        res.status(400).send({ 'error': "Interface is required" });
+    if (!req.body.INPUT_INTERFACE) {
+        res.status(400).send({ 'error': "Input Interface is required" });
+        return;
+    }
+    if (!req.body.OUTPUT_INTERFACE) {
+        res.status(400).send({ 'error': "Output Interface is required" });
         return;
     }
     if (!req.body.ACTION) {
@@ -51,7 +55,11 @@ module.exports.addCustomRule = (req, res) => {
     else if (req.body.DPORT_TYPE === "PORT" && req.body.DPORT) {
         command = command + `${req.body.PROTOCOL} dport ${req.body.DPORT} `;
     }
-    command = command + `iifname "${req.body.INTERFACE}" `
+    if (!req.body.SPORT && !req.body.DPORT && req.body.PROTOCOL){
+        command = command + `ip protocol ${req.body.PROTOCOL} `;
+    }
+    command = command + `iifname "${req.body.INPUT_INTERFACE}" `;
+    command = command + `oifname "${req.body.OUTPUT_INTERFACE}" `;
     if (req.body.RATE) {
         command = command + `limit rate ${req.body.RATE}/${req.body.UNIT} `;
     }
@@ -78,8 +86,12 @@ module.exports.updateCustomRule = (req, res) => {
         res.status(400).send({ 'error': "Protocol is required" });
         return;
     }
-    if (!req.body.INTERFACE) {
-        res.status(400).send({ 'error': "Interface is required" });
+    if (!req.body.INPUT_INTERFACE) {
+        res.status(400).send({ 'error': "Input Interface is required" });
+        return;
+    }
+    if (!req.body.OUTPUT_INTERFACE) {
+        res.status(400).send({ 'error': "Output Interface is required" });
         return;
     }
     if (!req.body.ACTION) {
@@ -135,7 +147,11 @@ module.exports.updateCustomRule = (req, res) => {
     else if (req.body.DPORT_TYPE === "PORT" && req.body.DPORT) {
         command = command + `${req.body.PROTOCOL} dport ${req.body.DPORT} `;
     }
-    command = command + `iifname "${req.body.INTERFACE}" `
+    if (!req.body.SPORT && !req.body.DPORT && req.body.PROTOCOL){
+        command = command + `ip protocol ${req.body.PROTOCOL} `;
+    }
+    command = command + `iifname "${req.body.INPUT_INTERFACE}" `;
+    command = command + `oifname "${req.body.OUTPUT_INTERFACE}" `;
     if (req.body.RATE) {
         command = command + `limit rate ${req.body.RATE}/${req.body.UNIT} `;
     }
