@@ -103,7 +103,7 @@ export const SetList = () => {
   }
 
   return (
-    <div className="table-container">
+    <div style={{ height: '100%', width: '100%' }} className="table-container">
       <div className="header-section">
         <button onClick={handleCreateSet} className="btn add-btn">➕ Create Set</button>
       </div>

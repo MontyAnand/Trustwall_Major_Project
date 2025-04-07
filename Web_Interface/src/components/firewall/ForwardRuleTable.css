@@ -1,4 +1,6 @@
 .table-container {
+  height: '100%';
+  width: '100%';
   padding: 2rem;
   background-color: #f4f7fa;
   border-radius: 10px;

@@ -95,7 +95,7 @@ export const IPRULETable = () => {
     value !== null && value !== undefined ? value : "-";
 
   return (
-    <div className="table-container">
+    <div style={{ height: '100%', width: '100%' }} className="table-container">
       <div className="header-section">
         <button onClick={handleAddRule} className="btn add-btn">➕ Add Rule</button>
       </div>
@@ -105,22 +105,22 @@ export const IPRULETable = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>SADDR TYPE</th>
-              <th>SADDR</th>
-              <th>SMASK</th>
-              <th>SPORT TYPE</th>
-              <th>SPORT</th>
-              <th>DADDR TYPE</th>
-              <th>DADDR</th>
-              <th>DMASK</th>
-              <th>DPORT TYPE</th>
-              <th>DPORT</th>
-              <th>PROTOCOL</th>
-              <th>INTERFACE</th>
-              <th>RATE</th>
-              <th>UNIT</th>
-              <th>BURST</th>
-              <th>ACTION</th>
+              <th>Source Address Type</th>
+              <th>Source Address</th>
+              <th>Source NetmasK</th>
+              <th>Source Port Type</th>
+              <th>Source Port</th>
+              <th>Destination Address Type</th>
+              <th>Destination Address</th>
+              <th>Destination NetmasK</th>
+              <th>Destination Port Type</th>
+              <th>Destination Port</th>
+              <th>Protocol</th>
+              <th>Interface</th>
+              <th>Rate</th>
+              <th>Unit</th>
+              <th>Burst</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>

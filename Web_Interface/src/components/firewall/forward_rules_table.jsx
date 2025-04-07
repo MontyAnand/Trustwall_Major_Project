@@ -106,7 +106,7 @@ export const ForwardRuleTable = () => {
     value !== null && value !== undefined ? value : "-";
 
   return (
-    <div className="table-container">
+    <div style={{ height: '100%', width: '100%' }} className="table-container">
       <div className="header-section">
         <button onClick={handleAddRule} className="btn add-btn">
           ➕ Add Rule
