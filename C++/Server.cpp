@@ -203,42 +203,71 @@ void Server::handleLANInterfaceDetailsRequest(int fd)
     return;
 }
 
-void Server::handleFilescan()
+void Server::handleBlockingRequest()
 {
     int fd;
     std::string filename;
     char *buffer;
+    int turn = 0;
     while (running)
     {
-        filename = "";
+        switch (turn)
         {
-            std::lock_guard<std::mutex> lock(fileScanMTX);
-            if (antivirusQueue.empty())
-                continue;
-            auto p = antivirusQueue.front();
-            antivirusQueue.pop();
-            fd = p.first;
-            buffer = p.second;
-        }
-        int size = (int)buffer[1];
-        for (int i = 0; i < size; i++)
+        case 0:
         {
-            filename = filename + buffer[2 + i];
+            filename = "";
+            {
+                std::lock_guard<std::mutex> lock(fileScanMTX);
+                if (antivirusQueue.empty())
+                    break;
+                auto p = antivirusQueue.front();
+                antivirusQueue.pop();
+                fd = p.first;
+                buffer = p.second;
+            }
+            int size = (int)buffer[1];
+            for (int i = 0; i < size; i++)
+            {
+                filename = filename + buffer[2 + i];
+            }
+            std::cout << "Antivirus request : " << filename << "\n";
+            if (Antivirus::startScanning(filename) != 1)
+            {
+                size = 0;
+            }
+            char response[2 + filename.length()];
+            response[0] = 1;
+            response[1] = size;
+            for (int i = 0; i < filename.length(); i++)
+            {
+                response[i + 2] = filename[i];
+            }
+            send(fd, response, sizeof(response), 0);
         }
-        std::cout << "Antivirus request : " << filename << "\n";
-        if (Antivirus::startScanning(filename) != 1)
+        case 1:
         {
-            size = 0;
+            {
+                std::lock_guard<std::mutex> lock(vpnMTX);
+                if (vpnQueue.empty())
+                    break;
+                auto p = vpnQueue.front();
+                vpnQueue.pop();
+                fd = p.first;
+                buffer = p.second;
+            }
+            int id = vpn.acceptConnectionRequest();
+            char response[5];
+            response[0] = 3;
+            std::memcpy(&response[1], &id, sizeof(id));
+            send(fd, response, 5, 0);
         }
-        char response[2 + filename.length()];
-        response[0] = 1;
-        response[1] = size;
-        for (int i = 0; i < filename.length(); i++)
-        {
-            response[i + 2] = filename[i];
+        default : {
+            break;
         }
-        send(fd, response, sizeof(response), 0);
+        }
+        turn = (turn + 1)%2;
     }
+    return;
 }
 
 void Server::handleVPNRequest()
@@ -385,6 +414,7 @@ void Server::continuousMonitoring()
 {
     std::string data;
     int count = 0;
+    std::map<std::string, std::vector<unsigned long>> prev_traffic = HealthMonitor::getNetworkStats();
     while (running)
     {
         switch (count)
@@ -423,13 +453,30 @@ void Server::continuousMonitoring()
         {
             data = HealthMonitor::getCPUStatusJSON();
             broadcastMessage(data, 13);
+            break;
+        }
+        case 4:
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            json data = json::array();
+            std::map<std::string, std::vector<unsigned long>> curr_traffic = HealthMonitor::getNetworkStats();
+            for (auto &p : curr_traffic)
+            {
+                data.push_back({{"interface", p.first},
+                                {"RX", (double)((p.second)[0] - prev_traffic[p.first][0]) / 1024.0},
+                                {"TX", (double)((p.second)[1] - prev_traffic[p.first][1]) / 1024.0}});
+            }
+            std::string message = data.dump();
+            broadcastMessage(message, 6);
+            prev_traffic = curr_traffic;
+            break;
         }
         default:
         {
         }
         }
         count = (count + 1) % 4;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // 2 second delay
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
@@ -472,10 +519,10 @@ Server::Server() : running(true)
     addToInputEventLoop(serverSocketFd);
     NodeServerThread = std::thread(&Server::startNodeServer, this, vpn.getIP());
     NodeServerThread.detach();
-    fileScanThread = std::thread(&Server::handleFilescan, this);
-    vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
+    fileScanThread = std::thread(&Server::handleBlockingRequest, this);
+    // vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
     healthMonitorThread = std::thread(&Server::continuousMonitoring, this);
-    networkTrafficThread = std::thread(&Server::watchNetworkTraffic, this);
+    // networkTrafficThread = std::thread(&Server::watchNetworkTraffic, this);
     eventLoop();
 }
 
@@ -487,18 +534,18 @@ Server::~Server()
         fileScanThread.join();
     }
 
-    if (vpnRequestThread.joinable())
-    {
-        vpnRequestThread.join();
-    }
+    // if (vpnRequestThread.joinable())
+    // {
+    //     vpnRequestThread.join();
+    // }
 
     if (healthMonitorThread.joinable())
     {
         healthMonitorThread.join();
     }
 
-    if (networkTrafficThread.joinable())
-    {
-        networkTrafficThread.join();
-    }
+    // if (networkTrafficThread.joinable())
+    // {
+    //     networkTrafficThread.join();
+    // }
 }
