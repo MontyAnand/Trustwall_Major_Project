@@ -34,3 +34,8 @@ void Firewall::allowMasquerading(std::string interface)
     system(command.c_str());
     return;
 }
+
+void Firewall::initializeRuleset(){
+    system("sudo nft -f init.nft");
+    return;
+}

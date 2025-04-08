@@ -150,7 +150,7 @@ module.exports.addCustomRules = ({
       SPORT_TYPE, SPORT,
       DADDR_TYPE, DADDR, DMASK,
       DPORT_TYPE, DPORT,
-      PROTOCOL, INPUT_INTERFACE, OUTPUT_INTERFACE
+      PROTOCOL, INPUT_INTERFACE, OUTPUT_INTERFACE,
       RATE, UNIT, BURST,
       ACTION
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`);

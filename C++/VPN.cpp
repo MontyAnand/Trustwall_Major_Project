@@ -28,7 +28,7 @@ VPN::VPN() : ip_pool(1), netmask("10.2.0."), PORT(51820), running(true), TIMEOUT
         exit(1);
     }
     // Start cleaner thread to revoke unsuded resources
-    addFirewallRules();
+    // addFirewallRules();
     cleaner = std::thread(&VPN::monitorClient, this);
 }
 

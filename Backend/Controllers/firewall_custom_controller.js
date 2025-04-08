@@ -7,10 +7,6 @@ module.exports.getCustomRules = (req, res) => {
 }
 
 module.exports.addCustomRule = (req, res) => {
-    if (!req.body.PROTOCOL) {
-        res.status(400).send({ 'error': "Protocol is required" });
-        return;
-    }
     if (!req.body.INPUT_INTERFACE) {
         res.status(400).send({ 'error': "Input Interface is required" });
         return;
@@ -82,10 +78,6 @@ module.exports.addCustomRule = (req, res) => {
 }
 
 module.exports.updateCustomRule = (req, res) => {
-    if (!req.body.PROTOCOL) {
-        res.status(400).send({ 'error': "Protocol is required" });
-        return;
-    }
     if (!req.body.INPUT_INTERFACE) {
         res.status(400).send({ 'error': "Input Interface is required" });
         return;

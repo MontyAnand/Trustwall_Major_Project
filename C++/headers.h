@@ -213,6 +213,7 @@ class Firewall
     static void flushChain (std::string , std::string);
     static void allowMasquerading(std::string);
     static void allowInterfaceForwarding(std::string, std::string);
+    static void initializeRuleset();
 };
 
 class Server
@@ -243,6 +244,9 @@ private:
     int createServerSocket();
     void broadcastMessage(std::string &, uint8_t);
     void eventLoop();
+    void sendRAMStatus();
+    void sendDiskStatus();
+    void sendConnnectionList();
     void handleAuthentication(std::string, int);
 
     void setNonBlocking(int);

@@ -60,6 +60,18 @@ io.on('connection', (socket) => {
     socket.on('change-interface-configuration', (data) => {
         tcpClient.changeInterfaceConfiguration(data);
     });
+    socket.on('getRAMInfo', ()=>{
+        tcpClient.ramInfoRequest();
+    });
+    socket.on('getDiskInfo',()=>{
+        tcpClient.diskInfoRequest();
+    });
+    socket.on('getConnectionList',()=>{
+        tcpClient.connectionListRequest();
+    });
+    socket.on('getCPUInfo',()=>{
+        tcpClient.cpuInfoRequest();
+    });
 });
 
 app.use(express.json());
