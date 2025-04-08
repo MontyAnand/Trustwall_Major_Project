@@ -149,6 +149,21 @@ void Server::processPacket(char *buffer, int fd, int size)
         }
         break;
     }
+    case 4:
+    {
+        sendRAMStatus();
+        break;
+    }
+    case 5:
+    {
+        sendDiskStatus();
+        break;
+    }
+    case 7:
+    {
+        sendConnnectionList();
+        break;
+    }
     case 8:
     {
         handleAuthentication(buffer, fd);
@@ -190,6 +205,36 @@ void Server::processPacket(char *buffer, int fd, int size)
     default:
         break;
     }
+}
+
+void Server::sendRAMStatus()
+{
+    struct sysinfo ramStatus;
+    std::string data;
+    int status = HealthMonitor::getRamStatus(&ramStatus);
+    if (status == 0)
+    {
+        data = HealthMonitor::ramInfoJSON(ramStatus);
+        broadcastMessage(data, 4);
+    }
+    return;
+}
+
+void Server::sendDiskStatus()
+{
+    std::string data;
+    std::vector<struct disk_info> allDisk = HealthMonitor::getAllMountedDisks();
+    data = HealthMonitor::diskInfoJSON(allDisk);
+    broadcastMessage(data, 5);
+    return;
+}
+
+void Server::sendConnnectionList()
+{
+    std::string data;
+    std::vector<connection_info> networkList = HealthMonitor::getNetworkConnections();
+    data = HealthMonitor::networkListJSON(networkList);
+    broadcastMessage(data, 7);
 }
 
 void Server::handleLANInterfaceDetailsRequest(int fd)
@@ -261,11 +306,12 @@ void Server::handleBlockingRequest()
             std::memcpy(&response[1], &id, sizeof(id));
             send(fd, response, 5, 0);
         }
-        default : {
+        default:
+        {
             break;
         }
         }
-        turn = (turn + 1)%2;
+        turn = (turn + 1) % 2;
     }
     return;
 }
@@ -473,6 +519,7 @@ void Server::continuousMonitoring()
         }
         default:
         {
+
         }
         }
         count = (count + 1) % 4;
@@ -522,7 +569,7 @@ Server::Server() : running(true)
     NodeServerThread.detach();
     fileScanThread = std::thread(&Server::handleBlockingRequest, this);
     // vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
-    healthMonitorThread = std::thread(&Server::continuousMonitoring, this);
+    // healthMonitorThread = std::thread(&Server::continuousMonitoring, this);
     // networkTrafficThread = std::thread(&Server::watchNetworkTraffic, this);
     eventLoop();
 }
@@ -540,10 +587,10 @@ Server::~Server()
     //     vpnRequestThread.join();
     // }
 
-    if (healthMonitorThread.joinable())
-    {
-        healthMonitorThread.join();
-    }
+    // if (healthMonitorThread.joinable())
+    // {
+    //     healthMonitorThread.join();
+    // }
 
     // if (networkTrafficThread.joinable())
     // {

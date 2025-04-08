@@ -120,6 +120,30 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
+    ramInfoRequest(){
+        const buffer = Buffer.alloc(1);
+        buffer.writeUInt8(4);
+        this.client.write(buffer);
+    }
+
+    diskInfoRequest(){
+        const buffer = Buffer.alloc(1);
+        buffer.writeUInt8(5);
+        this.client.write(buffer);
+    }
+
+    connectionListRequest(){
+        const buffer = Buffer.alloc(1);
+        buffer.writeUInt8(7);
+        this.client.write(buffer);
+    }
+
+    cpuInfoRequest(){
+        const buffer = Buffer.alloc(1);
+        buffer.writeUInt8(12);
+        this.client.write(buffer);
+    }
+
     serviceListRequest() {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(10);
