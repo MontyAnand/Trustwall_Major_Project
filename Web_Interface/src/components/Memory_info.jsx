@@ -13,6 +13,12 @@ const MemoryInfo = () => {
     ]);
 
     useEffect(() => {
+        if (socket) {
+            socket.emit("getRAMInfo");
+        }
+    }, [socket]);
+
+    useEffect(() => {
         if (!socket) return;
         socket.on('ram-info', (data) => {
             console.log(data);

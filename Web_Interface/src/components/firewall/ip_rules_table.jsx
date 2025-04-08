@@ -116,7 +116,8 @@ export const IPRULETable = () => {
               <th>Destination Port Type</th>
               <th>Destination Port</th>
               <th>Protocol</th>
-              <th>Interface</th>
+              <th>Input Interface</th>
+              <th>Output Interface</th>
               <th>Rate</th>
               <th>Unit</th>
               <th>Burst</th>
@@ -151,7 +152,8 @@ export const IPRULETable = () => {
                     <td>{displayValue(rule.DPORT_TYPE)}</td>
                     <td>{displayValue(rule.DPORT)}</td>
                     <td>{displayValue(rule.PROTOCOL)?.toUpperCase()}</td>
-                    <td>{displayValue(rule.INTERFACE)}</td>
+                    <td>{displayValue(rule.INPUT_INTERFACE)}</td>
+                    <td>{displayValue(rule.OUTPUT_INTERFACE)}</td>
                     <td>{displayValue(rule.RATE)}</td>
                     <td>{displayValue(rule.UNIT)}</td>
                     <td>{displayValue(rule.BURST)}</td>

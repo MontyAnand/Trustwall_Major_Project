@@ -166,8 +166,16 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
             placeholder="Protocol"
           />
 
-          <label>Interface</label>
-          <select name="INTERFACE" value={form.INTERFACE} onChange={handleChange}>
+          <label>Input Interface</label>
+          <select name="INPUT_INTERFACE" value={form.INPUT_INTERFACE} onChange={handleChange}>
+            <option value="">Select Interface</option>
+            {interfaceOptions.map((iface) => (
+              <option key={iface} value={iface}>{iface}</option>
+            ))}
+          </select>
+
+          <label>Output Interface</label>
+          <select name="OUTPUT_INTERFACE" value={form.OUTPUT_INTERFACE} onChange={handleChange}>
             <option value="">Select Interface</option>
             {interfaceOptions.map((iface) => (
               <option key={iface} value={iface}>{iface}</option>
