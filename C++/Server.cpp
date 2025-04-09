@@ -146,13 +146,13 @@ void Server::processPacket(char *buffer, int fd, int size)
     case 4:
     {
         sendRAMStatus();
-        std::cout << "RAM Request at C++ server\n";
+        // std::cout << "RAM Request at C++ server\n";
         break;
     }
     case 5:
     {
         sendDiskStatus();
-        std::cout << "DISK Request at C++ server\n";
+        // std::cout << "DISK Request at C++ server\n";
         break;
     }
     case 6: 
@@ -163,7 +163,7 @@ void Server::processPacket(char *buffer, int fd, int size)
     case 7:
     {
         sendConnnectionList();
-        std::cout << "Connection List Request at C++ server\n";
+        // std::cout << "Connection List Request at C++ server\n";
         break;
     }
     case 8:

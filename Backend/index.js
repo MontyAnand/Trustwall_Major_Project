@@ -16,8 +16,8 @@ const firewall_forward_routes = require('./Routes/firewall_forward');
 const firewall_set_routes = require('./Routes/firewall_set');
 const firewall_mac_routes = require('./Routes/firewall_mac_rule');
 const firewall_custom_rule_routes = require('./Routes/firewall_custom_rule');
-const { config } = require('process');
-
+const Counter = require('./utility/counter');
+const newCounter = new Counter(3);
 const app = express();
 const port = 5000;
 const HOST = process.argv[2];
@@ -61,15 +61,12 @@ io.on('connection', (socket) => {
         tcpClient.changeInterfaceConfiguration(data);
     });
     socket.on('getRAMInfo', ()=>{
-        console.log('Ram requested');
         tcpClient.ramInfoRequest();
     });
     socket.on('getDiskInfo',()=>{
-        console.log('disk requested');
         tcpClient.diskInfoRequest();
     });
     socket.on('getConnectionList',()=>{
-        console.log('connectionList requested');
         tcpClient.connectionListRequest();
     });
     socket.on('getCPUInfo',()=>{
@@ -79,6 +76,23 @@ io.on('connection', (socket) => {
 
 cron.schedule('*/1 * * * * *',()=>{
     tcpClient.sendNetworkTrafficRequest();
+});
+
+cron.schedule('*/1 * * * * *',()=>{
+    switch(newCounter.increment()){
+        case 0: {
+            tcpClient.diskInfoRequest();
+            break;
+        }
+        case 1: {
+            tcpClient.ramInfoRequest();
+            break;
+        }
+        case 2: {
+            tcpClient.connectionListRequest();
+            break;
+        }
+    }
 });
 
 app.use(express.json());
