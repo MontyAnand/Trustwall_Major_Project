@@ -135,33 +135,35 @@ void Server::processPacket(char *buffer, int fd, int size)
     {
     case 0:
     {
-        {
-            std::lock_guard<std::mutex> lock(fileScanMTX);
-            antivirusQueue.push(std::make_pair(fd, buffer));
-        }
+        handleAntivirusFileScan(fd, buffer);
         break;
     }
     case 2:
     {
-        {
-            std::lock_guard<std::mutex> lock(vpnMTX);
-            vpnQueue.push(std::make_pair(fd, buffer));
-        }
+        handleVPNConnectionRequest(fd, buffer);
         break;
     }
     case 4:
     {
         sendRAMStatus();
+        std::cout << "RAM Request at C++ server\n";
         break;
     }
     case 5:
     {
         sendDiskStatus();
+        std::cout << "DISK Request at C++ server\n";
+        break;
+    }
+    case 6: 
+    {
+        watchNetworkTraffic();
         break;
     }
     case 7:
     {
         sendConnnectionList();
+        std::cout << "Connection List Request at C++ server\n";
         break;
     }
     case 8:
@@ -245,6 +247,39 @@ void Server::handleLANInterfaceDetailsRequest(int fd)
     byteArray.push_back(flag);
     byteArray.insert(byteArray.end(), data.begin(), data.end());
     send(fd, byteArray.data(), byteArray.size(), 0);
+    return;
+}
+
+void Server::handleAntivirusFileScan(int fd, char *buffer)
+{
+    std::string filename;
+    int size = (int)buffer[1];
+    for (int i = 0; i < size; i++)
+    {
+        filename = filename + buffer[2 + i];
+    }
+    std::cout << "Antivirus request : " << filename << "\n";
+    if (Antivirus::startScanning(filename) != 1)
+    {
+        size = 0;
+    }
+    char response[2 + filename.length()];
+    response[0] = 1;
+    response[1] = size;
+    for (int i = 0; i < filename.length(); i++)
+    {
+        response[i + 2] = filename[i];
+    }
+    send(fd, response, sizeof(response), 0);
+}
+
+void Server::handleVPNConnectionRequest(int fd, char *buffer)
+{
+    int id = vpn.acceptConnectionRequest();
+    char response[5];
+    response[0] = 3;
+    std::memcpy(&response[1], &id, sizeof(id));
+    send(fd, response, 5, 0);
     return;
 }
 
@@ -519,7 +554,6 @@ void Server::continuousMonitoring()
         }
         default:
         {
-
         }
         }
         count = (count + 1) % 4;
@@ -529,22 +563,17 @@ void Server::continuousMonitoring()
 
 void Server::watchNetworkTraffic()
 {
-    std::map<std::string, std::vector<unsigned long>> prev_traffic = HealthMonitor::getNetworkStats();
-    while (running)
+    json data = json::array();
+    std::map<std::string, std::vector<unsigned long>> curr_traffic = HealthMonitor::getNetworkStats();
+    for (auto &p : curr_traffic)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        json data = json::array();
-        std::map<std::string, std::vector<unsigned long>> curr_traffic = HealthMonitor::getNetworkStats();
-        for (auto &p : curr_traffic)
-        {
-            data.push_back({{"interface", p.first},
-                            {"RX", (double)((p.second)[0] - prev_traffic[p.first][0]) / 1024.0},
-                            {"TX", (double)((p.second)[1] - prev_traffic[p.first][1]) / 1024.0}});
-        }
-        std::string message = data.dump();
-        broadcastMessage(message, 6);
-        prev_traffic = curr_traffic;
+        data.push_back({{"interface", p.first},
+                        {"RX", (double)((p.second)[0] - prev_traffic[p.first][0]) / 1024.0},
+                        {"TX", (double)((p.second)[1] - prev_traffic[p.first][1]) / 1024.0}});
     }
+    std::string message = data.dump();
+    broadcastMessage(message, 6);
+    prev_traffic = curr_traffic;
 }
 
 void Server::WANSetup(std::string interface)
@@ -562,12 +591,12 @@ Server::Server() : running(true)
         perror("epoll_create1 failed");
         exit(EXIT_FAILURE);
     }
-
+    prev_traffic = HealthMonitor::getNetworkStats();
     serverSocketFd = createServerSocket();
     addToInputEventLoop(serverSocketFd);
     NodeServerThread = std::thread(&Server::startNodeServer, this, vpn.getIP());
     NodeServerThread.detach();
-    fileScanThread = std::thread(&Server::handleBlockingRequest, this);
+    // fileScanThread = std::thread(&Server::handleBlockingRequest, this);
     // vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
     // healthMonitorThread = std::thread(&Server::continuousMonitoring, this);
     // networkTrafficThread = std::thread(&Server::watchNetworkTraffic, this);
@@ -577,10 +606,10 @@ Server::Server() : running(true)
 Server::~Server()
 {
     running = false;
-    if (fileScanThread.joinable())
-    {
-        fileScanThread.join();
-    }
+    // if (fileScanThread.joinable())
+    // {
+    //     fileScanThread.join();
+    // }
 
     // if (vpnRequestThread.joinable())
     // {

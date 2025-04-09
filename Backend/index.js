@@ -7,10 +7,10 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cors = require('cors');
-const os = require('os');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
+const cron = require('node-cron');
 
 const firewall_forward_routes = require('./Routes/firewall_forward');
 const firewall_set_routes = require('./Routes/firewall_set');
@@ -61,17 +61,24 @@ io.on('connection', (socket) => {
         tcpClient.changeInterfaceConfiguration(data);
     });
     socket.on('getRAMInfo', ()=>{
+        console.log('Ram requested');
         tcpClient.ramInfoRequest();
     });
     socket.on('getDiskInfo',()=>{
+        console.log('disk requested');
         tcpClient.diskInfoRequest();
     });
     socket.on('getConnectionList',()=>{
+        console.log('connectionList requested');
         tcpClient.connectionListRequest();
     });
     socket.on('getCPUInfo',()=>{
         tcpClient.cpuInfoRequest();
     });
+});
+
+cron.schedule('*/1 * * * * *',()=>{
+    tcpClient.sendNetworkTrafficRequest();
 });
 
 app.use(express.json());
