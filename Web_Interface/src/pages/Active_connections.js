@@ -1,6 +1,8 @@
 import React from "react";
 import { useSocket } from "../Contexts/socketContex";
 import { useEffect, useState } from "react";
+import './Active_connections.css';
+import Sidebar from "../components/Sidebar";
 
 const ActiveConnections = () => {
 
@@ -16,6 +18,7 @@ const ActiveConnections = () => {
 
     return (
         <>
+            <Sidebar/>
             <div id="Active_connections_container" className="Active_connections_container">
                 <div className="Active_connections_text"><h1>Number of Active Connections</h1></div>
                 <div className="Active_connections_table">

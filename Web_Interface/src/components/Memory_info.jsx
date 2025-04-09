@@ -36,14 +36,15 @@ const MemoryInfo = () => {
         colors: ["#2E5077", "#4DA1A9"],
         is3D: true,
         chartArea: { width: "75%", height: "75%" },
-        pieStartAngle: 10
+        pieStartAngle: 10,
+        backgroundColor: "#12121C"
     };
 
     return (
         <div id="Mem_container" className='Mem_container'>
-            <div className='mem_text'> <h1>Memory Usage</h1></div>
+            <div className='mem_text'> <h1 style={{color:'white'}}>Memory Usage</h1></div>
             <div className="mem_piechart" >
-                <Chart chartType='PieChart' data={data} options={options} width={"120%"} height={"300px"} />
+                <Chart chartType='PieChart' data={data} options={options} width={"500px"} height={"500px"} />
             </div>
         </div>
     );

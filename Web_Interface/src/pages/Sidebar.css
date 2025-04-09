@@ -31,7 +31,9 @@
     position: relative;
     display: inline-block;
   }
-  
+.sidebar-navbar{
+  margin-left: -20px;
+}
   /* Style the button */
   .dropdown_comp p {
     color: white;

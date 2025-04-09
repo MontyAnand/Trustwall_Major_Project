@@ -55,7 +55,7 @@ const CPUInfo = () => {
                                 data={cdata}
                                 options={options}
                                 width={"100%"}
-                                height={"400px"}/>
+                                height={"100%"}/>
                             </div>
                         </div>
                             

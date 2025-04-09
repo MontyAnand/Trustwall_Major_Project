@@ -12,6 +12,7 @@ import LinuxTerminal from "./pages/Terminal"
 import Suricata from "./pages/Suricata"
 import DHCPConfiguration from "./pages/dhcp_configuration";
 import Interface from "./pages/Interface";
+import ActiveConnections from "./pages/Active_connections";
 
 function App() {
   return (
@@ -29,9 +30,10 @@ function App() {
             <Route path="/DHCP-Configuration" element={<DHCPConfiguration/>}/>
             <Route path="/firewall" element={<Firewall />} />
             <Route path="/interface" element={<Interface/>}/>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/active-connection" element={<ActiveConnections />} />
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/antivirus" element={<Antivirus />} />
               <Route path="/VPN" element={<VPN />} />
             </Route>
