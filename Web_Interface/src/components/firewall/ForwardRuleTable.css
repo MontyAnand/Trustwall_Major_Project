@@ -23,7 +23,9 @@
 }
 
 .add-btn {
-  background-color: #007bff;
+  /* background-color: #007bff; */
+  background-color: #33A154;
+  background-image: linear-gradient(to right top,#33A154,#36ca63);
   color: white;
 }
 
