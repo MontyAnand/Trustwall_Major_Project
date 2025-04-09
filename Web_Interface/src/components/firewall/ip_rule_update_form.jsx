@@ -211,7 +211,7 @@ export const UpdateIPRuleForm = ({ rule, onSubmit, onCancel }) => {
           />
 
           <label>Action</label>
-          <select name="ACTION" value={form.ACTION} onChange={handleChange}>
+          <select style={{height:"26px"}} name="ACTION" value={form.ACTION} onChange={handleChange}>
             <option value="accept">accept</option>
             <option value="reject">reject</option>
           </select>
