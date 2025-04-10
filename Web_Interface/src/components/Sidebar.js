@@ -1,49 +1,47 @@
-import { Link } from "react-router-dom";
+import { Link , useLocation} from "react-router-dom";
+
 import "../pages/Sidebar.css";
 
+
 function Sidebar() {
+  const location = useLocation();
   return (
     <div className="sidebar-container">
       <h2 className="sidebar-heading">TRUSTWALL</h2>
       <nav className="sidebar-navbar">
         <ul className="sidebar-box">
-        <li className="py-2"><Link to="/dashboard">Dashboard</Link></li>
-        <li className="py-2"><Link to="/VPN">VPN</Link></li>
-        <li className="py-2"><Link to="/firewall">Firewall</Link></li>
-        <li className="py-2"><Link to="/interface">Interfaces</Link></li>
+        <li className="py-2"><Link to="/dashboard" style={{color:location.pathname === "/dashboard" ? "#007bff" :"white"}} >Dashboard</Link></li>
+        <li className="py-2"><Link to="/VPN" style={{color: location.pathname === "/VPN"? "#007bff" :"white"}} >VPN</Link></li>
+        <li className="py-2"><Link to="/firewall" style={{color:location.pathname === "/firewall" ? "#007bff" :"white"}}>Firewall</Link></li>
+        <li className="py-2"><Link to="/interface" style={{color:location.pathname === "/interface"? "#007bff" :"white"}} >Interfaces</Link></li>
         <li className="dropdown_comp">
             <p>Systems<span>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/" style={{fontSize: '15px'}}>Signout</Link>
+            <Link to="/" style={{fontSize: '15px',color:location.pathname === "/" ? "#007bff" :"white"}} >Signout</Link>
             </div>
           </li>
           <li className="dropdown_comp">
             <p>Services<span>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/suricata" style={{fontSize: '15px'}}>Suricata</Link>
-            <Link to="/DHCP-Configuration" style={{fontSize: '15px'}}>DHCP Server</Link>
-            <Link to="/services" style={{fontSize: '15px'}} >Services Table</Link>
+            <Link to="/suricata" style={{fontSize: '15px',color:location.pathname === "/suricata" ? "#007bff" :"white"}} >Suricata</Link>
+            <Link to="/DHCP-Configuration" style={{fontSize: '15px',color:location.pathname === "/DHCP-Configuration" ? "#007bff" :"white"}}  >DHCP Server</Link>
+            <Link to="/services" style={{fontSize: '15px',color:location.pathname === "/services" ? "#007bff" :"white"}}  >Services Table</Link>
             </div>
           </li>
           <li className="dropdown_comp" >
             <p>Status<span>&#11206;</span></p>
             <div className="dropdown_menu" >
-            <Link to="/dashboard" style={{fontSize: '15px'}}>Dashboard</Link>
-            <Link to="/active-connection" style={{fontSize: '15px'}}>Active Connetions</Link>
+            <Link to="/dashboard" style={{fontSize: '15px',color:location.pathname === "/dashboard" ? "#007bff" :"white"}}>Dashboard</Link>
+            <Link to="/active-connection" style={{fontSize: '15px',color:location.pathname === "/active-connection" ? "#007bff" :"white"}}>Active Connetions</Link>
             </div>
           </li>
           <li className="dropdown_comp">
             <p>Diagnostics<span>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/antivirus" style={{fontSize: '15px'}}>Antivirus</Link>
+            <Link to="/antivirus" style={{fontSize: '15px',color:location.pathname === "/antivirus" ? "#007bff" :"white"}}>Antivirus</Link>
             </div>
           </li>
-          
-          {/* <li className="py-2"><Link to="/services">Services Table</Link></li> */}
-          <li className="py-2"><Link to="/terminal">Terminal</Link></li>
-          {/* <li className="py-2"><Link to="/DHCP-Configuration">DHCP Server</Link></li>
-          <li className="py-2"><Link to="/antivirus">Antivirus</Link></li>
-          <li className="py-2"><Link to="/suricata">Suricata</Link></li> */}
+          <li className="py-2"><Link style={{color:location.pathname === "/terminal" ? "#007bff" :"white"}} to="/terminal">Terminal</Link></li>
         </ul>
       </nav>
     </div>
