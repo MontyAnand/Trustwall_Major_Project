@@ -31,6 +31,7 @@ module.exports.addMACRule = (req, res) => {
     else if (req.body.TYPE === "MAC") {
         command = command + `${req.body.MAC} `;
     }
+    command = command + `${req.body.ACTION} `;
     const ID = generateID();
     command = command + `comment "${ID}"`;
     const success = runCommand(command);
@@ -84,6 +85,7 @@ module.exports.updateMACRule = (req,res)=>{
     else if (req.body.TYPE === "MAC") {
         command = command + `${req.body.MAC} `;
     }
+    command = command + `${req.body.ACTION} `;
     command = command + `comment "${req.body.ID}"`;
     const success = runCommand(command);
 
