@@ -5,18 +5,20 @@ export const useAuth = () => useContext(AuthContext);
 
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    const login = (token) => {
-        setIsAuthenticated(true);
+    const isAuthenticated = () => {
+        return sessionStorage.getItem('authenticated') === 'true';
     };
-
+    
+    const login = () => {
+        sessionStorage.setItem('authenticated', 'true');
+    };
+    
     const logout = () => {
-        setIsAuthenticated(false);
+        sessionStorage.removeItem('authenticated');
     };
 
     return (
-        <AuthContext.Provider value={{ setIsAuthenticated,isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

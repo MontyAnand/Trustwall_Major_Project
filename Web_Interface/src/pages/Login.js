@@ -12,7 +12,7 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { setIsAuthenticated } = useAuth();
+  const { login } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
   const [isPassword, setIsPassword] = useState('password');
@@ -25,7 +25,7 @@ function Login() {
         setError(data.message);
         return;
       }
-      setIsAuthenticated(true);
+      login();
       navigate('/dashboard');
     });
 

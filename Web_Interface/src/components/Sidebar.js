@@ -1,9 +1,10 @@
 import { Link , useLocation} from "react-router-dom";
-
 import "../pages/Sidebar.css";
+import { useAuth } from "../Contexts/authContex";
 
 
 function Sidebar() {
+  const { logout } = useAuth();
   const location = useLocation();
   return (
     <div className="sidebar-container">
@@ -17,7 +18,7 @@ function Sidebar() {
         <li className="dropdown_comp">
             <p>Systems<span>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/" style={{fontSize: '15px',color:location.pathname === "/" ? "#007bff" :"white"}} >Signout</Link>
+            <Link to="/" onClick={()=>{logout();}} style={{fontSize: '15px',color:location.pathname === "/" ? "#007bff" :"white"}} >Signout</Link>
             </div>
           </li>
           <li className="dropdown_comp">

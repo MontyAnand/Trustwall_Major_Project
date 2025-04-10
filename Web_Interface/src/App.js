@@ -19,23 +19,23 @@ function App() {
     <Router>
       <div className="flex">
         {/* <Sidebar /> */}
-        <div className="flex-1" style={{padding:'0'}}>
+        <div className="flex-1" style={{ padding: '0' }}>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/suricata" element={<Suricata />} />
-            {<Route path="/services" element={<ServiceTable/>}/> }
-            <Route path="/cpu-info" element={<CPUInfo/>}/>
-            <Route path="/network-traffic" element={<NetworkTrafficChart/>}/>
-            <Route path="/terminal" element={<LinuxTerminal/>}/>
-            <Route path="/DHCP-Configuration" element={<DHCPConfiguration/>}/>
-            <Route path="/firewall" element={<Firewall />} />
-            <Route path="/interface" element={<Interface/>}/>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/active-connection" element={<ActiveConnections />} />
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/antivirus" element={<Antivirus />} />
               <Route path="/VPN" element={<VPN />} />
+              <Route path="/suricata" element={<Suricata />} />
+              {<Route path="/services" element={<ServiceTable />} />}
+              <Route path="/cpu-info" element={<CPUInfo />} />
+              <Route path="/network-traffic" element={<NetworkTrafficChart />} />
+              <Route path="/terminal" element={<LinuxTerminal />} />
+              <Route path="/DHCP-Configuration" element={<DHCPConfiguration />} />
+              <Route path="/firewall" element={<Firewall />} />
+              <Route path="/interface" element={<Interface />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/active-connection" element={<ActiveConnections />} />
             </Route>
           </Routes>
         </div>
