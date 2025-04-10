@@ -1,0 +1,23 @@
+flush ruleset
+
+table ip my_table {
+    chain forward_icmp {
+        type filter hook forward priority filter; policy drop;
+
+        # Allow only ICMP packets from 172.16.0.100 to 8.8.8.8 going from enp0s9 to enp0s8
+        ip saddr 172.16.0.100 ip daddr 8.8.8.8 ip protocol icmp iifname "enp0s9" oifname "enp0s8" accept
+
+        # Allow reverse ICMP replies from 8.8.8.8 to 172.16.0.100
+        ip saddr 8.8.8.8 ip daddr 172.16.0.100 ip protocol icmp iifname "enp0s8" oifname "enp0s9" accept
+
+        # Allow related replies (optional if above reverse rule is not used)
+        ct state established,related accept
+    }
+
+    chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+
+        # Apply masquerading on enp0s8 for outbound traffic
+        oifname "enp0s8" masquerade
+    }
+}

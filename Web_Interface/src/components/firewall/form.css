@@ -1,0 +1,68 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: #fff;
+    width: 90%;
+    height: 90%;
+    overflow-y: auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+  
+  .modal-content h2 {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .form-group input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .form-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .btn.cancel-btn {
+    background-color: #ccc;
+    color: #000;
+  }
+  
+  .btn.update-btn {
+    background-color: #28a745;
+    color: white;
+  }
+  

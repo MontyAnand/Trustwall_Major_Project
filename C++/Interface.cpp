@@ -57,6 +57,12 @@ void Interface::changeWANInterface(std::string &interface)
         file << interface;
         file.close();
     }
+    if (interface.length() == 0)
+    {
+        return;
+    }
+    Firewall::allowMasquerading(interface);
+    return;
 }
 
 void Interface::changeInterfaceConfiguration(const char *data, int length, int fd)
@@ -281,8 +287,7 @@ std::string Interface::getLANInterfaceDetails()
             {"IP", IP},
             {"nm", nm},
             {"bip", bip},
-            {"gip", gip}
-        } ;
+            {"gip", gip}};
         return data.dump();
     }
 
@@ -329,7 +334,7 @@ std::string Interface::getLANInterfaceDetails()
     gip = getGateway(iface);
 
     json data = {
-        {"if",iface},
+        {"if", iface},
         {"ip", IP},
         {"nm", nm},
         {"bip", bip},

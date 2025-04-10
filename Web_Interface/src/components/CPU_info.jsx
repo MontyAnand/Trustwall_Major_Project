@@ -9,13 +9,19 @@ const CPUInfo = () => {
     const { socket } = useSocket();
 
     useEffect(() => {
+        if (socket) {
+            socket.emit("getCPUInfo");
+        }
+    }, [socket]);
+
+    useEffect(() => {
         if (!socket) return;
 
         socket.on("cpu-data", (data) => {
-            setCpuNames(data.map(obj => "Core : "+obj.CPU));
+            setCpuNames(data.map(obj => "Core : " + obj.CPU));
             const X = data.map(({ CPU, ...rest }) => rest);
             const listFormat = X.map(obj => Object.entries(obj));
-            const cpu_data_list = listFormat.map(arr => [["cpu_name","cpu_value"],...arr]);
+            const cpu_data_list = listFormat.map(arr => [["cpu_name", "cpu_value"], ...arr]);
             console.log(cpu_data_list);
             setCleanedData(cpu_data_list);
             console.log(cleanedData);
@@ -24,12 +30,12 @@ const CPUInfo = () => {
         return () => {
             socket.off("cpu-data");
         };
-    }, [socket]); 
+    }, [socket]);
 
-    const options={
-        is3D :true,
-        pieHole:0.5,
-        pieSliceText:"percentage",
+    const options = {
+        is3D: true,
+        pieHole: 0.5,
+        pieSliceText: "percentage",
         colors: ["#E07A5F", "#85A389", "#96B6C5", "#FFC95F", "#916DB3"],
         legend: {
             position: "bottom",
@@ -58,7 +64,7 @@ const CPUInfo = () => {
                                 height={"100%"}/>
                             </div>
                         </div>
-                            
+
                     ))}
                 </div>
             ) : (

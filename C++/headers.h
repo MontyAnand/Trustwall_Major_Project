@@ -117,7 +117,6 @@ private:
 
     std::map<std::string, std::uint16_t> record;
 
-    std::string getPublicInterface();
     std::string getEndPoint();
     std::uint16_t getAvailableID();
     std::uint16_t generateClientConfiguration(std::string &, std::string &);
@@ -137,6 +136,7 @@ private:
 public:
     VPN();
     std::string getIP();
+    std::string getPublicInterface();
     std::uint16_t acceptConnectionRequest();
     ~VPN();
 };
@@ -202,11 +202,18 @@ public:
     static std ::string getWANInterface();
     static std::string getLANInterfaceDetails();
     static std::string getGateway(const std::string &);
-    static void changeInterfaceConfiguration(const char* , int , int);
+    static void changeInterfaceConfiguration(const char *, int, int);
     static void changeLANInterface(std::string &);
     static void changeWANInterface(std::string &);
-    static void changeIPAddress(const std::string &, const std::string &, int );
+    static void changeIPAddress(const std::string &, const std::string &, int);
+};
 
+class Firewall
+{   public: 
+    static void flushChain (std::string , std::string);
+    static void allowMasquerading(std::string);
+    static void allowInterfaceForwarding(std::string, std::string);
+    static void initializeRuleset();
 };
 
 class Server
@@ -237,6 +244,9 @@ private:
     int createServerSocket();
     void broadcastMessage(std::string &, uint8_t);
     void eventLoop();
+    void sendRAMStatus();
+    void sendDiskStatus();
+    void sendConnnectionList();
     void handleAuthentication(std::string, int);
 
     void setNonBlocking(int);
@@ -247,14 +257,15 @@ private:
     void processPacket(char *, int, int);
     void watchNetworkTraffic();
 
-    void handleFilescan();
+    void handleBlockingRequest();
     void handleVPNRequest();
     void continuousMonitoring();
     void handleLANInterfaceDetailsRequest(int);
     void handleServiceListRequest(int);
     void handleCPUStatusRequest(int);
     void manageServiceRequest(std::string);
-    void handleInterfaceRequest(std::string,int);
+    void handleInterfaceRequest(std::string, int);
+    void WANSetup(std::string);
 
 public:
     Server();

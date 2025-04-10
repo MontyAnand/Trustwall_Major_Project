@@ -3,3 +3,4 @@ a.out
 **/*.qr
 **/*.conf
 qrcode.png
+Firewall.db

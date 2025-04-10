@@ -8,6 +8,13 @@ const ActiveConnections = () => {
 
     const [connectionList, setConnectionList] = useState([]);
     const { socket, socketID } = useSocket();
+
+    useEffect(() => {
+        if (socket) {
+            socket.emit("getConnectionList");
+        }
+    }, [socket]);
+
     useEffect(() => {
         if (!socket) return;
         socket.on('connection-list', (connections) => {

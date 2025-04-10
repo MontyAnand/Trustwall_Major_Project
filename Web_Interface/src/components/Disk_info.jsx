@@ -9,6 +9,12 @@ const DiskInfo = () => {
     const [diskValue, setDiskValue] = useState([]);
 
     useEffect(() => {
+        if (socket) {
+            socket.emit("getDiskInfo");
+        }
+    }, [socket]);
+
+    useEffect(() => {
         if (!socket) return;
 
         socket.on("disk-info", (disks) => {
