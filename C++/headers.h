@@ -238,6 +238,7 @@ private:
     std::atomic<bool> running;
 
     std::unordered_set<int> connectedFd;
+    std::map<std::string, std::vector<unsigned long>> prev_traffic;
 
     VPN vpn;
 
@@ -248,6 +249,8 @@ private:
     void sendDiskStatus();
     void sendConnnectionList();
     void handleAuthentication(std::string, int);
+    void handleAntivirusFileScan(int , char *);
+    void handleVPNConnectionRequest(int , char *);
 
     void setNonBlocking(int);
     void addToInputEventLoop(int);

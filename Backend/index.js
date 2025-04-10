@@ -7,17 +7,17 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cors = require('cors');
-const os = require('os');
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
+const cron = require('node-cron');
 
 const firewall_forward_routes = require('./Routes/firewall_forward');
 const firewall_set_routes = require('./Routes/firewall_set');
 const firewall_mac_routes = require('./Routes/firewall_mac_rule');
 const firewall_custom_rule_routes = require('./Routes/firewall_custom_rule');
-const { config } = require('process');
-
+const Counter = require('./utility/counter');
+const newCounter = new Counter(3);
 const app = express();
 const port = 5000;
 const HOST = process.argv[2];
@@ -72,6 +72,27 @@ io.on('connection', (socket) => {
     socket.on('getCPUInfo',()=>{
         tcpClient.cpuInfoRequest();
     });
+});
+
+cron.schedule('*/1 * * * * *',()=>{
+    tcpClient.sendNetworkTrafficRequest();
+});
+
+cron.schedule('*/1 * * * * *',()=>{
+    switch(newCounter.increment()){
+        case 0: {
+            tcpClient.diskInfoRequest();
+            break;
+        }
+        case 1: {
+            tcpClient.ramInfoRequest();
+            break;
+        }
+        case 2: {
+            tcpClient.connectionListRequest();
+            break;
+        }
+    }
 });
 
 app.use(express.json());
