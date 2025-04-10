@@ -15,13 +15,19 @@ export default function Dashboard() {
             <div className="dashboard_container">
                 {/* <h2>Dashboard</h2> */}
                 <div className="dashboard_inner_container">
-                    <NetworkTrafficCharts/>
-                    <CPUInfo/>
-                    <DiskInfo/>
-                    <div className="dashboard_combined_container">
+                    <div className="Memory">
                     <MemoryInfo/>
-                    <ActiveConnections/>
                     </div>
+                    <div className="Disk">
+                    <DiskInfo/>
+                    </div>
+                    <div className="Network">
+                    <NetworkTrafficCharts/>
+                    </div>
+                    <div className="CPU">
+                    <CPUInfo/>
+                    </div>
+                
                 </div>
             </div>
         </>

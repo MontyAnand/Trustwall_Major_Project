@@ -42,7 +42,8 @@ const DiskInfo = () => {
         colors: ["#493D9E", "#B2A5FF"],
         is3D: true,
         chartArea: { width: "75%", height: "75%" },
-        pieStartAngle: 10
+        pieStartAngle: 10,
+        backgroundColor: "#12121C"
     };
 
     let data = [];
@@ -54,12 +55,12 @@ const DiskInfo = () => {
                 {diskName.map((row, rowIndex) => (
                     data = [
                         ["disk_usage", "space"],
-                        ["Used", diskValue[rowIndex]],
-                        ["Free", 100 - diskValue[rowIndex]]
+                        ["Used Space", diskValue[rowIndex]],
+                        ["Free Space", 100 - diskValue[rowIndex]]
                     ],
                     <div className='Disk_box'>
                         <p>{row}</p>
-                        <Chart chartType='PieChart' data={data} options={options} width={"350px"} height={"350px"} />
+                        <Chart chartType='PieChart' data={data} options={options} width={"100%"} />
                     </div>
                 ))}
             </div>

@@ -70,7 +70,7 @@ const NetworkTrafficCharts = () => {
   // backgroundColor: "#12121C"
   
   return (
-    <div id="Network_Traffic_Container" style={{ padding: "20px", minHeight: "100vh",width: '100vw' }}>
+    <div id="Network_Traffic_Container" style={{ padding: "20px", minHeight: "100%",width:"100%"}}>
       <h1 style={{ color: "#EAEAEA", textAlign: "center", margin:"20px 0"}}>Real-Time Network Traffic</h1>
       {Object.keys(data).map((iface) => (
         <div

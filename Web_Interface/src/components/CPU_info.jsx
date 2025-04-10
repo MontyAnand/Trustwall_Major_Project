@@ -57,11 +57,11 @@ const CPUInfo = () => {
                             <h3 className="cpu_name">{cpuNames[index]}</h3>
                             <div className="cpu_chart">
                                 <Chart
-                                    chartType="PieChart"
-                                    data={cdata}
-                                    options={options}
-                                    width={"100%"}
-                                    height={"400px"} />
+                                chartType="PieChart"
+                                data={cdata}
+                                options={options}
+                                width={"100%"}
+                                height={"100%"}/>
                             </div>
                         </div>
 

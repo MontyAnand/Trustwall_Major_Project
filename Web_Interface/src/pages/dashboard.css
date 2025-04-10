@@ -2,21 +2,19 @@
     margin: 0;
 }
 .dashboard_container{
-    display: flex;
+    /* display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: center; */
     margin-top: 50px;
     background-color:#12121C;
-    color:white;
-    width: 100vw;
+    /* color:white; */
+    /* width: 100vw; */
 }
 .dashboard_inner_container{
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    width: 40%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    margin-top: 78px;
 }
 
 .dashboard_container .change_btn{
@@ -38,12 +36,17 @@
     text-align: center;
     /* transform: "translateX(-50%)", */
 }
+.mem_text h1{
+    margin-bottom: 80px;
+    color:white;
+}
 .Disk_container,.Network_Traffic_Container{
     margin-left: 40px;
     margin-bottom: 40px;
     border-radius: 10px;
     padding-bottom: 30px;
     width: 100%;
+    color:white;
 }
 .Mem_container{
     display: flex;
@@ -54,8 +57,11 @@
     margin-bottom: 40px;
     border-radius: 10px;
     padding-bottom: 30px;
-    width: 100%;
-    margin-top: -350px;
+    width: 500px;
+    background-color: #12121C;
+}
+.mem_text{
+    color:white;
 }
 .mem_piechart{
     display: flex;
@@ -76,70 +82,14 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    width:500px;
 }
 .Disk_inner_container{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap:40px;
+    grid-template-columns: 1fr 1fr;
 }
 .Disk_box p{
     text-align: center;
     font-weight: bold;
     margin-bottom: 20px;
-}
-
-/* Active_Connections_container */
-.Active_connections_container table,.Active_connections_container th,.Active_connections_container td{
-    font-size: 12px;
-    border-spacing: 0;
-    border-right: 1px solid rgb(167, 163, 163);
-    text-align: center;
-    font-family: sans-serif;
-}
-.Active_connections_container{
-    height: 100%;
-    margin-left: -10px;
-    border-radius: 10px;
-    padding: 20px 50px;
-    color:black;
-}
-.Active_connections_container table{
-    height: 100%;
-    width: 100%;
-}
-.Table_row_content{
-    padding: 12px 12px;
-}
-.Active_connections_header th{
-    padding: 20px 9px;
-}
-.Active_connections_table{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-.Table_row:nth-child(odd){
-    background-color: whitesmoke;
-}
-.Table_row:nth-child(even){
-    background-color: gainsboro;
-}
-thead{
-    background-color: grey;
-}
-.Active_connections_text{
-    color:white;
-    padding-bottom: 30px;
-    text-align: center;
-}
-.Table_row_content:nth-last-child(1){
-    font-weight: bold;
-}
-.Table_row_content:nth-last-child(6){
-    border-left: 1.5px solid rgb(167, 163, 163);
-}
-.dashboard_combined_container{
-    display:flex;
-    width:100vw;
 }
