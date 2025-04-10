@@ -6,6 +6,7 @@ import { useAuth } from "../Contexts/authContex";
 function Sidebar() {
   const { logout } = useAuth();
   const location = useLocation();
+
   return (
     <div className="sidebar-container">
       <h2 className="sidebar-heading">TRUSTWALL</h2>
@@ -16,13 +17,13 @@ function Sidebar() {
         <li className="py-2"><Link to="/firewall" style={{color:location.pathname === "/firewall" ? "#007bff" :"white"}}>Firewall</Link></li>
         <li className="py-2"><Link to="/interface" style={{color:location.pathname === "/interface"? "#007bff" :"white"}} >Interfaces</Link></li>
         <li className="dropdown_comp">
-            <p>Systems<span>&#11206;</span></p>
+            <p style={{color:location.pathname === "/" ? "#007bff" :"white"}} >Systems<span style={{color:"white"}}>&#11206;</span></p>
             <div className="dropdown_menu">
             <Link to="/" onClick={()=>{logout();}} style={{fontSize: '15px',color:location.pathname === "/" ? "#007bff" :"white"}} >Signout</Link>
             </div>
           </li>
           <li className="dropdown_comp">
-            <p>Services<span>&#11206;</span></p>
+            <p style={{color:location.pathname === "/suricata"|location.pathname === "/DHCP-Configuration"|location.pathname === "/services" ? "#007bff" :"white"}}>Services<span style={{color:"white"}}>&#11206;</span></p>
             <div className="dropdown_menu">
             <Link to="/suricata" style={{fontSize: '15px',color:location.pathname === "/suricata" ? "#007bff" :"white"}} >Suricata</Link>
             <Link to="/DHCP-Configuration" style={{fontSize: '15px',color:location.pathname === "/DHCP-Configuration" ? "#007bff" :"white"}}  >DHCP Server</Link>
@@ -30,14 +31,13 @@ function Sidebar() {
             </div>
           </li>
           <li className="dropdown_comp" >
-            <p>Status<span>&#11206;</span></p>
-            <div className="dropdown_menu" >
-            <Link to="/dashboard" style={{fontSize: '15px',color:location.pathname === "/dashboard" ? "#007bff" :"white"}}>Dashboard</Link>
+            <p style={{fontSize: '15px',color:location.pathname === "/active-connection" ? "#007bff" :"white"}}>Status<span style={{color:"white"}}>&#11206;</span></p>
+            <div className="dropdown_menu">
             <Link to="/active-connection" style={{fontSize: '15px',color:location.pathname === "/active-connection" ? "#007bff" :"white"}}>Active Connetions</Link>
             </div>
           </li>
           <li className="dropdown_comp">
-            <p>Diagnostics<span>&#11206;</span></p>
+            <p style={{fontSize: '15px',color:location.pathname === "/antivirus" ? "#007bff" :"white"}}>Diagnostics<span style={{color:"white"}}>&#11206;</span></p>
             <div className="dropdown_menu">
             <Link to="/antivirus" style={{fontSize: '15px',color:location.pathname === "/antivirus" ? "#007bff" :"white"}}>Antivirus</Link>
             </div>
