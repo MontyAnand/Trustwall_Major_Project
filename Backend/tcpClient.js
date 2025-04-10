@@ -312,9 +312,9 @@ module.exports.client = class TcpClient extends EventEmitter {
             // console.log(`Ram: data : ${percentageUsage}`);
             // this.io.emit('ram-info', percentageUsage);
         } catch (error) {
-            console.log(`Error in RAM data`);
+            // console.log(`Error in RAM data`);
             // console.error('Error parsing JSON:', error);
-            this.ramInfoRequest();
+            // this.ramInfoRequest();
         }
     }
 
@@ -328,7 +328,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         } catch (error) {
             console.log(`Error in Disk data`);
             // console.error('Error parsing JSON:', error);
-            this.diskInfoRequest();
+            // this.diskInfoRequest();
         }
     }
 
@@ -355,7 +355,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         } catch (error) {
             // console.log(`Error in Connection list data`);
             // console.error('Error parsing JSON:', error);
-            this.connectionListRequest();
+            // this.connectionListRequest();
         }
     }
 
