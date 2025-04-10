@@ -7,11 +7,21 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cors = require('cors');
+<<<<<<< HEAD
 const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
 const cron = require('node-cron');
 
+=======
+const os = require('os');
+const yaml = require('js-yaml');
+
+const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
+const { SocketQueue, serviceListQueue } = require('./utility/queue');
+const { client } = require('./tcpClient');
+const suricataRoute = require('./Routes/suricata');
+>>>>>>> 3dbe23c (Suricata partially done)
 const firewall_forward_routes = require('./Routes/firewall_forward');
 const firewall_set_routes = require('./Routes/firewall_set');
 const firewall_mac_routes = require('./Routes/firewall_mac_rule');
@@ -146,6 +156,8 @@ app.get('/lanInfo', (req, res) => {
 });
 
 
+// app.use('/suricata',suricataRute);
+
 app.get('/interfaces',(req,res)=>{
     tcpClient.interfaceListRequest("null");
     tcpClient.once('interface-list',(data)=>{
@@ -158,6 +170,9 @@ app.use('/firewall', firewall_forward_routes);
 app.use('/firewall', firewall_set_routes);
 app.use('/firewall', firewall_mac_routes);
 app.use('/firewall',firewall_custom_rule_routes)
+
+// Suricata Endpoints
+app.use('/suricata',suricataRoute);
 
 
 // This part is to manage DHCP configuration

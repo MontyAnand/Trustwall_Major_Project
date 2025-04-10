@@ -1,52 +1,60 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import "../pages/Sidebar.css";
 
-function Sidebar() {
+const Sidebar = () => {
+  const location = useLocation();
+
+  // Helper to determine if a dropdown should be active
+  const isDropdownActive = (paths) => {
+    return paths.some((path) => location.pathname.startsWith(path));
+  };
+
   return (
-    <div className="sidebar-container">
-      <h2 className="sidebar-heading">TRUSTWALL</h2>
-      <nav className="sidebar-navbar">
-        <ul className="sidebar-box">
-        {/* <li className="py-2"><Link to="/">Dashboard</Link></li> */}
-        <li className="py-2"><Link to="/VPN">VPN</Link></li>
-        <li className="py-2"><Link to="/firewall">Firewall</Link></li>
-        <li className="py-2"><Link to="/interface">Interfaces</Link></li>
-        <li className="dropdown_comp">
-            <p>Systems<span>&#11206;</span></p>
-            <div className="dropdown_menu">
-            <Link to="/" style={{fontSize: '15px'}}>Signout</Link>
-            </div>
-          </li>
-          <li className="dropdown_comp">
-            <p>Services<span>&#11206;</span></p>
-            <div className="dropdown_menu">
-            <Link to="/suricata" style={{fontSize: '15px'}}>Suricata</Link>
-            <Link to="/DHCP-Configuration" style={{fontSize: '15px'}}>DHCP Server</Link>
-            </div>
-          </li>
-          <li className="dropdown_comp" >
-            <p>Status<span>&#11206;</span></p>
-            <div className="dropdown_menu" >
-            <Link to="/services" style={{fontSize: '15px'}} >Services Table</Link>
-            <Link to="/dashboard" style={{fontSize: '15px'}}>Dashboard</Link>
-            </div>
-          </li>
-          <li className="dropdown_comp">
-            <p>Diagnostics<span>&#11206;</span></p>
-            <div className="dropdown_menu">
-            <Link to="/antivirus" style={{fontSize: '15px'}}>Antivirus</Link>
-            </div>
-          </li>
-          
-          {/* <li className="py-2"><Link to="/services">Services Table</Link></li> */}
-          <li className="py-2"><Link to="/terminal">Terminal</Link></li>
-          {/* <li className="py-2"><Link to="/DHCP-Configuration">DHCP Server</Link></li>
-          <li className="py-2"><Link to="/antivirus">Antivirus</Link></li>
-          <li className="py-2"><Link to="/suricata">Suricata</Link></li> */}
-        </ul>
-      </nav>
+    <div className="trustwall-navbar">
+      <div className="logo">Trust<span>WALL</span></div>
+      <ul className="nav-menu">
+        <li><NavLink to="/system" className={({ isActive }) => isActive ? "active" : ""}>System</NavLink></li>
+
+        <li className={`dropdown ${isDropdownActive(["/interface"]) ? "active-dropdown" : ""}`}>
+          <span>Interfaces ▼</span>
+          <ul className="dropdown-menu">
+            <li><NavLink to="/interface">Interface Assignments</NavLink></li>
+          </ul>
+        </li>
+
+        <li><NavLink to="/firewall" className={({ isActive }) => isActive ? "active" : ""}>Firewall</NavLink></li>
+
+        <li className={`dropdown ${isDropdownActive(["/DHCP-Configuration", "/suricata"]) ? "active-dropdown" : ""}`}>
+          <span>Services ▼</span>
+          <ul className="dropdown-menu">
+            <li><NavLink to="/DHCP-Configuration">DHCP Server</NavLink></li>
+            <li><NavLink to="/suricata">Suricata</NavLink></li>
+          </ul>
+        </li>
+
+        <li><NavLink to="/VPN" className={({ isActive }) => isActive ? "active" : ""}>VPN</NavLink></li>
+
+        <li className={`dropdown ${isDropdownActive(["/services", "/dashboard"]) ? "active-dropdown" : ""}`}>
+          <span>Status ▼</span>
+          <ul className="dropdown-menu">
+            <li><NavLink to="/services">Services Status</NavLink></li>
+            <li><NavLink to="/dashboard">Dashboard</NavLink></li>
+          </ul>
+        </li>
+
+        <li className={`dropdown ${isDropdownActive(["/antivirus", "/terminal"]) ? "active-dropdown" : ""}`}>
+          <span>Diagonistics ▼</span>
+          <ul className="dropdown-menu">
+            <li><NavLink to="/antivirus">Virus Scanning</NavLink></li>
+            <li><NavLink to="/terminal">Terminal</NavLink></li>
+          </ul>
+        </li>
+
+        <li><NavLink to="/help" className={({ isActive }) => isActive ? "active" : ""}>Help</NavLink></li>
+      </ul>
     </div>
   );
-}
+};
 
 export default Sidebar;

@@ -774,7 +774,7 @@ function DHCPConfiguration() {
             onClick={handleSubmit}
             className="dhcp_save_btn"
           >
-            Save Configuration
+            Save Changes
           </button>
         </div>
       </div>
