@@ -138,6 +138,11 @@ void Server::processPacket(char *buffer, int fd, int size)
         handleAntivirusFileScan(fd, buffer);
         break;
     }
+    case 1:
+    {
+        setupVPNServer(fd, buffer);
+        break;
+    }
     case 2:
     {
         handleVPNConnectionRequest(fd, buffer);
@@ -155,7 +160,7 @@ void Server::processPacket(char *buffer, int fd, int size)
         // std::cout << "DISK Request at C++ server\n";
         break;
     }
-    case 6: 
+    case 6:
     {
         watchNetworkTraffic();
         break;
@@ -207,6 +212,25 @@ void Server::processPacket(char *buffer, int fd, int size)
     default:
         break;
     }
+}
+
+void Server::setupVPNServer(int fd, char *buffer)
+{
+    int ipSize = (int)buffer[1];
+    int netmaskSize = (int)buffer[2];
+    std::string ip = "";
+    std::string netmask = "";
+    for (int i = 0; i < ipSize; i++)
+    {
+        ip = ip + buffer[i + 3];
+    }
+    for (int i = 0; i < netmaskSize; i++)
+    {
+        netmask = netmask + buffer[3 + ipSize+i];
+    }
+    std::cout <<"At server" <<  ip << " " << netmask << "\n";
+    vpn.setupServer(ip, netmask);
+    return;
 }
 
 void Server::sendRAMStatus()
@@ -583,8 +607,17 @@ void Server::WANSetup(std::string interface)
 
 Server::Server() : running(true)
 {
+    if (!Utility::checkConnectivity())
+    {
+        std::cerr << "Not connected with Internet\n";
+        exit(EXIT_FAILURE);
+    }
+    if(Utility::getPublicInterface().empty()){
+        std::cerr << "No Interface detected\n";
+        exit(1);
+    }
     Firewall::initializeRuleset();
-    WANSetup(vpn.getPublicInterface());
+    WANSetup(Utility::getPublicInterface());
     epollFd = epoll_create1(0);
     if (epollFd == -1)
     {
@@ -594,7 +627,7 @@ Server::Server() : running(true)
     prev_traffic = HealthMonitor::getNetworkStats();
     serverSocketFd = createServerSocket();
     addToInputEventLoop(serverSocketFd);
-    NodeServerThread = std::thread(&Server::startNodeServer, this, vpn.getIP());
+    NodeServerThread = std::thread(&Server::startNodeServer, this, Utility::getEndPoint());
     NodeServerThread.detach();
     // fileScanThread = std::thread(&Server::handleBlockingRequest, this);
     // vpnRequestThread = std::thread(&Server::handleVPNRequest, this);

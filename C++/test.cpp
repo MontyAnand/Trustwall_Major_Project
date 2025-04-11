@@ -1,93 +1,82 @@
 #include <iostream>
-#include <cstring>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <unistd.h>
+#include <vector>
+#include <string>
 #include <arpa/inet.h>
-#include <fstream>
-#include <sstream>
+#include <iostream>
 
-void getInterfaceDetails(const std::string &iface) {
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd == -1) {
-        perror("Socket creation failed");
-        return;
+class IPPool {
+private:
+    uint32_t network;
+    uint32_t broadcast;
+    int pool_size;
+    std::vector<bool> bitmap;
+
+    uint32_t ip_to_int(const std::string& ip) {
+        struct in_addr addr;
+        inet_pton(AF_INET, ip.c_str(), &addr);
+        return ntohl(addr.s_addr);
     }
 
-    struct ifreq ifr;
-    strncpy(ifr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
-
-    // Get IP Address
-    if (ioctl(fd, SIOCGIFADDR, &ifr) == 0) {
-        struct sockaddr_in *ip = (struct sockaddr_in *)&ifr.ifr_addr;
-        std::cout << "IP Address: " << inet_ntoa(ip->sin_addr) << std::endl;
-    } else {
-        perror("Failed to get IP Address");
+    std::string int_to_ip(uint32_t ip) {
+        struct in_addr addr;
+        addr.s_addr = htonl(ip);
+        char buf[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &addr, buf, INET_ADDRSTRLEN);
+        return std::string(buf);
     }
 
-    // Get Netmask
-    if (ioctl(fd, SIOCGIFNETMASK, &ifr) == 0) {
-        struct sockaddr_in *netmask = (struct sockaddr_in *)&ifr.ifr_netmask;
-        std::cout << "Netmask: " << inet_ntoa(netmask->sin_addr) << std::endl;
-    } else {
-        perror("Failed to get Netmask");
+public:
+    IPPool(const std::string& base_ip, const std::string& netmask) {
+        uint32_t base = ip_to_int(base_ip);
+        uint32_t mask = ip_to_int(netmask);
+        network = base & mask;
+        broadcast = network | ~mask;
+        pool_size = broadcast - network - 1;
+        bitmap.resize(pool_size, false);  // false = available
     }
 
-    // Get Broadcast Address
-    if (ioctl(fd, SIOCGIFBRDADDR, &ifr) == 0) {
-        struct sockaddr_in *bcast = (struct sockaddr_in *)&ifr.ifr_broadaddr;
-        std::cout << "Broadcast IP: " << inet_ntoa(bcast->sin_addr) << std::endl;
-    } else {
-        perror("Failed to get Broadcast IP");
+    std::string allocate_ip() {
+        for (int i = 0; i < pool_size; ++i) {
+            if (!bitmap[i]) {
+                bitmap[i] = true;
+                return int_to_ip(network + 1 + i);
+            }
+        }
+        return "No IPs available";
     }
 
-    close(fd);
-}
+    void release_ip(const std::string& ip) {
+        uint32_t ip_val = ip_to_int(ip);
+        if (ip_val <= network || ip_val >= broadcast) return;
 
-// Get Default Gateway from /proc/net/route
-std::string getGateway(const std::string &iface) {
-    std::ifstream file("/proc/net/route");
-    if (!file.is_open()) {
-        std::cerr << "Failed to open /proc/net/route" << std::endl;
-        return "";
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string interfaceName, destination, gateway, flags;
-
-        if (!(iss >> interfaceName >> destination >> gateway >> flags))
-            continue;
-
-        if (interfaceName == iface && destination == "00000000") { // Default route for the given interface
-            unsigned int gwHex;
-            std::stringstream ss;
-            ss << std::hex << gateway;
-            ss >> gwHex;
-
-            struct in_addr gwAddr;
-            gwAddr.s_addr = gwHex;
-            return inet_ntoa(gwAddr);
+        int index = ip_val - network - 1;
+        if (index >= 0 && index < pool_size) {
+            bitmap[index] = false;
         }
     }
+};
 
-    return "";
-}
-
-int main() {
-    std::string interface = "enp0s8"; // Change to your interface name
-
-    std::cout << "Interface: " << interface << std::endl;
-    getInterfaceDetails(interface);
-
-    std::string gateway = getGateway(interface);
-    if (!gateway.empty()) {
-        std::cout << "Gateway IP: " << gateway << std::endl;
-    } else {
-        std::cout << "Failed to retrieve Gateway IP" << std::endl;
+int main(){
+    std::string bip;
+    std::string netmask;
+    std::cout << "enter Base IP\n";
+    std::cin>>bip;
+    std::cout << "Rnter Netmask\n";
+    std::cin >> netmask;
+    IPPool x(bip,netmask);
+    int z;
+    while(true){
+        std::cin >> z;
+        if(z == 1){
+            std::cout<<x.allocate_ip()<<"\n";
+            continue;
+        }
+        if(z == 2){
+            std::string ip;
+            std::cin>>ip;
+            x.release_ip(ip);
+            continue;
+        }
+        break;
     }
-
-    return 0;
 }

@@ -22,6 +22,7 @@
 #include <chrono>
 #include <cstdio>
 #include <memory>
+#include <bitset>
 
 #include <nlohmann/json.hpp>
 
@@ -99,48 +100,6 @@ public:
     static std::string generate_qr_base64(const std::string &text, int scale = 10);
 };
 
-class VPN
-{
-private:
-    int TIMEOUT_PERIOD;
-    std::string publicInterface;
-    std::string endPoint;
-    std::string publicIP;
-    std::string server_public_key;
-    std::uint64_t ip_pool;
-    std::uint16_t PORT;
-    std::string netmask;
-
-    std::mutex mtx;
-    std::thread cleaner;
-    std::atomic<bool> running;
-
-    std::map<std::string, std::uint16_t> record;
-
-    std::string getEndPoint();
-    std::uint16_t getAvailableID();
-    std::uint16_t generateClientConfiguration(std::string &, std::string &);
-    std::string prepareIP(std::uint16_t);
-    bool generateServerKeys();
-    bool setupServer();
-    bool generateConfigurationFile(std::string &);
-    bool vpnInterfaceSetup();
-    bool isNumber(std::string &);
-    bool checkConnectivity();
-    void revokeIP(std::uint16_t);
-    void monitorClient();
-    void parseString(std::string &, std::map<std::string, int> &);
-    void generateQRCode(std::uint16_t, std::string &, std::string &);
-    void addFirewallRules();
-
-public:
-    VPN();
-    std::string getIP();
-    std::string getPublicInterface();
-    std::uint16_t acceptConnectionRequest();
-    ~VPN();
-};
-
 class Antivirus
 {
 public:
@@ -209,11 +168,66 @@ public:
 };
 
 class Firewall
-{   public: 
-    static void flushChain (std::string , std::string);
+{
+public:
+    static void flushChain(std::string, std::string);
     static void allowMasquerading(std::string);
     static void allowInterfaceForwarding(std::string, std::string);
     static void initializeRuleset();
+};
+
+class IPPool
+{
+private:
+    uint32_t network;
+    uint32_t broadcast;
+    std::string netmask;
+    int pool_size;
+    std::vector<bool> bitmap;
+    uint32_t ip_to_int(const std::string &);
+    std::string int_to_ip(uint32_t);
+
+public:
+    IPPool(const std::string &, const std::string &);
+    std::pair<int, std::string> allocate_ip();
+    int getNetmask();
+    void release_ip(uint32_t);
+};
+
+class VPN
+{
+private:
+    IPPool *pool;
+    int TIMEOUT_PERIOD;
+    std::string server_public_key;
+    std::string server_ip;
+    std::map<std::string, std::uint32_t> record;
+    std::mutex mtx;
+    std::thread cleaner;
+    std::atomic<bool> running;
+    std::uint16_t PORT;
+    std::uint32_t generateClientConfiguration(std::string &, std::string &);
+    bool generateServerKeys();
+    bool generateConfigurationFile(std::string &);
+    bool vpnInterfaceSetup();
+    bool isNumber(std::string &);
+    void parseString(std::string &, std::map<std::string, int> &);
+    void generateQRCode(std::string &, std::uint32_t, std::string &, std::string &);
+    void monitorClient();
+    void addFirewallRules();
+
+public:
+    VPN();
+    bool setupServer(std::string , std::string );
+    std::uint32_t acceptConnectionRequest(); 
+    ~VPN();
+};
+
+class Utility{
+    public: 
+        static std::string getEndPoint();
+        static std::string getPublicInterface();
+        static bool checkConnectivity();
 };
 
 class Server
@@ -249,9 +263,9 @@ private:
     void sendDiskStatus();
     void sendConnnectionList();
     void handleAuthentication(std::string, int);
-    void handleAntivirusFileScan(int , char *);
-    void handleVPNConnectionRequest(int , char *);
-
+    void handleAntivirusFileScan(int, char *);
+    void handleVPNConnectionRequest(int, char *);
+    void setupVPNServer(int, char*);
     void setNonBlocking(int);
     void addToInputEventLoop(int);
     void addToOutputEventLoop(int);
@@ -269,6 +283,7 @@ private:
     void manageServiceRequest(std::string);
     void handleInterfaceRequest(std::string, int);
     void WANSetup(std::string);
+
 
 public:
     Server();

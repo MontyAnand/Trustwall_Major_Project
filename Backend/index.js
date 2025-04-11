@@ -18,7 +18,7 @@ const firewall_set_routes = require('./Routes/firewall_set');
 const firewall_mac_routes = require('./Routes/firewall_mac_rule');
 const firewall_custom_rule_routes = require('./Routes/firewall_custom_rule');
 const Counter = require('./utility/counter');
-const newCounter = new Counter(4);
+const newCounter = new Counter(5);
 const app = express();
 const port = 5000;
 const HOST = process.argv[2];
@@ -79,7 +79,7 @@ cron.schedule('*/2 * * * * *',()=>{
     tcpClient.sendNetworkTrafficRequest();
 });
 
-cron.schedule('*/1 * * * * *',()=>{
+cron.schedule('*/5 * * * * *',()=>{
     switch(newCounter.increment()){
         case 0: {
             tcpClient.diskInfoRequest();
@@ -95,6 +95,11 @@ cron.schedule('*/1 * * * * *',()=>{
         }
         case 3:{
             tcpClient.cpuInfoRequest();
+            break;
+        }
+        case 4:{
+            tcpClient.interfaceListRequest();
+            break;
         }
     }
 });
@@ -157,6 +162,11 @@ app.get('/interfaces',(req,res)=>{
     tcpClient.once('interface-list',(data)=>{
         res.status(200).send(data);
     });
+});
+
+app.post('/vpnServerSetup', (req,res)=>{
+    tcpClient.vpnServerSetupRequest(req.body);
+    res.status(200).send('VPN server setup completed');
 });
 
 // firewall endpoints
