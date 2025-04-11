@@ -316,7 +316,7 @@ app.post('/dhcp/save', function (req, res) {
     const data = req.body;
     console.log(data);
     // Write data to a file
-    const dhcpFilePath="/etc/dhcp/check.conf";
+    const dhcpFilePath="/etc/dhcp/dhcpd.conf";
     const dhcpConfig = generateDhcpConfig(data);
     fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
         if (err) {
