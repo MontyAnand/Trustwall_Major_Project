@@ -65,7 +65,7 @@ module.exports.client = class TcpClient extends EventEmitter {
                     this.handleInterfaceResult(data);
                     break;
                 }
-                case 21:  {
+                case 21: {
                     this.broadcastInterfaceACK();
                     break;
                 }
@@ -86,6 +86,25 @@ module.exports.client = class TcpClient extends EventEmitter {
             console.error(`Error: ${err.message}`);
             this.emit('error', err);
         });
+    }
+
+    vpnServerSetupRequest({ ip, netmask }) {
+        if (!ip || !netmask) return;
+        console.log(ip, " ", netmask);
+
+        const buf1 = Buffer.from(ip, 'utf8');
+        const buf2 = Buffer.from(netmask, 'utf8');
+
+        const totalLength = 1 + 1 + 1 + buf1.length + buf2.length;
+        const buffer = Buffer.alloc(totalLength);
+
+        buffer[0] = 1; 
+        buffer[1] = buf1.length; 
+        buffer[2] = buf2.length; 
+
+        buf1.copy(buffer, 3); 
+        buf2.copy(buffer, 3 + buf1.length); 
+        this.client.write(buffer);
     }
 
     fileScan(filename) {
@@ -120,25 +139,25 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
-    ramInfoRequest(){
+    ramInfoRequest() {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(4);
         this.client.write(buffer);
     }
 
-    diskInfoRequest(){
+    diskInfoRequest() {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(5);
         this.client.write(buffer);
     }
 
-    connectionListRequest(){
+    connectionListRequest() {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(7);
         this.client.write(buffer);
     }
 
-    cpuInfoRequest(){
+    cpuInfoRequest() {
         const buffer = Buffer.alloc(1);
         buffer.writeUInt8(12);
         this.client.write(buffer);
@@ -157,12 +176,12 @@ module.exports.client = class TcpClient extends EventEmitter {
         this.client.write(buffer);
     }
 
-    sendLANDetailsRequest(){
+    sendLANDetailsRequest() {
         const buffer = Buffer.from([22]);
         this.client.write(buffer);
     }
 
-    sendNetworkTrafficRequest(){
+    sendNetworkTrafficRequest() {
         const buffer = Buffer.from([6]);
         this.client.write(buffer);
     }
@@ -187,7 +206,7 @@ module.exports.client = class TcpClient extends EventEmitter {
     }
 
     changeInterfaceConfiguration(data) {
-        if (!data.if || !data.ip || !data.netmask || data.type  == null) {
+        if (!data.if || !data.ip || !data.netmask || data.type == null) {
             console.log("Invalid Data");
             return;
         }
@@ -223,7 +242,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         try {
             const jsonData = JSON.parse(result);
             this.io.to(socketID).emit('interface-list', jsonData);
-            this.emit('interface-list',jsonData);
+            this.emit('interface-list', jsonData);
         } catch (error) {
             // console.log("Interface : ", error);
         }
@@ -281,13 +300,13 @@ module.exports.client = class TcpClient extends EventEmitter {
         }
     }
 
-    handleLANInterfaceDetails(data){
+    handleLANInterfaceDetails(data) {
         const jsonString = data.subarray(1).toString('utf-8');
-        try{
+        try {
             const jsonData = JSON.parse(jsonString);
-            this.emit('lan-interface-details',jsonData);
-        }catch(error){
-            this.emit('lan-interface-details',{'error':error});
+            this.emit('lan-interface-details', jsonData);
+        } catch (error) {
+            this.emit('lan-interface-details', { 'error': error });
         }
     }
 
@@ -312,9 +331,9 @@ module.exports.client = class TcpClient extends EventEmitter {
             // console.log(`Ram: data : ${percentageUsage}`);
             // this.io.emit('ram-info', percentageUsage);
         } catch (error) {
-            console.log(`Error in RAM data`);
+            // console.log(`Error in RAM data`);
             // console.error('Error parsing JSON:', error);
-            this.ramInfoRequest();
+            // this.ramInfoRequest();
         }
     }
 
@@ -328,7 +347,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         } catch (error) {
             console.log(`Error in Disk data`);
             // console.error('Error parsing JSON:', error);
-            this.diskInfoRequest();
+            // this.diskInfoRequest();
         }
     }
 
@@ -355,7 +374,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         } catch (error) {
             // console.log(`Error in Connection list data`);
             // console.error('Error parsing JSON:', error);
-            this.connectionListRequest();
+            // this.connectionListRequest();
         }
     }
 
@@ -399,7 +418,7 @@ module.exports.client = class TcpClient extends EventEmitter {
         }
     }
 
-    broadcastInterfaceACK(){
+    broadcastInterfaceACK() {
         this.io.emit('interface-ack');
     }
 

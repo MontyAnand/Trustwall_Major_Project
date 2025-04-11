@@ -102,8 +102,14 @@ function DHCPConfiguration() {
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.error("Error:", error));
+      .then((data) => {
+        console.log(data);
+        alert(data.message);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert(error);
+      });
   }
 
   // Function to convert an IP address to binary
@@ -774,7 +780,7 @@ function DHCPConfiguration() {
             onClick={handleSubmit}
             className="dhcp_save_btn"
           >
-            Save Configuration
+            Save Changes
           </button>
         </div>
       </div>

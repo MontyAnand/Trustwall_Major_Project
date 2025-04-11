@@ -21,7 +21,7 @@ table inet SYSTEM_TABLE {
 
         # Allow Web Interface from external
         tcp dport { 3000, 5000 } accept
-
+        udp dport { 51820 } accept
         # Allow established connections
         ct state established,related accept
         return

@@ -11,13 +11,14 @@ const { socketFileMap, socketUserMap, ClientIDMap } = require('./utility/maps');
 const { SocketQueue, serviceListQueue } = require('./utility/queue');
 const { client } = require('./tcpClient');
 const cron = require('node-cron');
-
+const yaml = require('js-yaml');
+const suricataRoute = require('./Routes/suricata');
 const firewall_forward_routes = require('./Routes/firewall_forward');
 const firewall_set_routes = require('./Routes/firewall_set');
 const firewall_mac_routes = require('./Routes/firewall_mac_rule');
 const firewall_custom_rule_routes = require('./Routes/firewall_custom_rule');
 const Counter = require('./utility/counter');
-const newCounter = new Counter(3);
+const newCounter = new Counter(5);
 const app = express();
 const port = 5000;
 const HOST = process.argv[2];
@@ -74,11 +75,11 @@ io.on('connection', (socket) => {
     });
 });
 
-cron.schedule('*/1 * * * * *',()=>{
+cron.schedule('*/2 * * * * *',()=>{
     tcpClient.sendNetworkTrafficRequest();
 });
 
-cron.schedule('*/1 * * * * *',()=>{
+cron.schedule('*/5 * * * * *',()=>{
     switch(newCounter.increment()){
         case 0: {
             tcpClient.diskInfoRequest();
@@ -90,6 +91,14 @@ cron.schedule('*/1 * * * * *',()=>{
         }
         case 2: {
             tcpClient.connectionListRequest();
+            break;
+        }
+        case 3:{
+            tcpClient.cpuInfoRequest();
+            break;
+        }
+        case 4:{
+            tcpClient.interfaceListRequest();
             break;
         }
     }
@@ -146,6 +155,8 @@ app.get('/lanInfo', (req, res) => {
 });
 
 
+// app.use('/suricata',suricataRute);
+
 app.get('/interfaces',(req,res)=>{
     tcpClient.interfaceListRequest("null");
     tcpClient.once('interface-list',(data)=>{
@@ -153,11 +164,19 @@ app.get('/interfaces',(req,res)=>{
     });
 });
 
+app.post('/vpnServerSetup', (req,res)=>{
+    tcpClient.vpnServerSetupRequest(req.body);
+    res.status(200).send('VPN server setup completed');
+});
+
 // firewall endpoints
 app.use('/firewall', firewall_forward_routes);
 app.use('/firewall', firewall_set_routes);
 app.use('/firewall', firewall_mac_routes);
 app.use('/firewall',firewall_custom_rule_routes)
+
+// Suricata Endpoints
+app.use('/suricata',suricataRoute);
 
 
 // This part is to manage DHCP configuration
@@ -297,7 +316,7 @@ app.post('/dhcp/save', function (req, res) {
     const data = req.body;
     console.log(data);
     // Write data to a file
-    const dhcpFilePath="/etc/dhcp/check.conf";
+    const dhcpFilePath="/etc/dhcp/dhcpd.conf";
     const dhcpConfig = generateDhcpConfig(data);
     fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
         if (err) {
