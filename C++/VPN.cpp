@@ -5,7 +5,7 @@ bool VPN::setupServer(std::string IP, std::string netmask)
     try
     {
         pool = new IPPool(IP, netmask);
-        std::pair<int,std::string> p = pool->allocate_ip();
+        std::pair<int, std::string> p = pool->allocate_ip();
         server_ip = p.second;
         if (!generateServerKeys())
         {
@@ -63,15 +63,14 @@ bool VPN::setupServer(std::string IP, std::string netmask)
         }
 
         fs::current_path(current_path);
-        running = true;
         addFirewallRules();
-        cleaner = std::thread(&VPN::monitorClient, this);
     }
     catch (fs::filesystem_error &e)
     {
         std::cerr << e.what() << std::endl;
         return false;
     }
+    
     return true;
 }
 
@@ -89,6 +88,10 @@ bool VPN::isNumber(std::string &word)
 
 void VPN::parseString(std::string &s, std::map<std::string, int> &handsakeTime)
 {
+    if(s.empty()){
+        return;
+    }
+
     std::stringstream ss(s);
     std::string word;
     while (ss >> word)
@@ -344,7 +347,8 @@ void VPN::addFirewallRules()
 VPN::VPN() : PORT(51820), TIMEOUT_PERIOD(30 * 60)
 {
     pool = NULL;
-    running = false;
+    running = true;
+    cleaner = std::thread(&VPN::monitorClient, this);
 }
 
 VPN::~VPN()

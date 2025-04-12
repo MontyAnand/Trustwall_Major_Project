@@ -140,7 +140,7 @@ void Server::processPacket(char *buffer, int fd, int size)
     }
     case 1:
     {
-        setupVPNServer(fd, buffer);
+        setupVPNServer(fd, buffer, size);
         break;
     }
     case 2:
@@ -214,10 +214,14 @@ void Server::processPacket(char *buffer, int fd, int size)
     }
 }
 
-void Server::setupVPNServer(int fd, char *buffer)
+void Server::setupVPNServer(int fd, char *buffer, int size)
 {
+    if (size < 3)
+        return;
     int ipSize = (int)buffer[1];
     int netmaskSize = (int)buffer[2];
+    if (size != (3 + ipSize + netmaskSize))
+        return;
     std::string ip = "";
     std::string netmask = "";
     for (int i = 0; i < ipSize; i++)
@@ -226,9 +230,8 @@ void Server::setupVPNServer(int fd, char *buffer)
     }
     for (int i = 0; i < netmaskSize; i++)
     {
-        netmask = netmask + buffer[3 + ipSize+i];
+        netmask = netmask + buffer[3 + ipSize + i];
     }
-    std::cout <<"At server" <<  ip << " " << netmask << "\n";
     vpn.setupServer(ip, netmask);
     return;
 }
@@ -612,7 +615,8 @@ Server::Server() : running(true)
         std::cerr << "Not connected with Internet\n";
         exit(EXIT_FAILURE);
     }
-    if(Utility::getPublicInterface().empty()){
+    if (Utility::getPublicInterface().empty())
+    {
         std::cerr << "No Interface detected\n";
         exit(1);
     }

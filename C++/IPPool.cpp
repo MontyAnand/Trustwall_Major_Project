@@ -44,7 +44,6 @@ void IPPool::release_ip(uint32_t ip_val) {
 }
 
 IPPool::IPPool(const std::string& base_ip, const std::string& netmask) {
-    std::cout << base_ip << " " << netmask << "\n";
     this->netmask = netmask;
     uint32_t base = ip_to_int(base_ip);
     uint32_t mask = ip_to_int(netmask);

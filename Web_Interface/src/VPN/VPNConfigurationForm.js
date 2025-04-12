@@ -50,7 +50,7 @@ export const VPNConfigurationForm = () => {
     // alert("✅ IP and Netmask are valid and compatible.");
     try {
       const response = await axios.post(
-        `http://${process.env.REACT_APP_SERVER_IP}/vpnServerSetup`, 
+        `http://${process.env.REACT_APP_SERVER_IP}:5000/vpnServerSetup`, 
         formData,
         {
           headers: {

@@ -265,7 +265,7 @@ private:
     void handleAuthentication(std::string, int);
     void handleAntivirusFileScan(int, char *);
     void handleVPNConnectionRequest(int, char *);
-    void setupVPNServer(int, char*);
+    void setupVPNServer(int, char*,int);
     void setNonBlocking(int);
     void addToInputEventLoop(int);
     void addToOutputEventLoop(int);
