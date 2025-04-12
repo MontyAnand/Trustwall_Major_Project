@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Antivirus from "./pages/Antivirus";
 import Firewall from "./pages/Firewall";
-import VPN from "./pages/VPN";
+import VPN from "./VPN/VPNPage";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ServiceTable from "./pages/ServiceList";
@@ -22,10 +22,11 @@ function App() {
         <div className="flex-1" style={{ padding: '0' }}>
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/VPN" element={<VPN />} />
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/antivirus" element={<Antivirus />} />
-              <Route path="/VPN" element={<VPN />} />
+              
               <Route path="/suricata" element={<Suricata />} />
               {<Route path="/services" element={<ServiceTable />} />}
               <Route path="/cpu-info" element={<CPUInfo />} />

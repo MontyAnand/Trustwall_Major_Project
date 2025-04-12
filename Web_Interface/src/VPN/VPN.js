@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import React from "react";
-import Sidebar from "../components/Sidebar";
 import { useSocket } from "../Contexts/socketContex";
 import "./VPN.css"
 
@@ -63,7 +62,6 @@ function VPN() {
 
     return (
         <>
-            <Sidebar />
             <div className="outside_container">
                 {content}
             </div>
