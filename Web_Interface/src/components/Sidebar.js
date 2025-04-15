@@ -16,12 +16,12 @@ function Sidebar() {
         <li className="py-2"><Link to="/VPN" style={{color: location.pathname === "/VPN"? "#007bff" :"white"}} >VPN</Link></li>
         <li className="py-2"><Link to="/firewall" style={{color:location.pathname === "/firewall" ? "#007bff" :"white"}}>Firewall</Link></li>
         <li className="py-2"><Link to="/interface" style={{color:location.pathname === "/interface"? "#007bff" :"white"}} >Interfaces</Link></li>
-        <li className="dropdown_comp">
+        {/* <li className="dropdown_comp">
             <p style={{color:location.pathname === "/" ? "#007bff" :"white"}} >Systems<span style={{color:"white"}}>&#11206;</span></p>
             <div className="dropdown_menu">
             <Link to="/" onClick={()=>{logout();}} style={{fontSize: '15px',color:location.pathname === "/" ? "#007bff" :"white"}} >Signout</Link>
             </div>
-          </li>
+          </li> */}
           <li className="dropdown_comp">
             <p style={{color:location.pathname === "/suricata"|location.pathname === "/DHCP-Configuration"|location.pathname === "/services" ? "#007bff" :"white"}}>Services<span style={{color:"white"}}>&#11206;</span></p>
             <div className="dropdown_menu">
@@ -43,6 +43,7 @@ function Sidebar() {
             </div>
           </li>
           <li className="py-2"><Link style={{color:location.pathname === "/terminal" ? "#007bff" :"white"}} to="/terminal">Terminal</Link></li>
+          <li className="py-2"><Link to="/" onClick={()=>{logout();}} style={{color:location.pathname === "/"? "#007bff" :"white"}} >Signout</Link></li>
         </ul>
       </nav>
     </div>
