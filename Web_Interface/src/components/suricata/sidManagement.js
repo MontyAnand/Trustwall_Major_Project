@@ -1,5 +1,6 @@
-import React, { useState} from 'react';
-import Sidebar from "../Sidebar";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Navbar from './navbar';
 import './interfaceForm.css';
 
 const SidManagement = () => {
@@ -17,7 +18,7 @@ const SidManagement = () => {
                 newValue = checked;
                 break;
             case 'file':
-                newValue = files; 
+                newValue = files; // Or files[0] if single file
                 break;
             default:
                 newValue = value;
@@ -37,7 +38,7 @@ const SidManagement = () => {
 
     return (
         <>
-           {/* <Sidebar/> */}
+            <Navbar />
 
             <form onSubmit={handleSubmit}>
                 <h1>General Settings</h1>

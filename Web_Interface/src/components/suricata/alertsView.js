@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from "../../components/Sidebar";
-import './interfaceForm.css';
+import Navbar from './navbar';
+// import './interfaceForm.css';
 const AlertsViewForm = () => {
     const [formData, setFormData] = useState({
         alertInstanceView: "",
@@ -26,9 +26,26 @@ const AlertsViewForm = () => {
         };
     }, []);
 
-    useEffect(() => {
-        axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/alert_settings`).then((res) => res.data !== "" ? setFormData(res.data) : "");
-    }, []);
+//     useEffect(() => {
+//         axios.get("http://localhost:5000/api/alert_settings").then((res) => res.data !== "" ? setFormData(res.data) : "");
+//     }, []);
+
+
+//   useEffect(() => {
+//     let intervalId;
+
+//     if (formData.enablerefresh) {
+//       // Set a timer to refresh every 5 seconds (you can change this)
+//       intervalId = setInterval(() => {
+//         window.location.reload();
+//       }, 18000);
+//     }
+
+//     // Cleanup the interval when formData.enablerefresh is turned off
+//     return () => {
+//       if (intervalId) clearInterval(intervalId);
+//     };
+//   }, [formData.enablerefresh]);
 
     const handleChange = (e) => {
         const { name, type, value, checked, files } = e.target;
@@ -57,7 +74,7 @@ const AlertsViewForm = () => {
         e.preventDefault();
         axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/alert_settings`, formData)
             .then((res) => {
-                console.log("Response:", res.data);
+                console.log("Response-settings:", res.data);
             })
             .catch((err) => {
                 console.error("Error:", err);
@@ -65,7 +82,7 @@ const AlertsViewForm = () => {
 
         axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/alertlogs`)
             .then((res) => {
-                console.log("Response:", res.data);
+                console.log("Response-data:", res.data);
                 setLogs(res.data);
             })
             .catch((err) => {
@@ -74,7 +91,7 @@ const AlertsViewForm = () => {
     };
     return (
         <>
-          {/* <Sidebar/> */}
+            <Navbar />
             <form onSubmit={handleSubmit}>
                 {/* Alert view settings */}
                 <h1>Alert Log View Settings</h1>
@@ -87,13 +104,13 @@ const AlertsViewForm = () => {
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Choose which instance alerts you want to inspect</label>
                 </div>
 
-                <div className='section'>
+                {/* <div className='section'>
                     <label>Save or Remove Logs&emsp;&emsp;</label>
                     <button type='button'>&#11015;Download</button>
                     <label style={{ fontSize: '0.85em', color: '#777' }}>&emsp;All alerts log files for selected interface will be downloaded&emsp;&emsp;</label>
                     <button type='button' style={{ backgroundColor: "red" }}>&#128465; Clear</button>
                     <label style={{ fontSize: '0.85em', color: '#777' }}>&emsp;Clear the currently active Alerts log file</label>
-                </div>
+                </div> */}
 
                 <div className='section'>
                     <label>Save Settings&emsp;&emsp;</label>
@@ -133,7 +150,7 @@ const AlertsViewForm = () => {
                         {logs.map((log, index) => (
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{log.date}</td>
+                                <td>{log.timestamp}</td>
                                 <td>{log.action}</td>
                                 <td>{log.protocol}</td>
                                 <td>{log.sourceIP}</td>
@@ -141,7 +158,7 @@ const AlertsViewForm = () => {
                                 <td>{log.destinationIP}</td>
                                 <td>{log.destinationPort}</td>
                                 <td>{log.description}</td>
-                                <td>{log.gidSidRev}</td>
+                                <td>{log.gid}:{log.sid}:{log.rev}</td>
                             </tr>
                         ))}
                     </tbody>

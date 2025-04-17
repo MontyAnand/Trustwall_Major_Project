@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import './interfaceForm.css';
+// import './interfaceForm.css';
 
 const InterfaceForm = () => {
   const navigate = useNavigate();
@@ -9,33 +9,36 @@ const InterfaceForm = () => {
   const [formData, setFormData] = useState({
     enableInterface: false,
     interface: "",
-    status: "",
+    status: "inactive",
     description: "",
-    enableAlertsToSystemLog: "",
-    enableStatsCollection: "",
-    enableHTTPLog: "",
-    httpLogFileType: "",
-    enableAppendHTTPLog: "",
-    enableLogExtendedHTTPinfo: "",
-    enableTLSLog: "",
-    enableFILEStore: "",
-    enablePacketLog: "",
-    enableVerboseLog: "",
-    enableEVEJSONLog: "",
-    enableBlockOffenders: "",
-    runMode: "",
+    enableStart: false,
+    enableStop: true,
+    enableRestart: true,
+    enableAlertsToSystemLog: true,
+    enableStatsCollection: true,
+    enableHTTPLog: false,
+    httpLogFileType: "regular",
+    enableAppendHTTPLog: false,
+    enableLogExtendedHTTPinfo: false,
+    enableTLSLog: false,
+    enableFILEStore: false,
+    enablePacketLog: false,
+    enableVerboseLog: false,
+    enableEVEJSONLog: true,
+    // enableBlockOffenders: "",
+    runMode: "workers",
     maxPendingPackets: 1024,
-    detectEngineProfile: "",
-    multiPatternMatcherAlgo: "",
-    singlePatternMatcherAlgo: "",
-    signatureGroupHeaderMPM: "",
+    detectEngineProfile: "medium",
+    multiPatternMatcherAlgo: "auto",
+    singlePatternMatcherAlgo: "auto",
+    signatureGroupHeaderMPM: "auto",
     inspectionRecursionLimit: 3000,
-    enableDelayedDetect: "",
-    enablePromiscuousMode: "",
-    interfaceSNAPLen: 1518,
+    // enableDelayedDetect: "",
+    // enablePromiscuousMode: "",
+    // interfaceSNAPLen: 1518,
     homeNet: "",
     externalNet: "",
-    alertSuppressionandFiltering: ""
+    // alertSuppressionandFiltering: ""
   });
   // const [interfaces, setInterfaces] = useState([]);
 
@@ -45,7 +48,7 @@ const InterfaceForm = () => {
         setFormData(res.data);
       });
     }
-  }, [id]);
+  }, [id, formData.enableInterface, formData.interface]);
 
   const handleChange = (e) => {
     const { name, type, value, checked, files } = e.target;
@@ -73,9 +76,16 @@ const InterfaceForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (id) {
-      axios.put(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/interfaces/${id}`, formData).then(() => navigate("/"));
+      formData.enableRestart=false;
+      formData.enableStart=true;
+      formData.enableStop=false;
+      axios.put(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/interfaces/${id}`, formData).then(() => navigate("/suricata"));
     } else {
-      axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/interfaces`, formData).then(() => navigate("/"));
+      axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/interfaces`, formData)
+        .then((res) => {
+          console.log(res.data.message);
+        })
+        .then(() => navigate("/suricata"));
     }
   };
 
@@ -95,6 +105,18 @@ const InterfaceForm = () => {
   //   const interval = setInterval(fetchInterfaces, 5000); // Poll every 5 sec
   //   return () => clearInterval(interval); // Cleanup
   // }, []);
+
+  // useEffect(() => {
+  //   fetch(`http://localhist:5000/laninfo`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+
+  //     })
+  //     .catch((err) => {
+  //       console.error("Failed to fetch network info:", err);
+  //     });
+  // }, []);
+
 
 
 
@@ -118,6 +140,8 @@ const InterfaceForm = () => {
             <option value={""}>--- select a interface ---</option>
             <option value={"WAN"}>WAN</option>
             <option value={"LAN"}>LAN</option>
+            {/* make dynamic dropdown */}
+
             {/* {interfaces.map((iface) => (
               <option key={iface} value={iface}>
                 {iface}
@@ -130,7 +154,7 @@ const InterfaceForm = () => {
 
         <div className="section">
           <label>Description&emsp;&emsp;</label>
-          <input type="text" name="description" value={formData.description} onChange={handleChange} placeholder="Description" required />
+          <input type="text" name="description" value={formData.description} onChange={handleChange} placeholder="Description" />
         </div>
 
 
@@ -160,8 +184,8 @@ const InterfaceForm = () => {
           <label>HTTP Log File Type&emsp;&emsp;</label>
           <select name="httpLogFileType" value={formData.httpLogFileType} onChange={handleChange} >
             <option value={"regular"}>Regular</option>
-            <option value={"unix_stream"}>Datagram</option>
-            <option value={"unix_dgram"}>Stream</option>
+            <option value={"unix_dgram"}>Datagram</option>
+            <option value={"unix_stream"}>Stream</option>
           </select>
           <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
         </div>
@@ -187,7 +211,7 @@ const InterfaceForm = () => {
         <div className="section">
           <label>Enable File-Store&emsp;&emsp;</label>
           <input type="checkbox" name="enableFILEStore" checked={formData.enableFILEStore} onChange={handleChange} />
-          <label>&ensp;Suricata will extract and store files from application layer streams.Default is Not checked.WARNING:Enabling file-store will consume a significant amount of disk space on a busy network!.</label>
+          <label>&ensp;Suricata will extract and store files from application layer streams.Default is Not checked.<span style={{ color: 'red', fontWeight: 'bolder' }}>Warning: </span>Enabling file-store will consume a significant amount of disk space on a busy network!.</label>
         </div>
 
         <div className="section">
@@ -212,12 +236,12 @@ const InterfaceForm = () => {
         </div>
 
         {/* Alert and Block Settings */}
-        <h1>Alert and Block Settings</h1>
+        {/* <h1>Alert and Block Settings</h1>
         <div className="section">
           <label>Block Offenders&emsp;&emsp;</label>
           <input type="checkbox" name="enableBlockOffenders" checked={formData.enableBlockOffenders} onChange={handleChange} />
           <label>&ensp;Checking this option will automatically block hosts that generate a Suricata alert.Default is Not checked.</label>
-        </div>
+        </div> */}
 
 
         {/* performance and detection engine settings */}
@@ -225,66 +249,68 @@ const InterfaceForm = () => {
         <div className="section">
           <label>Run Mode&emsp;&emsp;</label>
           <select name="runMode" value={formData.runMode} onChange={handleChange} >
-            <option value={"AutoFP"}>Regular</option>
-            <option value={"Workers"}>Datagram</option>
-            <option value={"Single"}>Stream</option>
+            <option value={"autofp"}>AutoFP</option>
+            <option value={"workers"}>Workers</option>
+            {/* <option value={"Single"}>Single</option> */}
           </select>
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <label style={{ fontSize: '0.85em', color: '#777' }}>Choose a Suricata run mode settings.Default is "AutoFP" and is the recommended setting for IDS-only."Workers" uses multiple worker threads, each of which processes the packets it acquires through all the deco0de and detect modules."Workers" runmode is preferred for Inline IPS Mode blocking because it offers superior peformance in that configuration."Single" uses only a thread for all operations , and is intended for use only in testing or development instances.</label>
         </div>
 
         <div className="section">
           <label>Max Pending Packets&emsp;&emsp;</label>
-          <input type="number" name="maxPendingPackets" value={formData.maxPendingPackets} onChange={handleChange} />
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <input type="number" name="maxPendingPackets" value={formData.maxPendingPackets} min={1} max={65000} onChange={handleChange} />
+          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Enter number of simultaneous packets to process.Default is 1024.This controls the number of simultaneous packets the engine can handle .Setting this higher generally keeps the threads busy.The minimum value is 1 and maximum value is 65,000.<span style={{ color: 'red', fontWeight: 'bolder' }}>Warning: </span>Set this too high can lead to degradation and a possible system crash by exhausting available memory.</label>
         </div>
 
         <div className="section">
           <label>Detect-Engine Profile&emsp;&emsp;</label>
           <select name="detectEngineProfile" value={formData.detectEngineProfile} onChange={handleChange} >
-            <option value={"High"}>Regular</option>
-            <option value={"Medium"}>Datagram</option>
-            <option value={"Low"}>Stream</option>
+            <option value={"Medium"}>Medium</option>
+            <option value={"High"}>High</option>
+            <option value={"Low"}>Low</option>
           </select>
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <label style={{ fontSize: '0.85em', color: '#777' }}>Choose a detection engine profile.Default is Medium.MEDIUM is recommended for most systems because it offers a good balance between memory and performance.LOW uses less memory,but it offers lower performance.HIGH consumes a large amount of memory but it offers the highest performance.</label>
         </div>
 
         <div className="section">
           <label>Multi-Pattern Matcher Algorithm&emsp;&emsp;</label>
           <select name="multiPatternMatcherAlgo" value={formData.multiPatternMatcherAlgo} onChange={handleChange} >
-            <option value={"Auto"}>Regular</option>
-            <option value={"algo1"}>Datagram</option>
-            <option value={"algo2"}>Stream</option>
+            <option value={"auto"}>Auto</option>
+            <option value={"ac"}>Aho-Corasick</option>
+            <option value={"ac-bs"}>Aho-Corasick (Reduced mMemory)</option>
+            <option value={"ac-ks"}>Aho-Corasick,("Ken Steele" variant)</option>
+            <option value={"hs"}>Hyperscan</option>
           </select>
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <label style={{ fontSize: '0.85em', color: '#777' }}>Choose a multi-pattern matcher(MPM) algorithm.Auto is default and is best choice for almost all system.Auto will use Hyperscan if available else will use Aho-Corasick.</label>
         </div>
 
         <div className="section">
           <label>Single-Pattern Matcher Algorithm&emsp;&emsp;</label>
           <select name="singlePatternMatcherAlgo" value={formData.singlePatternMatcherAlgo} onChange={handleChange} >
-            <option value={"Auto"}>Regular</option>
-            <option value={"algo1"}>Datagram</option>
-            <option value={"algo2"}>Stream</option>
+            <option value={"auto"}>Auto</option>
+            <option value={"bm"}>Boyer-Moore</option>
+            <option value={"hs"}>Hyperscan</option>
           </select>
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <label style={{ fontSize: '0.85em', color: '#777' }}>Choose a single-pattern matcher(SPM) algorithm.Auto is default and is best choice for almost all system.Auto will use Hyperscan if available else will use Boyer-Moore.</label>
         </div>
 
         <div className="section">
           <label>Signature Group Header MPM Context&emsp;&emsp;</label>
           <select name="signatureGroupHeaderMPM" value={formData.signatureGroupHeaderMPM} onChange={handleChange} >
-            <option value={"Auto"}>Regular</option>
-            <option value={"algo1"}>Datagram</option>
-            <option value={"algo2"}>Stream</option>
+            <option value={"auto"}>Auto</option>
+            <option value={""}>Full</option>
+            <option value={""}>Single</option>
           </select>
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <label style={{ fontSize: '0.85em', color: '#777' }}>Choose a Signatuire Group Haeder multi-pattern matcher context.Default is Auto.AUTO means Suricata selects between Full and Single based on the MPM algorithm chosen.Full means every Signatures Group has its own MPM context.SINGLE means all signature Groups share a single MPM context.Using FULL can improve performance at the expense of significant memory consumption.</label>
         </div>
 
         <div className="section">
           <label>Inspection Recursion Limit&emsp;&emsp;</label>
           <input type="number" name="inspectionRecursionLimit" value={formData.inspectionRecursionLimit} onChange={handleChange} />
-          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
+          <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Enter limit for recursive calls in context inspection code.Default is 3000</label>
         </div>
 
-        <div className="section">
+        {/* <div className="section">
           <label>Delayed Detect&emsp;&emsp;</label>
           <input type="checkbox" name="enableDelayedDetect" checked={formData.enableDelayedDetect} onChange={handleChange} />
           <label>&ensp;Checking this option will build list of signatures after packet capture threads have started.Default is Not checked.</label>
@@ -301,7 +327,7 @@ const InterfaceForm = () => {
           <label>Interface PCAP Snaplen&emsp;&emsp;</label>
           <input type="number" name="interfaceSNAPLen" value={formData.interfaceSNAPLen} onChange={handleChange} />
           <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
-        </div>
+        </div> */}
 
         {/* Networks Suricata should Inspect and protect */}
         <h1>Networks Suricata should Inspect and protect</h1>
@@ -323,14 +349,14 @@ const InterfaceForm = () => {
         </div>
 
         {/* Alert Suppression and Filtering */}
-        <h1>Alert Suppression and Filtering</h1>
+        {/* <h1>Alert Suppression and Filtering</h1>
         <div className="section">
           <label>Alert Suppression and Filtering&emsp;&emsp;</label>
           <select name="alertSuppressionandFiltering" value={formData.alertSuppressionandFiltering} onChange={handleChange} >
             <option value={"default"}>default</option>
           </select>
           <label style={{ fontSize: '0.85em', color: '#777' }}>&ensp;Select 'Regular' to log to a conventional file, or choose UNIX 'Datagram' or 'Stream' Socket to log to an existing UNIX socket.Default is 'Regular'</label>
-        </div>
+        </div> */}
 
         {/* Submit button */}
         <div className="section">

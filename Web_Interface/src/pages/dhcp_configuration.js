@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./dhcp_configuration.css";
+import "./dhcp_configuration"
 import DynamicDNS from "../components/dynamicDNS";
 import MACAddressControl from "../components/MACAddressControl";
 import NTP from "../components/NTP";
@@ -57,7 +57,32 @@ function DHCPConfiguration() {
 
   //useState for controlling submit button's functionality
   const [isValid, setIsValid] = useState(true);
-  const [issubmitbuttondisabled, setIsSubmitDisabled] = useState(true);
+  const [issubmitbuttondisabled, setIsSubmitButtonDisabled] = useState(true);
+  const [enableButtonset, setEnableButtonSet] = useState(false);
+  const [disableStart, setdisableStart] = useState(true);
+  const [disableRestart, setdisableRestart] = useState(false);
+  const [disableStop, setdisableStop] = useState(false);
+
+
+  function serviceStatusManagement() {
+    axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/status`).then((res) => {
+      if (res.data === "active") {
+        setdisableStart(true);
+        setdisableRestart(false);
+        setdisableStop(false);
+      } else if (res.data === "inactive") {
+        setdisableStart(false);
+        setdisableRestart(true);
+        setdisableStop(true);
+      } else {
+        setdisableStart(true);
+        setdisableRestart(false);
+        setdisableStop(true);
+      }
+    })
+  }
+
+
 
   function handleSubmit() {
     const data = {
@@ -103,8 +128,12 @@ function DHCPConfiguration() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         alert(data.message);
+
+        // Dhcp server's Start Restart and Stop buttons will be activated heere
+        setEnableButtonSet(true);
+        serviceStatusManagement();
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -156,7 +185,7 @@ function DHCPConfiguration() {
     if (checkkey && omapialgo) {
       try {
         const response = await axios.post(
-          `http://${process.env.REACT_APP_SERVER_IP}:5000/generateKey`,
+          `http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/generateKey`,
           { omapialgo }
         );
         setOmapikKey(response.data.hmac_key);
@@ -210,12 +239,12 @@ function DHCPConfiguration() {
         isIpInSubnet(startIP, subnet, mask) &&
         isIpInSubnet(endIP, subnet, mask)
       ) {
-        setIsSubmitDisabled(false);
+        setIsSubmitButtonDisabled(false);
       } else {
-        setIsSubmitDisabled(true);
+        setIsSubmitButtonDisabled(true);
       }
     } else {
-      setIsSubmitDisabled(true);
+      setIsSubmitButtonDisabled(true);
     }
   }, [interfacechecked, startIP, endIP, subnet, mask, isValid]);
 
@@ -256,11 +285,48 @@ function DHCPConfiguration() {
     }
   }, [failoverpeerip, isValid]);
 
+
+  function handleClick(action) {
+    const actionOnService = action.trim();
+  
+    if (actionOnService !== "") {
+      axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/service`, {
+        action: actionOnService
+      })
+      .then((res) => {
+        console.log(res.data); // Optional: Log the success message
+        serviceStatusManagement();
+      })
+      .catch((err) => {
+        console.error("Service action failed:", err.response?.data || err.message);
+        alert("❌ Failed to perform the action: " + (err.response?.data?.error || err.message));
+      });
+    }
+  }
+  
+
   return (
     <>
-      <Sidebar/>
+      <Sidebar />
       <div className="dhcp_container">
-        <h1>DHCPv4 Server Configuration</h1>
+
+        <h1 style={{
+          display: 'flex',
+          justifyContent: !issubmitbuttondisabled ? 'space-between' : 'center',
+          alignItems: 'center',
+          gap: '20px'
+        }}>
+          <span>DHCPv4 Server Configuration</span>
+
+          {!issubmitbuttondisabled && enableButtonset && (
+            <span style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => handleClick('start')} disabled={disableStart}>Start</button>
+              <button onClick={() => handleClick('restart')} disabled={disableRestart} >Restart</button>
+              <button onClick={() => handleClick('stop')} disabled={disableStop} >Stop</button>
+            </span>
+          )}
+        </h1>
+
         {/* General setting */}
         <h2
           onClick={() => setContent1((prevContent) => [!prevContent[0], null])}
@@ -425,7 +491,7 @@ function DHCPConfiguration() {
                         setIsValid(
                           (pattern.test(e.target.value) &&
                             e.target.value.trim() !== "") ||
-                            e.target.value.trim() === ""
+                          e.target.value.trim() === ""
                         );
                       }}
                     ></input>
@@ -444,13 +510,13 @@ function DHCPConfiguration() {
                         setEndIP(e.target.value);
                         setIsValid(
                           pattern.test(e.target.value) &&
-                            e.target.value.trim() !== ""
+                          e.target.value.trim() !== ""
                         );
                       }}
                     ></input>
                   </div>
 
-                  <div className="dhcp_add_btn">
+                  {/* <div className="dhcp_add_btn">
                     <label htmlFor="additional_pool">Additional Pools</label>
                     <button
                       onClick={() => {
@@ -459,7 +525,7 @@ function DHCPConfiguration() {
                     >
                       <span>&#43;</span> Add Address Pool
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             }
@@ -587,13 +653,13 @@ function DHCPConfiguration() {
                     >
                       <option value="1">HMAC-MD5 (legacy default)</option>
                       <option value="2">HMAC-SHA1</option>
-                      <option value="3">HAMC-SHA224</option>
+                      {/* <option value="3">HAMC-SHA224</option>
                       <option value="4">HAMC-SHA224</option>
                       <option value="5">
                         HAMC-SHA256 (current bind9 default)
                       </option>
                       <option value="6">HAMC-SHA384</option>
-                      <option value="7">HAMC-SHA512</option>
+                      <option value="7">HAMC-SHA512</option> */}
                     </select>
                   </div>
                 </div>
@@ -667,7 +733,7 @@ function DHCPConfiguration() {
                     ></input>
                   </div>
 
-                  <div className="dhcp_text">
+                  {/* <div className="dhcp_text">
                     <label htmlFor="failover_ip">Failover peer IP:</label>
                     <input
                       type="text"
@@ -685,7 +751,7 @@ function DHCPConfiguration() {
                         );
                       }}
                     ></input>
-                  </div>
+                  </div> */}
 
                   <div className="dhcp_checkbox">
                     <div>
@@ -759,13 +825,13 @@ function DHCPConfiguration() {
                   ) : (
                     <></>
                   )}
-                  <DynamicDNS />
+                  {/* <DynamicDNS />
                   <MACAddressControl />
                   <NTP />
                   <TFTP />
                   <LDAP />
                   <NetworkBooting />
-                  <CustomDHCP />
+                  <CustomDHCP /> */}
                 </div>
               </div>
             }

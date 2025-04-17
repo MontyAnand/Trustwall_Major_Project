@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from "../../components/Sidebar";
+import Navbar from './navbar';
 import './interfaceForm.css';
 
 const LogViewForm = () => {
@@ -15,8 +15,8 @@ const LogViewForm = () => {
         e.preventDefault();
         const loadFile = async () => {
             try {
-                const response = await axios.get('http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/file', {
-                    params: { path: logFileView }
+                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/file`, {
+                    params: { interface: logInstanceView, filename: logFileView }
                 });
                 setFileContent(response.data);
             } catch (err) {
@@ -43,26 +43,31 @@ const LogViewForm = () => {
 
     return (
         <>
-            {/* <Sidebar/> */}
+            <Navbar />
             <form onSubmit={handleSubmit}>
                 {/* Alert view settings */}
                 <h1>Logs Browser Selection</h1>
                 <div className='section'>
                     <label>Instance to View</label>
                     <select name="logInstanceView" value={logInstanceView} onChange={(e) => {
+                        
                         setLogInstanceView(e.target.value);
 
                         // Fetch list of files from backend
-                        axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/files`)
+                    
+                        axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/files`, {
+                            params: { interface: e.target.value }
+                        })
                             .then(response => {
                                 setFiles(response.data);
+                                console.log(response.data);
                             })
                             .catch(error => {
                                 console.error('Error fetching files:', error);
                             });
                     }} required>
                         <option value="">--- select a interface ---</option>
-                        <option value={"WA"}>WAN</option>
+                        <option value={"WAN"}>WAN</option>
                         <option value={"LAN"}>LAN</option>
                     </select>
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Choose which instance alerts you want to inspect</label>
@@ -80,7 +85,7 @@ const LogViewForm = () => {
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Choose which instance alerts you want to inspect</label>
                 </div>
 
-                <button type='submit'>&#x1F501; Load</button><br/><br/>
+                <button type='submit'>&#x1F501; Load</button><br /><br />
             </form >
 
             {/* Logs content */}
@@ -91,7 +96,7 @@ const LogViewForm = () => {
                     cols={cols}
                     value={filecontent}
                     readOnly
-                    style={{ fontFamily: 'monospace', whiteSpace: 'pre' , width:'100%' }}
+                    style={{ fontFamily: 'monospace', whiteSpace: 'pre', width: '100%' }}
                 />
             </div>
         </>
