@@ -9,7 +9,15 @@ import ServiceTable from "./pages/ServiceList";
 import CPUInfo from "./components/CPU_info";
 import NetworkTrafficChart from "./pages/Network_Traffic"
 import LinuxTerminal from "./pages/Terminal"
-import Suricata from "./pages/Suricata"
+// import Suricata from "./pages/Suricata";
+import Suricata from "./components/suricata/homePage";
+import InterfaceForm from "./components/suricata/interfaceForm";
+import GlobalSettingsForm from "./components/suricata/global_settingsForm";
+import AlertsViewForm from "./components/suricata/alertsView";
+// import BlocksViewForm from "./components/suricatablockView";
+import LogViewForm from "./components/suricata/logView";
+// import LogManagement from "./components/suricatalogManagement";
+// import SidManagement from "./components/suricatasidManagement";
 import DHCPConfiguration from "./pages/dhcp_configuration";
 import Interface from "./pages/Interface";
 import ActiveConnections from "./pages/Active_connections";
@@ -27,12 +35,20 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/antivirus" element={<Antivirus />} />
               
+               {/* Suricata routes for front-end  */}
               <Route path="/suricata" element={<Suricata />} />
-              {<Route path="/services" element={<ServiceTable />} />}
+              <Route path="/suricata/add" element={<InterfaceForm />} />
+              <Route path="/suricata/edit/:id" element={<InterfaceForm />} />
+              <Route path="/suricata/global-settings" element={<GlobalSettingsForm />} />
+              <Route path="/suricata/alerts" element={<AlertsViewForm />} />
+              <Route path="/suricata/logs-view" element={<LogViewForm />} />
+
+
+              <Route path="/services" element={<ServiceTable />} />
               <Route path="/cpu-info" element={<CPUInfo />} />
               <Route path="/network-traffic" element={<NetworkTrafficChart />} />
               <Route path="/terminal" element={<LinuxTerminal />} />
-              <Route path="/DHCP-Configuration" element={<DHCPConfiguration />} />
+              <Route path="/dhcp" element={<DHCPConfiguration />} />
               <Route path="/firewall" element={<Firewall />} />
               <Route path="/interface" element={<Interface />} />
               <Route path="/dashboard" element={<Dashboard />} />

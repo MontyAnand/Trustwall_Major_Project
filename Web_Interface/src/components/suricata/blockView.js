@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from "../Sidebar";
+import Navbar from './navbar';
 import './interfaceForm.css';
 
 const BlocksViewForm = () => {
@@ -13,7 +13,7 @@ const BlocksViewForm = () => {
     const [logs, setLogs] = useState([]);
 
     useEffect(() => {
-        axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/blocklogs`)
+        axios.get("http://localhost:5000/api/blocklogs")
             .then((res) => {
                 console.log("Response:", res.data);
                 setLogs(res.data);
@@ -28,7 +28,7 @@ const BlocksViewForm = () => {
     }, []);
 
     useEffect(() => {
-        axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/block_settings`).then((res) => res.data !== "" ? setFormData(res.data) : "");
+        axios.get("http://localhost:5000/api/block_settings").then((res) => res.data !== "" ? setFormData(res.data) : "");
     }, []);
 
     const handleChange = (e) => {
@@ -56,7 +56,7 @@ const BlocksViewForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/block_settings`, formData)
+        axios.post("http://localhost:5000/api/block_settings", formData)
             .then((res) => {
                 console.log("Response:", res.data);
             })
@@ -64,7 +64,7 @@ const BlocksViewForm = () => {
                 console.error("Error:", err);
             });
 
-        axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/suricata/api/blocklogs`)
+        axios.get("http://localhost:5000/api/blocklogs")
             .then((res) => {
                 console.log("Response:", res.data);
                 setLogs(res.data);
@@ -75,7 +75,7 @@ const BlocksViewForm = () => {
     };
     return (
         <>
-          {/* <Sidebar/> */}
+            <Navbar />
             <form onSubmit={handleSubmit}>
                 {/* Alert view settings */}
                 <h1>Block Log View Settings</h1>

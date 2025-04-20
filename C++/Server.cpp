@@ -439,11 +439,8 @@ void Server::handleServiceListRequest(int fd)
 void Server::handleCPUStatusRequest(int fd)
 {
     std::string cpuStatus = HealthMonitor::getCPUStatusJSON();
-    std::vector<uint8_t> byteArray;
     uint8_t flag = 13;
-    byteArray.push_back(flag);
-    byteArray.insert(byteArray.end(), cpuStatus.begin(), cpuStatus.end());
-    send(fd, byteArray.data(), byteArray.size(), 0);
+    broadcastMessage(cpuStatus,flag);
     return;
 }
 
@@ -520,71 +517,11 @@ void Server::broadcastMessage(std::string &data, uint8_t flag)
 
 void Server::continuousMonitoring()
 {
-    std::string data;
     int count = 0;
-    std::map<std::string, std::vector<unsigned long>> prev_traffic = HealthMonitor::getNetworkStats();
     while (running)
     {
-        switch (count)
-        {
-        case 0:
-        {
-            // RAM Status
-            struct sysinfo ramStatus;
-            int status = HealthMonitor::getRamStatus(&ramStatus);
-            if (status == 0)
-            {
-                data = HealthMonitor::ramInfoJSON(ramStatus);
-                broadcastMessage(data, 4);
-            }
-            break;
-        }
-
-        case 1:
-        {
-            // Disk Info
-            std::vector<struct disk_info> allDisk = HealthMonitor::getAllMountedDisks();
-            data = HealthMonitor::diskInfoJSON(allDisk);
-            broadcastMessage(data, 5);
-            break;
-        }
-
-        case 2:
-        {
-            // List of active Connections
-            std::vector<connection_info> networkList = HealthMonitor::getNetworkConnections();
-            data = HealthMonitor::networkListJSON(networkList);
-            broadcastMessage(data, 7);
-            break;
-        }
-        case 3:
-        {
-            data = HealthMonitor::getCPUStatusJSON();
-            broadcastMessage(data, 13);
-            break;
-        }
-        case 4:
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            json data = json::array();
-            std::map<std::string, std::vector<unsigned long>> curr_traffic = HealthMonitor::getNetworkStats();
-            for (auto &p : curr_traffic)
-            {
-                data.push_back({{"interface", p.first},
-                                {"RX", (double)((p.second)[0] - prev_traffic[p.first][0]) / 1024.0},
-                                {"TX", (double)((p.second)[1] - prev_traffic[p.first][1]) / 1024.0}});
-            }
-            std::string message = data.dump();
-            broadcastMessage(message, 6);
-            prev_traffic = curr_traffic;
-            break;
-        }
-        default:
-        {
-        }
-        }
-        count = (count + 1) % 4;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        sendRAMStatus();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 

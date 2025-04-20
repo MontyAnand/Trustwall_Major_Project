@@ -59,6 +59,38 @@ body {
   }
   
 
+  .navbar {
+    background-color: #fff;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .navbar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .navbar li {
+    display: inline;
+    margin: 0 15px;
+  }
+  
+  .navbar a {
+    text-decoration: none;
+    color: red;
+    font-weight: bold;
+  }
+  
+  .navbar a:hover {
+    text-decoration: underline;
+  }
+
+  .navbar a:active{
+    background-color: yellow;
+  }
+
+
+
   .logs-container {
     padding: 20px;
   }
@@ -78,3 +110,7 @@ body {
   th {
     background-color: #f2f2f2;
   }
+  button:disabled {
+    opacity: 0.5; 
+    cursor: not-allowed; 
+}

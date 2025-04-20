@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from "../../components/Sidebar";
+import Navbar from './navbar';
 import './interfaceForm.css';
 
 
@@ -59,7 +59,7 @@ const LogManagement = () => {
 
     return (
         <>
-         {/* <Sidebar/> */}
+            <Navbar />
 
             <form onSubmit={handleSubmit}>
                 <h1>General Settings</h1>

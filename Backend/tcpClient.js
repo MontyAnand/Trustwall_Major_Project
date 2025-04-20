@@ -329,7 +329,7 @@ module.exports.client = class TcpClient extends EventEmitter {
             const jsonData = JSON.parse(jsonString);
             const percentageUsage = ((jsonData.total - jsonData.free) / jsonData.total) * 100;
             // console.log(`Ram: data : ${percentageUsage}`);
-            // this.io.emit('ram-info', percentageUsage);
+            this.io.emit('ram-info', percentageUsage);
         } catch (error) {
             // console.log(`Error in RAM data`);
             // console.error('Error parsing JSON:', error);
