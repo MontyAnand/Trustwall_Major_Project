@@ -1,48 +1,51 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import './navbar.css';
+import {Link} from 'react-router-dom';
+// import "./interfaceForm.css";
 
-const Navbar = () => {
+const Navbar=()=>{
+    return (
+        <>
+        <h1>Suricata Configuration</h1>
 
-  return (
-    <>
-      <h1 >Suricata Configuration</h1>
-
-      <nav className="navbar">
-        <ul>
-
-          <li>
-            <NavLink to="/suricata">Interfaces</NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/suricata/global-settings" className={({ isActive }) => isActive ? "active" : ""}>Global Settings</NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/suricata/alerts" className={({ isActive }) => isActive ? "active" : ""}>Alerts</NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/suricata/blocks" className={({ isActive }) => isActive ? "active" : ""}>Blocks</NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/suricata/logs-view" className={({ isActive }) => isActive ? "active" : ""}>Logs View</NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/suricata/logs-mgmt" className={({ isActive }) => isActive ? "active" : ""}>Logs Mgmt</NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/suricata/sid-mgmt" className={({ isActive }) => isActive ? "active" : ""}>SID Mgmt</NavLink>
-          </li>
-
-        </ul>
-      </nav>
-    </>
-  );
+<nav className="navbar">
+  <ul>
+    <li>
+      <Link to="/suricata">Interfaces</Link>
+    </li>
+    <li>
+      <Link to="/suricata/global-settings">Global Settings</Link>
+    </li>
+    {/* <li>
+      <Link to="/updates">Updates</Link>
+    </li> */}
+    <li>
+      <Link to="/suricata/alerts">Alerts</Link>
+    </li>
+    {/* <li>
+      <Link to="/blocks">Blocks</Link>
+    </li> */}
+    {/* <li>
+      <Link to="/files">Files</Link>
+    </li> */}
+    {/* <li>
+      <Link to="/pass-lists">Pass Lists</Link>
+    </li> */}
+    {/* <li>
+      <Link to="/suppress">Suppress</Link>
+    </li> */}
+    <li>
+      <Link to="/suricata/logs-view">Logs View</Link>
+    </li>
+    {/* <li>
+      <Link to="/logs-mgmt">Logs Mgmt</Link>
+    </li>
+    <li>
+      <Link to="/sid-mgmt">SID Mgmt</Link>
+    </li> */}
+  </ul>
+</nav>
+        </>
+    );
 };
 
 export default Navbar;

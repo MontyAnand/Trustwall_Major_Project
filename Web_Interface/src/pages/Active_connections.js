@@ -32,9 +32,9 @@ const ActiveConnections = () => {
                     <table>
                         <thead>
                             <tr className="Active_connections_header">
-                                <th>Protocol</th>
                                 <th>Local IP</th>
                                 <th>Local Port</th>
+                                <th>Protocol</th>
                                 <th>Remote IP</th>
                                 <th>Remote Port</th>
                                 <th>State</th>

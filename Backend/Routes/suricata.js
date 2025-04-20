@@ -1,5 +1,16 @@
 const { Router } = require('express');
+const bodyParser = require("body-parser");
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const yaml = require('js-yaml');
+const { exec } = require('child_process');
+const util = require('util');
+const execAsync = util.promisify(exec);
+
+
 const app = Router();
+
 
 let interfaces = [];
 let nextId = 1;
@@ -8,8 +19,8 @@ let alert_settings = "";
 let block_settings = "";
 
 // Interface Assigned Name
-const WAN = "wlan0";
-const LAN = "wlan0";
+let WAN = "";
+let LAN = "";
 
 const configDirectory = "/etc/suricata/";
 const logDirectory = "/var/log/suricata/";
@@ -302,16 +313,16 @@ outputs:
 
       # File size limit.  Can be specified in kb, mb, gb.  Just a number
       # is parsed as bytes.
-      limit: 1000mb
+      limit: 32mb
 
       # If set to a value, ring buffer mode is enabled. Will keep maximum of
       # "max-files" of size "limit"
-      max-files: 2000
+      max-files: 200
 
       # Compression algorithm for pcap files. Possible values: none, lz4.
       # Enabling compression is incompatible with the sguil mode. Note also
       # that on Windows, enabling compression will *increase* disk I/O.
-      compression: none
+      compression: lz4
 
       # Further options for lz4 compression. The compression level can be set
       # to a value between 0 and 16, where higher values result in higher
@@ -323,7 +334,7 @@ outputs:
 
       # Directory to place pcap files. If not provided the default log
       # directory will be used. Required for "sguil" mode.
-      dir: /nsm_data/
+      #dir: /nsm_data/
 
       #ts-format: usec # sec or usec second format (default) is filename.sec usec is filename.sec.usec
       use-stream-depth: no #If set to "yes" packets seen after reaching stream inspection depth are ignored. "no" logs all packets
@@ -336,58 +347,1066 @@ outputs:
   }
 
   if (newEntry.enableVerboseLog) {
-    configLines.push(`# Logging configuration.  This is not about logging IDS alerts/events, but
-# output about what Suricata is doing, like startup messages, errors, etc.
-logging:
-  # The default log level: can be overridden in an output section.
-  # Note that debug level logging will only be emitted if Suricata was
-  # compiled with the --enable-debug configure option.
-  #
-  # This value is overridden by the SC_LOG_LEVEL env var.
-  default-log-level: info
-
-  # The default output format.  Optional parameter, should default to
-  # something reasonable if not provided.  Can be overridden in an
-  # output section.  You can leave this out to get the default.
-  #
-  # This console log format value can be overridden by the SC_LOG_FORMAT env var.
-  #default-log-format: "%D: %S: %M"
-  #
-  # For the pre-7.0 log format use:
-  #default-log-format: "[%i] %t [%S] - (%f:%l) <%d> (%n) -- "
-
-  # A regex to filter output.  Can be overridden in an output section.
-  # Defaults to empty (no filter).
-  #
-  # This value is overridden by the SC_LOG_OP_FILTER env var.
-  default-output-filter:
-
-  # Requires libunwind to be available when Suricata is configured and built.
-  # If a signal unexpectedly terminates Suricata, displays a brief diagnostic
-  # message with the offending stacktrace if enabled.
-  #stacktrace-on-signal: on
-
-  # Define your logging outputs.  If none are defined, or they are all
-  # disabled you will get the default: console output.
-  outputs:
-  - console:
-      enabled: yes
-      type: json
-  - file:
-      enabled: yes
-      level: info
-      filename: suricata.log
-      # format: "[%i - %m] %z %d: %S: %M"
-      # type: json
-  - syslog:
+    configLines.push(`  # a full alert log containing much information for signature writers
+  # or for investigating suspected false positives.
+  - alert-debug:
       enabled: no
-      facility: local5
-      format: "[%i] <%d> -- "
-      # type: json
+      filename: alert-debug.log
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+`);
+  }
+  configLines.push(`##
+## Step 4: App Layer Protocol configuration
+##
 
+# Configure the app-layer parsers.
+#
+# The error-policy setting applies to all app-layer parsers. Values can be
+# "drop-flow", "pass-flow", "bypass", "drop-packet", "pass-packet", "reject" or
+# "ignore" (the default).
+#
+# The protocol's section details each protocol.
+#
+# The option "enabled" takes 3 values - "yes", "no", "detection-only".
+# "yes" enables both detection and the parser, "no" disables both, and
+# "detection-only" enables protocol detection only (parser disabled).
+app-layer:
+  # error-policy: ignore
+  protocols:
+    telnet:
+      enabled: yes
+    rfb:
+      enabled: yes
+      detection-ports:
+        dp: 5900, 5901, 5902, 5903, 5904, 5905, 5906, 5907, 5908, 5909
+    mqtt:
+      enabled: yes
+      # max-msg-length: 1mb
+      # subscribe-topic-match-limit: 100
+      # unsubscribe-topic-match-limit: 100
+      # Maximum number of live MQTT transactions per flow
+      # max-tx: 4096
+    krb5:
+      enabled: yes
+    bittorrent-dht:
+      enabled: yes
+    snmp:
+      enabled: yes
+    ike:
+      enabled: yes
+    tls:
+      enabled: yes
+      detection-ports:
+        dp: 443
+
+      # Generate JA3/JA4 fingerprints from client hello. If not specified it
+      # will be disabled by default, but enabled if rules require it.
+      #ja3-fingerprints: auto
+      #ja4-fingerprints: auto
+
+      # What to do when the encrypted communications start:
+      # - default: keep tracking TLS session, check for protocol anomalies,
+      #            inspect tls_* keywords. Disables inspection of unmodified
+      #            'content' signatures.
+      # - bypass:  stop processing this flow as much as possible. No further
+      #            TLS parsing and inspection. Offload flow bypass to kernel
+      #            or hardware if possible.
+      # - full:    keep tracking and inspection as normal. Unmodified content
+      #            keyword signatures are inspected as well.
+      #
+      # For best performance, select 'bypass'.
+      #
+      #encryption-handling: default
+
+    pgsql:
+      enabled: no
+      # Stream reassembly size for PostgreSQL. By default, track it completely.
+      stream-depth: 0
+      # Maximum number of live PostgreSQL transactions per flow
+      # max-tx: 1024
+    dcerpc:
+      enabled: yes
+      # Maximum number of live DCERPC transactions per flow
+      # max-tx: 1024
+    ftp:
+      enabled: yes
+      # memcap: 64mb
+    rdp:
+      #enabled: yes
+    ssh:
+      enabled: yes
+      #hassh: yes
+    http2:
+      enabled: yes
+      # Maximum number of live HTTP2 streams in a flow
+      #max-streams: 4096
+      # Maximum headers table size
+      #max-table-size: 65536
+      # Maximum reassembly size for header + continuation frames
+      #max-reassembly-size: 102400
+    smtp:
+      enabled: yes
+      raw-extraction: no
+      # Maximum number of live SMTP transactions per flow
+      # max-tx: 256
+      # Configure SMTP-MIME Decoder
+      mime:
+        # Decode MIME messages from SMTP transactions
+        # (may be resource intensive)
+        # This field supersedes all others because it turns the entire
+        # process on or off
+        decode-mime: yes
+
+        # Decode MIME entity bodies (ie. Base64, quoted-printable, etc.)
+        decode-base64: yes
+        decode-quoted-printable: yes
+
+        # Maximum bytes per header data value stored in the data structure
+        # (default is 2000)
+        header-value-depth: 2000
+
+        # Extract URLs and save in state data structure
+        extract-urls: yes
+        # Scheme of URLs to extract
+        # (default is [http])
+        #extract-urls-schemes: [http, https, ftp, mailto]
+        # Log the scheme of URLs that are extracted
+        # (default is no)
+        #log-url-scheme: yes
+        # Set to yes to compute the md5 of the mail body. You will then
+        # be able to journalize it.
+        body-md5: no
+      # Configure inspected-tracker for file_data keyword
+      inspected-tracker:
+        content-limit: 100000
+        content-inspect-min-size: 32768
+        content-inspect-window: 4096
+    imap:
+      enabled: detection-only
+    smb:
+      enabled: yes
+      detection-ports:
+        dp: 139, 445
+      # Maximum number of live SMB transactions per flow
+      # max-tx: 1024
+
+      # Stream reassembly size for SMB streams. By default track it completely.
+      #stream-depth: 0
+
+    nfs:
+      enabled: yes
+      # max-tx: 1024
+    tftp:
+      enabled: yes
+    dns:
+      tcp:
+        enabled: yes
+        detection-ports:
+          dp: 53
+      udp:
+        enabled: yes
+        detection-ports:
+          dp: 53
+    http:
+      enabled: yes
+
+      # Byte Range Containers default settings
+      # byterange:
+      #   memcap: 100mb
+      #   timeout: 60
+
+      # memcap:                   Maximum memory capacity for HTTP
+      #                           Default is unlimited, values can be 64mb, e.g.
+
+      # default-config:           Used when no server-config matches
+      #   personality:            List of personalities used by default
+      #   request-body-limit:     Limit reassembly of request body for inspection
+      #                           by http_client_body & pcre /P option.
+      #   response-body-limit:    Limit reassembly of response body for inspection
+      #                           by file_data, http_server_body & pcre /Q option.
+      #
+      #   For advanced options, see the user guide
+
+
+      # server-config:            List of server configurations to use if address matches
+      #   address:                List of IP addresses or networks for this block
+      #   personality:            List of personalities used by this block
+      #
+      #                           Then, all the fields from default-config can be overloaded
+      #
+      # Currently Available Personalities:
+      #   Minimal, Generic, IDS (default), IIS_4_0, IIS_5_0, IIS_5_1, IIS_6_0,
+      #   IIS_7_0, IIS_7_5, Apache_2
+      libhtp:
+         default-config:
+           personality: IDS
+
+           # Can be specified in kb, mb, gb.  Just a number indicates
+           # it's in bytes.
+           request-body-limit: 100kb
+           response-body-limit: 100kb
+
+           # inspection limits
+           request-body-minimal-inspect-size: 32kb
+           request-body-inspect-window: 4kb
+           response-body-minimal-inspect-size: 40kb
+           response-body-inspect-window: 16kb
+
+           # response body decompression (0 disables)
+           response-body-decompress-layer-limit: 2
+
+           # auto will use http-body-inline mode in IPS mode, yes or no set it statically
+           http-body-inline: auto
+
+           # Decompress SWF files. Disabled by default.
+           # Two types: 'deflate', 'lzma', 'both' will decompress deflate and lzma
+           # compress-depth:
+           # Specifies the maximum amount of data to decompress,
+           # set 0 for unlimited.
+           # decompress-depth:
+           # Specifies the maximum amount of decompressed data to obtain,
+           # set 0 for unlimited.
+           swf-decompression:
+             enabled: no
+             type: both
+             compress-depth: 100kb
+             decompress-depth: 100kb
+
+           # Use a random value for inspection sizes around the specified value.
+           # This lowers the risk of some evasion techniques but could lead
+           # to detection change between runs. It is set to 'yes' by default.
+           #randomize-inspection-sizes: yes
+           # If "randomize-inspection-sizes" is active, the value of various
+           # inspection size will be chosen from the [1 - range%, 1 + range%]
+           # range
+           # Default value of "randomize-inspection-range" is 10.
+           #randomize-inspection-range: 10
+
+           # decoding
+           double-decode-path: no
+           double-decode-query: no
+
+           # Can enable LZMA decompression
+           #lzma-enabled: false
+           # Memory limit usage for LZMA decompression dictionary
+           # Data is decompressed until dictionary reaches this size
+           #lzma-memlimit: 1mb
+           # Maximum decompressed size with a compression ratio
+           # above 2048 (only LZMA can reach this ratio, deflate cannot)
+           #compression-bomb-limit: 1mb
+           # Maximum time spent decompressing a single transaction in usec
+           #decompression-time-limit: 100000
+           # Maximum number of live transactions per flow
+           #max-tx: 512
+           # Maximum used number of HTTP1 headers in one request or response
+           #headers-limit: 1024
+
+         server-config:
+
+           #- apache:
+           #    address: [192.168.1.0/24, 127.0.0.0/8, "::1"]
+           #    personality: Apache_2
+           #    # Can be specified in kb, mb, gb.  Just a number indicates
+           #    # it's in bytes.
+           #    request-body-limit: 4096
+           #    response-body-limit: 4096
+           #    double-decode-path: no
+           #    double-decode-query: no
+
+           #- iis7:
+           #    address:
+           #      - 192.168.0.0/24
+           #      - 192.168.10.0/24
+           #    personality: IIS_7_0
+           #    # Can be specified in kb, mb, gb.  Just a number indicates
+           #    # it's in bytes.
+           #    request-body-limit: 4096
+           #    response-body-limit: 4096
+           #    double-decode-path: no
+           #    double-decode-query: no
+
+    # Note: Modbus probe parser is minimalist due to the limited usage in the field.
+    # Only Modbus message length (greater than Modbus header length)
+    # and protocol ID (equal to 0) are checked in probing parser
+    # It is important to enable detection port and define Modbus port
+    # to avoid false positives
+    modbus:
+      # How many unanswered Modbus requests are considered a flood.
+      # If the limit is reached, the app-layer-event:modbus.flooded; will match.
+      #request-flood: 500
+
+      enabled: no
+      detection-ports:
+        dp: 502
+      # According to MODBUS Messaging on TCP/IP Implementation Guide V1.0b, it
+      # is recommended to keep the TCP connection opened with a remote device
+      # and not to open and close it for each MODBUS/TCP transaction. In that
+      # case, it is important to set the depth of the stream reassembling as
+      # unlimited (stream.reassembly.depth: 0)
+
+      # Stream reassembly size for modbus. By default track it completely.
+      stream-depth: 0
+
+    # DNP3
+    dnp3:
+      enabled: no
+      detection-ports:
+        dp: 20000
+
+    # SCADA EtherNet/IP and CIP protocol support
+    enip:
+      enabled: no
+      detection-ports:
+        dp: 44818
+        sp: 44818
+
+    ntp:
+      enabled: yes
+
+    quic:
+      enabled: yes
+
+    dhcp:
+      enabled: yes
+
+    sip:
+      #enabled: yes
+
+# Limit for the maximum number of asn1 frames to decode (default 256)
+asn1-max-frames: 256
+
+# Datasets default settings
+datasets:
+  # Default fallback memcap and hashsize values for datasets in case these
+  # were not explicitly defined.
+  defaults:
+    #memcap: 100mb
+    #hashsize: 2048
+
+  rules:
+    # Set to true to allow absolute filenames and filenames that use
+    # ".." components to reference parent directories in rules that specify
+    # their filenames.
+    #allow-absolute-filenames: false
+
+    # Allow datasets in rules write access for "save" and
+    # "state". This is enabled by default, however write access is
+    # limited to the data directory.
+    #allow-write: true
+
+##############################################################################
+##
+## Advanced settings below
+##
+##############################################################################
+
+##
+## Run Options
+##
+
+# Run Suricata with a specific user-id and group-id:
+#run-as:
+#  user: suri
+#  group: suri
+
+security:
+  # if true, prevents process creation from Suricata by calling
+  # setrlimit(RLIMIT_NPROC, 0)
+  limit-noproc: true
+  # Use landlock security module under Linux
+  landlock:
+    enabled: no
+    directories:
+      #write:
+      #  - /var/run/
+      # /usr and /etc folders are added to read list to allow
+      # file magic to be used.
+      read:
+        - /usr/
+        - /etc/
+        - /etc/suricata/
+
+  lua:
+    # Allow Lua rules. Disabled by default.
+    #allow-rules: false
+
+# Some logging modules will use that name in event as identifier. The default
+# value is the hostname
+#sensor-name: suricata
+
+# Default location of the pid file. The pid file is only used in
+# daemon mode (start Suricata with -D). If not running in daemon mode
+# the --pidfile command line option must be used to create a pid file.
+#pid-file: /var/run/suricata.pid
+
+# Daemon working directory
+# Suricata will change directory to this one if provided
+# Default: "/"
+#daemon-directory: "/"
+
+# Umask.
+# Suricata will use this umask if it is provided. By default it will use the
+# umask passed on by the shell.
+#umask: 022
+
+# Suricata core dump configuration. Limits the size of the core dump file to
+# approximately max-dump. The actual core dump size will be a multiple of the
+# page size. Core dumps that would be larger than max-dump are truncated. On
+# Linux, the actual core dump size may be a few pages larger than max-dump.
+# Setting max-dump to 0 disables core dumping.
+# Setting max-dump to 'unlimited' will give the full core dump file.
+# On 32-bit Linux, a max-dump value >= ULONG_MAX may cause the core dump size
+# to be 'unlimited'.
+
+coredump:
+  max-dump: unlimited
+
+# If the Suricata box is a router for the sniffed networks, set it to 'router'. If
+# it is a pure sniffing setup, set it to 'sniffer-only'.
+# If set to auto, the variable is internally switched to 'router' in IPS mode
+# and 'sniffer-only' in IDS mode.
+# This feature is currently only used by the reject* keywords.
+host-mode: auto
+`);
+
+  if (newEntry.maxPendingPackets) {
+    configLines.push(`# Number of packets preallocated per thread. The default is 1024. A higher number 
+# will make sure each CPU will be more easily kept busy, but may negatively 
+# impact caching.
+max-pending-packets: ${newEntry.maxPendingPackets}
 
 `);
   }
+
+  if (newEntry.runMode) {
+    configLines.push(`# Runmode the engine should use. Please check --list-runmodes to get the available
+# runmodes for each packet acquisition method. Default depends on selected capture
+# method. 'workers' generally gives best performance.
+runmode: ${newEntry.runMode}
+`);
+  }
+
+  configLines.push(`# Specifies the kind of flow load balancer used by the flow pinned autofp mode.
+#
+# Supported schedulers are:
+#
+# hash     - Flow assigned to threads using the 5-7 tuple hash.
+# ippair   - Flow assigned to threads using addresses only.
+# ftp-hash - Flow assigned to threads using the hash, except for FTP, so that
+#            ftp-data flows will be handled by the same thread
+#
+#autofp-scheduler: hash
+
+# Preallocated size for each packet. Default is 1514 which is the classical
+# size for pcap on Ethernet. You should adjust this value to the highest
+# packet size (MTU + hardware header) on your system.
+#default-packet-size: 1514
+
+# Unix command socket that can be used to pass commands to Suricata.
+# An external tool can then connect to get information from Suricata
+# or trigger some modifications of the engine. Set enabled to yes
+# to activate the feature. In auto mode, the feature will only be
+# activated in live capture mode. You can use the filename variable to set
+# the file name of the socket.
+unix-command:
+  enabled: yes
+  filename: /var/run/suricata-command.socket
+
+# Magic file. The extension .mgc is added to the value here.
+#magic-file: /usr/share/file/magic
+#magic-file: 
+
+# GeoIP2 database file. Specify path and filename of GeoIP2 database
+# if using rules with "geoip" rule option.
+#geoip-database: /usr/local/share/GeoLite2/GeoLite2-Country.mmdb
+
+legacy:
+  uricontent: enabled
+##
+## Detection settings
+##
+
+# Set the order of alerts based on actions
+# The default order is pass, drop, reject, alert
+# action-order:
+#   - pass
+#   - drop
+#   - reject
+#   - alert
+
+# Define maximum number of possible alerts that can be triggered for the same
+# packet. Default is 15
+#packet-alert-max: 15
+
+# Exception Policies
+#
+# Define a common behavior for all exception policies.
+# In IPS mode, the default is drop-flow. For cases when that's not possible, the
+# engine will fall to drop-packet. To fallback to old behavior (setting each of
+# them individually, or ignoring all), set this to ignore.
+# All values available for exception policies can be used, and there is one
+# extra option: auto - which means drop-flow or drop-packet (as explained above)
+# in IPS mode, and ignore in IDS mode. Exception policy values are: drop-packet,
+# drop-flow, reject, bypass, pass-packet, pass-flow, ignore (disable).
+exception-policy: auto
+
+# IP Reputation
+#reputation-categories-file: /etc/suricata/iprep/categories.txt
+#default-reputation-path: /etc/suricata/iprep
+#reputation-files:
+# - reputation.list
+
+# When run with the option --engine-analysis, the engine will read each of
+# the parameters below, and print reports for each of the enabled sections
+# and exit.  The reports are printed to a file in the default log dir
+# given by the parameter "default-log-dir", with engine reporting
+# subsection below printing reports in its own report file.
+engine-analysis:
+  # enables printing reports for fast-pattern for every rule.
+  rules-fast-pattern: yes
+  # enables printing reports for each rule
+  rules: yes
+
+#recursion and match limits for PCRE where supported
+pcre:
+  match-limit: 3500
+  match-limit-recursion: 1500
+
+##
+## Advanced Traffic Tracking and Reconstruction Settings
+##
+
+# Host specific policies for defragmentation and TCP stream
+# reassembly. The host OS lookup is done using a radix tree, just
+# like a routing table so the most specific entry matches.
+host-os-policy:
+  # Make the default policy windows.
+  windows: [0.0.0.0/0]
+  bsd: []
+  bsd-right: []
+  old-linux: []
+  linux: []
+  old-solaris: []
+  solaris: []
+  hpux10: []
+  hpux11: []
+  irix: []
+  macos: []
+  vista: []
+  windows2k3: []
+
+# Defrag settings:
+
+# The memcap-policy value can be "drop-packet", "pass-packet", "reject" or
+# "ignore" (which is the default).
+defrag:
+  memcap: 32mb
+  # memcap-policy: ignore
+  hash-size: 65536
+  trackers: 65535 # number of defragmented flows to follow
+  max-frags: 65535 # number of fragments to keep (higher than trackers)
+  prealloc: yes
+  timeout: 60
+
+# Enable defrag per host settings
+#  host-config:
+#
+#    - dmz:
+#        timeout: 30
+#        address: [192.168.1.0/24, 127.0.0.0/8, 1.1.1.0/24, 2.2.2.0/24, "1.1.1.1", "2.2.2.2", "::1"]
+#
+#    - lan:
+#        timeout: 45
+#        address:
+#          - 192.168.0.0/24
+#          - 192.168.10.0/24
+#          - 172.16.14.0/24
+
+# Flow settings:
+# By default, the reserved memory (memcap) for flows is 32MB. This is the limit
+# for flow allocation inside the engine. You can change this value to allow
+# more memory usage for flows.
+# The hash-size determines the size of the hash used to identify flows inside
+# the engine, and by default the value is 65536.
+# At startup, the engine can preallocate a number of flows, to get better
+# performance. The number of flows preallocated is 10000 by default.
+# emergency-recovery is the percentage of flows that the engine needs to
+# prune before clearing the emergency state. The emergency state is activated
+# when the memcap limit is reached, allowing new flows to be created, but
+# pruning them with the emergency timeouts (they are defined below).
+# If the memcap is reached, the engine will try to prune flows
+# with the default timeouts. If it doesn't find a flow to prune, it will set
+# the emergency bit and it will try again with more aggressive timeouts.
+# If that doesn't work, then it will try to kill the oldest flows using
+# last time seen flows.
+# The memcap can be specified in kb, mb, gb.  Just a number indicates it's
+# in bytes.
+# The memcap-policy can be "drop-packet", "pass-packet", "reject" or "ignore"
+# (which is the default).
+
+flow:
+  memcap: 128mb
+  #memcap-policy: ignore
+  hash-size: 65536
+  prealloc: 10000
+  emergency-recovery: 30
+  #managers: 1 # default to one flow manager
+  #recyclers: 1 # default to one flow recycler thread
+
+# This option controls the use of VLAN ids in the flow (and defrag)
+# hashing. Normally this should be enabled, but in some (broken)
+# setups where both sides of a flow are not tagged with the same VLAN
+# tag, we can ignore the VLAN id's in the flow hashing.
+vlan:
+  use-for-tracking: true
+
+# This option controls the use of livedev ids in the flow (and defrag)
+# hashing. This is enabled by default and should be disabled if
+# multiple live devices are used to capture traffic from the same network
+livedev:
+  use-for-tracking: true
+
+# Specific timeouts for flows. Here you can specify the timeouts that the
+# active flows will wait to transit from the current state to another, on each
+# protocol. The value of "new" determines the seconds to wait after a handshake or
+# stream startup before the engine frees the data of that flow it doesn't
+# change the state to established (usually if we don't receive more packets
+# of that flow). The value of "established" is the amount of
+# seconds that the engine will wait to free the flow if that time elapses
+# without receiving new packets or closing the connection. "closed" is the
+# amount of time to wait after a flow is closed (usually zero). "bypassed"
+# timeout controls locally bypassed flows. For these flows we don't do any other
+# tracking. If no packets have been seen after this timeout, the flow is discarded.
+#
+# There's an emergency mode that will become active under attack circumstances,
+# making the engine to check flow status faster. This configuration variables
+# use the prefix "emergency-" and work similar as the normal ones.
+# Some timeouts doesn't apply to all the protocols, like "closed", for udp and
+# icmp.
+
+flow-timeouts:
+
+  default:
+    new: 30
+    established: 300
+    closed: 0
+    bypassed: 100
+    emergency-new: 10
+    emergency-established: 100
+    emergency-closed: 0
+    emergency-bypassed: 50
+  tcp:
+    new: 60
+    established: 600
+    closed: 60
+    bypassed: 100
+    emergency-new: 5
+    emergency-established: 100
+    emergency-closed: 10
+    emergency-bypassed: 50
+  udp:
+    new: 30
+    established: 300
+    bypassed: 100
+    emergency-new: 10
+    emergency-established: 100
+    emergency-bypassed: 50
+  icmp:
+    new: 30
+    established: 300
+    bypassed: 100
+    emergency-new: 10
+    emergency-established: 100
+    emergency-bypassed: 50
+
+# Stream engine settings. Here the TCP stream tracking and reassembly
+# engine is configured.
+#
+# stream:
+#   memcap: 64mb                # Can be specified in kb, mb, gb.  Just a
+#                               # number indicates it's in bytes.
+#   memcap-policy: ignore       # Can be "drop-flow", "pass-flow", "bypass",
+#                               # "drop-packet", "pass-packet", "reject" or
+#                               # "ignore" default is "ignore"
+#   checksum-validation: yes    # To validate the checksum of received
+#                               # packet. If csum validation is specified as
+#                               # "yes", then packets with invalid csum values will not
+#                               # be processed by the engine stream/app layer.
+#                               # Warning: locally generated traffic can be
+#                               # generated without checksum due to hardware offload
+#                               # of checksum. You can control the handling of checksum
+#                               # on a per-interface basis via the 'checksum-checks'
+#                               # option
+#   prealloc-sessions: 2048     # 2k sessions prealloc'd per stream thread
+#   midstream: false            # don't allow midstream session pickups
+#   midstream-policy: ignore    # Can be "drop-flow", "pass-flow", "bypass",
+#                               # "drop-packet", "pass-packet", "reject" or
+#                               # "ignore" default is "ignore"
+#   async-oneside: false        # don't enable async stream handling
+#   inline: no                  # stream inline mode
+#   drop-invalid: yes           # in inline mode, drop packets that are invalid with regards to streaming engine
+#   max-syn-queued: 10          # Max different SYNs to queue
+#   max-synack-queued: 5        # Max different SYN/ACKs to queue
+#   bypass: no                  # Bypass packets when stream.reassembly.depth is reached.
+#                               # Warning: first side to reach this triggers
+#                               # the bypass.
+#   liberal-timestamps: false   # Treat all timestamps as if the Linux policy applies. This
+#                               # means it's slightly more permissive. Enabled by default.
+#
+#   reassembly:
+#     memcap: 256mb             # Can be specified in kb, mb, gb.  Just a number
+#                               # indicates it's in bytes.
+#     memcap-policy: ignore     # Can be "drop-flow", "pass-flow", "bypass",
+#                               # "drop-packet", "pass-packet", "reject" or
+#                               # "ignore" default is "ignore"
+#     depth: 1mb                # Can be specified in kb, mb, gb.  Just a number
+#                               # indicates it's in bytes.
+#     toserver-chunk-size: 2560 # inspect raw stream in chunks of at least
+#                               # this size.  Can be specified in kb, mb,
+#                               # gb.  Just a number indicates it's in bytes.
+#     toclient-chunk-size: 2560 # inspect raw stream in chunks of at least
+#                               # this size.  Can be specified in kb, mb,
+#                               # gb.  Just a number indicates it's in bytes.
+#     randomize-chunk-size: yes # Take a random value for chunk size around the specified value.
+#                               # This lowers the risk of some evasion techniques but could lead
+#                               # to detection change between runs. It is set to 'yes' by default.
+#     randomize-chunk-range: 10 # If randomize-chunk-size is active, the value of chunk-size is
+#                               # a random value between (1 - randomize-chunk-range/100)*toserver-chunk-size
+#                               # and (1 + randomize-chunk-range/100)*toserver-chunk-size and the same
+#                               # calculation for toclient-chunk-size.
+#                               # Default value of randomize-chunk-range is 10.
+#
+#     raw: yes                  # 'Raw' reassembly enabled or disabled.
+#                               # raw is for content inspection by detection
+#                               # engine.
+#
+#     segment-prealloc: 2048    # number of segments preallocated per thread
+#
+#     check-overlap-different-data: true|false
+#                               # check if a segment contains different data
+#                               # than what we've already seen for that
+#                               # position in the stream.
+#                               # This is enabled automatically if inline mode
+#                               # is used or when stream-event:reassembly_overlap_different_data;
+#                               # is used in a rule.
+#
+stream:
+  memcap: 64mb
+  #memcap-policy: ignore
+  checksum-validation: yes      # reject incorrect csums
+  #midstream: false
+  #midstream-policy: ignore
+  inline: auto                  # auto will use inline mode in IPS mode, yes or no set it statically
+  reassembly:
+    # experimental TCP urgent handling logic
+    #urgent:
+    #  policy: inline           # drop, inline, oob (1 byte, see RFC 6093, 3.1), gap
+    #  oob-limit-policy: drop
+    memcap: 256mb
+    #memcap-policy: ignore
+    depth: 1mb                  # reassemble 1mb into a stream
+    toserver-chunk-size: 2560
+    toclient-chunk-size: 2560
+    randomize-chunk-size: yes
+    #randomize-chunk-range: 10
+    #raw: yes
+    #segment-prealloc: 2048
+    #check-overlap-different-data: true
+
+# Host table:
+#
+# Host table is used by the tagging and per host thresholding subsystems.
+#
+host:
+  hash-size: 4096
+  prealloc: 1000
+  memcap: 32mb
+
+# IP Pair table:
+#
+# Used by xbits 'ippair' tracking.
+#
+#ippair:
+#  hash-size: 4096
+#  prealloc: 1000
+#  memcap: 32mb
+
+# Decoder settings
+
+decoder:
+  # Teredo decoder is known to not be completely accurate
+  # as it will sometimes detect non-teredo as teredo.
+  teredo:
+    enabled: true
+    # ports to look for Teredo. Max 4 ports. If no ports are given, or
+    # the value is set to 'any', Teredo detection runs on _all_ UDP packets.
+    #ports: $TEREDO_PORTS # syntax: '[3544, 1234]' or '3533' or 'any'.
+
+  # VXLAN decoder is assigned to up to 4 UDP ports. By default only the
+  # IANA assigned port 4789 is enabled.
+  vxlan:
+    enabled: true
+    #ports: $VXLAN_PORTS # syntax: '[8472, 4789]' or '4789'.
+
+  # Geneve decoder is assigned to up to 4 UDP ports. By default only the
+  # IANA assigned port 6081 is enabled.
+  geneve:
+    enabled: true
+    #ports: $GENEVE_PORTS # syntax: '[6081, 1234]' or '6081'.
+
+  # maximum number of decoder layers for a packet
+  # max-layers: 16
+
+##
+## Performance tuning and profiling
+##
+
+# The detection engine builds internal groups of signatures. The engine
+# allows us to specify the profile to use for them, to manage memory in an
+# efficient way keeping good performance. For the profile keyword you
+# can use the words "low", "medium", "high" or "custom". If you use custom,
+# make sure to define the values in the "custom-values" section.
+# Usually you would prefer medium/high/low.
+#
+# "sgh mpm-context", indicates how the staging should allot mpm contexts for
+# the signature groups.  "single" indicates the use of a single context for
+# all the signature group heads.  "full" indicates a mpm-context for each
+# group head.  "auto" lets the engine decide the distribution of contexts
+# based on the information the engine gathers on the patterns from each
+# group head.
+#
+# The option inspection-recursion-limit is used to limit the recursive calls
+# in the content inspection code.  For certain payload-sig combinations, we
+# might end up taking too much time in the content inspection code.
+# If the argument specified is 0, the engine uses an internally defined
+# default limit.  When a value is not specified, there are no limits on the recursion.
+`);
+  if (newEntry.detectEngineProfile) {
+    configLines.push(`detect:
+  profile: ${newEntry.detectEngineProfile}
+  custom-values:
+    toclient-groups: 3
+    toserver-groups: 25
+`);
+  }
+
+  if (newEntry.signatureGroupHeaderMPM) {
+    configLines.push(`  sgh-mpm-context: ${newEntry.signatureGroupHeaderMPM}
+`);
+  }
+
+  if (newEntry.inspectionRecursionLimit) {
+    configLines.push(`  inspection-recursion-limit: ${newEntry.inspectionRecursionLimit}
+`);
+  }
+
+  if (newEntry.multiPatternMatcherAlgo) {
+    configLines.push(`  # try to tie an app-layer transaction for rules without app-layer keywords
+  # if there is only one live transaction for the flow
+  # allows to log app-layer metadata in alert
+  # but the transaction may not be the relevant one.
+  # guess-applayer-tx: no
+  # If set to yes, the loading of signatures will be made after the capture
+  # is started. This will limit the downtime in IPS mode.
+  #delayed-detect: yes
+
+  prefilter:
+    # default prefiltering setting. "mpm" only creates MPM/fast_pattern
+    # engines. "auto" also sets up prefilter engines for other keywords.
+    # Use --list-keywords=all to see which keywords support prefiltering.
+    default: mpm
+
+  # the grouping values above control how many groups are created per
+  # direction. Port whitelisting forces that port to get its own group.
+  # Very common ports will benefit, as well as ports with many expensive
+  # rules.
+  grouping:
+    #tcp-whitelist: 53, 80, 139, 443, 445, 1433, 3306, 3389, 6666, 6667, 8080
+    #udp-whitelist: 53, 135, 5060
+
+  profiling:
+    # Log the rules that made it past the prefilter stage, per packet
+    # default is off. The threshold setting determines how many rules
+    # must have made it past pre-filter for that rule to trigger the
+    # logging.
+    #inspect-logging-threshold: 200
+    grouping:
+      dump-to-disk: false
+      include-rules: false      # very verbose
+      include-mpm-stats: false
+
+# Select the multi pattern algorithm you want to run for scan/search the
+# in the engine.
+#
+# The supported algorithms are:
+# "ac"      - Aho-Corasick, default implementation
+# "ac-bs"   - Aho-Corasick, reduced memory implementation
+# "ac-ks"   - Aho-Corasick, "Ken Steele" variant
+# "hs"      - Hyperscan, available when built with Hyperscan support
+#
+# The default mpm-algo value of "auto" will use "hs" if Hyperscan is
+# available, "ac" otherwise.
+#
+# The mpm you choose also decides the distribution of mpm contexts for
+# signature groups, specified by the conf - "detect.sgh-mpm-context".
+# Selecting "ac" as the mpm would require "detect.sgh-mpm-context"
+# to be set to "single", because of ac's memory requirements, unless the
+# ruleset is small enough to fit in memory, in which case one can
+# use "full" with "ac".  The rest of the mpms can be run in "full" mode.
+
+mpm-algo: ${newEntry.multiPatternMatcherAlgo}
+
+`);
+  }
+
+  if (newEntry.singlePatternMatcherAlgo) {
+    configLines.push(`spm-algo: auto
+
+# Suricata is multi-threaded. Here the threading can be influenced.
+threading:
+  set-cpu-affinity: no
+  # Tune cpu affinity of threads. Each family of threads can be bound
+  # to specific CPUs.
+  #
+  # These 2 apply to the all runmodes:
+  # management-cpu-set is used for flow timeout handling, counters
+  # worker-cpu-set is used for 'worker' threads
+  #
+  # Additionally, for autofp these apply:
+  # receive-cpu-set is used for capture threads
+  # verdict-cpu-set is used for IPS verdict threads
+  #
+  cpu-affinity:
+    - management-cpu-set:
+        cpu: [ 0 ]  # include only these CPUs in affinity settings
+    - receive-cpu-set:
+        cpu: [ 0 ]  # include only these CPUs in affinity settings
+    - worker-cpu-set:
+        cpu: [ "all" ]
+        mode: "exclusive"
+        # Use explicitly 3 threads and don't compute number by using
+        # detect-thread-ratio variable:
+        # threads: 3
+        prio:
+          low: [ 0 ]
+          medium: [ "1-2" ]
+          high: [ 3 ]
+          default: "medium"
+    #- verdict-cpu-set:
+    #    cpu: [ 0 ]
+    #    prio:
+    #      default: "high"
+  #
+  # By default Suricata creates one "detect" thread per available CPU/CPU core.
+  # This setting allows controlling this behaviour. A ratio setting of 2 will
+  # create 2 detect threads for each CPU/CPU core. So for a dual core CPU this
+  # will result in 4 detect threads. If values below 1 are used, less threads
+  # are created. So on a dual core CPU a setting of 0.5 results in 1 detect
+  # thread being created. Regardless of the setting at a minimum 1 detect
+  # thread will always be created.
+  #
+  detect-thread-ratio: 1.0
+  #
+  # By default, the per-thread stack size is left to its default setting. If
+  # the default thread stack size is too small, use the following configuration
+  # setting to change the size. Note that if any thread's stack size cannot be
+  # set to this value, a fatal error occurs.
+  #
+  # Generally, the per-thread stack-size should not exceed 8MB.
+  #stack-size: 8mb
+
+# Luajit has a strange memory requirement, its 'states' need to be in the
+# first 2G of the process' memory.
+#
+# 'luajit.states' is used to control how many states are preallocated.
+# State use: per detect script: 1 per detect thread. Per output script: 1 per
+# script.
+luajit:
+  states: 128
+
+# Profiling settings. Only effective if Suricata has been built with
+# the --enable-profiling configure flag.
+#
+profiling:
+  # Run profiling for every X-th packet. The default is 1, which means we
+  # profile every packet. If set to 1024, one packet is profiled for every
+  # 1024 received. The sample rate must be a power of 2.
+  #sample-rate: 1024
+
+  # rule profiling
+  rules:
+
+    # Profiling can be disabled here, but it will still have a
+    # performance impact if compiled in.
+    enabled: yes
+    filename: rule_perf.log
+    append: yes
+    # Set active to yes to enable rules profiling at start
+    # if set to no (default), the rules profiling will have to be started
+    # via unix socket commands.
+    #active:no
+
+    # Sort options: ticks, avgticks, checks, matches, maxticks
+    # If commented out all the sort options will be used.
+    #sort: avgticks
+
+    # Limit the number of sids for which stats are shown at exit (per sort).
+    limit: 10
+
+    # output to json
+    json: yes
+
+  # per keyword profiling
+  keywords:
+    enabled: yes
+    filename: keyword_perf.log
+    append: yes
+
+  prefilter:
+    enabled: yes
+    filename: prefilter_perf.log
+    append: yes
+
+  # per rulegroup profiling
+  rulegroups:
+    enabled: yes
+    filename: rule_group_perf.log
+    append: yes
+
+  # packet profiling
+  packets:
+
+    # Profiling can be disabled here, but it will still have a
+    # performance impact if compiled in.
+    enabled: yes
+    filename: packet_stats.log
+    append: yes
+
+    # per packet csv output
+    csv:
+
+      # Output can be disabled here, but it will still have a
+      # performance impact if compiled in.
+      enabled: no
+      filename: packet_stats.csv
+
+  # profiling of locking. Only available when Suricata was built with
+  # --enable-profiling-locks.
+  locks:
+    enabled: no
+    filename: lock_stats.log
+    append: yes
+
+  pcap-log:
+    enabled: no
+    filename: pcaplog_stats.log
+    append: yes
+
+`);
+  }
+
+
 
   configLines.push(`##
 ## Netfilter integration
@@ -451,7 +1470,7 @@ reference-config-file: /etc/suricata/reference.config
 #  - include1.yaml
 #  - include2.yaml
 `);
-  return configLines;
+  return configLines.join('\n');
 }
 
 function generateServiceContent(pidFile, configFile, queue_num) {
@@ -489,11 +1508,17 @@ function yamlSynatxCheck(yamlContent) {
 }
 
 function createFolderFilesContents(newEntry) {
-  try {
+  // try {
+    // If interface name is enable and selected
     if (newEntry.enableInterface === true && newEntry.interface) {
+
       const configPath = path.join(configDirectory, `${newEntry.interface}`);
       const logPath = path.join(logDirectory, `${newEntry.interface}`);
-      let configYamlFile = "";
+
+      const configYamlFile = path.join(configPath, `suricata-${newEntry.interface}.yaml`);
+      const pidFile = `suricata-${newEntry.interface}.pid`;
+      const systemdServiceFile = path.join(systemdDirectory, `suricata-${newEntry.interface}.service`);
+
       // Ensure parent directories exists
       if (!fs.existsSync(configDirectory)) {
         fs.mkdirSync(configDirectory, { recursive: true });
@@ -518,22 +1543,50 @@ function createFolderFilesContents(newEntry) {
       if (fs.existsSync(configPath)) {
         console.log(`Folder "${configPath}" already exists.`);
 
-        configYamlFile = path.join(configPath, `suricata-${newEntry.interface}.yaml`);
         if (fs.existsSync(configYamlFile)) {
           yamlSynatxCheck(generateYamlContent(newEntry));
-          fs.writeFileSync(configYamlFile, generateYamlContent(newEntry), 'utf8');
+          fs.writeFile(configYamlFile, generateYamlContent(newEntry), function (err) {
+            if (err) {
+              console.error('Error writing to the file:', err);
+
+            } else {
+              console.log('Suricata Configuration Data is saved to a file location ', configYamlFile);
+            }
+          });
           console.log(`Updated: ${configYamlFile}`);
         }
 
-      } else {
+        // Create the yaml file
+        else {
+          yamlSynatxCheck(generateYamlContent(newEntry));
+          fs.writeFile(configYamlFile, generateYamlContent(newEntry), function (err) {
+            if (err) {
+              console.error('Error writing to file:', err);
+
+            } else {
+              console.log('Suricata Configuration Data is saved to the file location ', configYamlFile);
+            }
+          });
+          console.log(`Created: ${configYamlFile}`);
+        }
+      }
+
+      else {
         // Create new folder and add initial files 
         fs.mkdirSync(configPath);
         console.log(`Folder "${configPath}" created.`);
 
-        // Create info.txt
-        configYamlFile = path.join(configPath, `suricata-${newEntry.interface}.yaml`);
+        // Create the yaml file
+
         yamlSynatxCheck(generateYamlContent(newEntry));
-        fs.writeFileSync(configYamlFile, generateYamlContent(), 'utf8');
+        fs.writeFile(configYamlFile, generateYamlContent(newEntry), function (err) {
+          if (err) {
+            console.error('Error writing to file:', err);
+
+          } else {
+            console.log('Suricata Configuration Data is saved to the file location ', configYamlFile);
+          }
+        });
         console.log(`Created: ${configYamlFile}`);
       }
 
@@ -545,23 +1598,27 @@ function createFolderFilesContents(newEntry) {
         console.log(`Folder "${logPath}" created.`);
       }
 
-
-      const pidFile = `suricata-${newEntry.interface}.pid`;
-
-      const systemdServiceFile = path.join(systemdDirectory, `suricata-${newEntry.interface}.service`);
       if (fs.existsSync(systemdServiceFile)) {
-        fs.writeFileSync(systemdServiceFile, generateServiceContent(pidFile, configYamlFile, 0), 'utf8');
+        fs.writeFileSync(systemdServiceFile, generateServiceContent(pidFile, configYamlFile, newEntry.queue), 'utf8');
         console.log(`Updated: ${systemdServiceFile}`);
       }
       else {
-        fs.writeFileSync(systemdServiceFile, generateServiceContent(pidFile, configYamlFile, 0), 'utf8');
+        fs.writeFileSync(systemdServiceFile, generateServiceContent(pidFile, configYamlFile, newEntry.queue), 'utf8');
         console.log(`Created: ${systemdServiceFile}`);
       }
     }
-  }
-  catch (err) {
-    console.error('Error occurred:', err.message);
-  }
+    exec('systemctl daemon-reload', (error) => {
+      if (error) {
+        console.error(`❌ Error: ${error.message}`);
+      }
+      else {
+        console.log(`systemctl daemon is reloaded successfully`);
+      }
+    });
+  // }
+  // catch (err) {
+  //   console.error('Error occurred:', err.message);
+  // }
 }
 
 function deleteFolderFilesContents(data) {
@@ -584,12 +1641,77 @@ function deleteFolderFilesContents(data) {
   }
 }
 
+async function NFQUEUEForwarding(newEntry, save) {
+  const iface = newEntry.interface;
+  const qn = newEntry.queue;
+
+  if (iface !== "" && qn >= 0) {
+    if (save) {
+      const command = `iptables -A  OUTPUT -o ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn} && sudo ip6tables -A  OUTPUT -o ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn} &&
+                    iptables -A  INPUT -i ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn} && sudo ip6tables -A  INPUT -i ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn}                    
+`;
+      // iptables -A  FORWARD -i wlan0 -j NFQUEUE --queue-num 0 && sudo ip6tables  FORWARD -i wlan0 -j NFQUEUE --queue-num 0 &&
+      // iptables -A  FORWARD -o wlan0 -j NFQUEUE --queue-num 0 && sudo ip6tables  FORWARD -o wlan0 -j NFQUEUE --queue-num 0
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`❌ Error: ${error.message}`);
+          return;
+        }
+        if (stderr) {
+          console.error(`⚠️ STDERR: ${stderr}`);
+          return;
+        }
+        console.log(`✅ IPTables rules added for ${iface} on nfqueue ${qn}:\n${stdout}`);
+      });
+    }
+    else {
+      const command = `iptables -D  OUTPUT -o ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn} && sudo ip6tables -D  OUTPUT -o ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn} &&
+                    iptables -D  INPUT -i ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn} && sudo ip6tables -D  INPUT -i ${iface === "WAN" ? WAN : LAN} -j NFQUEUE --queue-num ${qn}                    
+`;
+
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`❌ Error: ${error.message}`);
+          return;
+        }
+        if (stderr) {
+          console.error(`⚠️ STDERR: ${stderr}`);
+          return;
+        }
+        console.log(`✅ IPTables rules removed for ${iface} on nfqueue ${qn}:\n${stdout}`);
+      });
+    }
+  }
+}
+
+
+const getInterface=(iface)=>{
+  const path=`/tmp/${iface}`;
+  try{
+    return fs.readFileSync(path,'utf8');
+  }
+  catch(err){
+    console.log(err);
+    return "";
+  }
+};
 
 app.post("/api/interfaces", (req, res) => {
-  const newEntry = { ...req.body, id: nextId++ };
+  const newEntry = { ...req.body, id: nextId++, queue: queue_num, save: true };
+  const iface=getInterface(newEntry.interface);
+  if(iface!==""){
+    if(newEntry.interface==="WAN"){
+      WAN=iface;
+    }
+    else if(newEntry.interface==="LAN"){
+      LAN=iface;
+    }
+  }
+  NFQUEUEForwarding(newEntry, true);
   createFolderFilesContents(newEntry);
   interfaces.push(newEntry);
-  res.json(newEntry);
+  queue_num++;
+  res.json({ message: `Interface(${newEntry.interface}) data is a saved.` });
 });
 
 app.put("/api/interfaces/:id", (req, res) => {
@@ -607,17 +1729,232 @@ app.put("/api/interfaces/:id", (req, res) => {
   }
 });
 
-app.delete("/api/interfaces/:id", (req, res) => {
+app.delete("/api/interfaces/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const index = interfaces.findIndex((i) => i.id === id);
   if (index !== -1) {
+    await execAsync(`systemctl stop suricata-${interfaces[index].interface}.service`);
+
     deleteFolderFilesContents(interfaces[index]);
+    if (interfaces[index].save) {
+      NFQUEUEForwarding(interfaces[index], false);
+    }
+
+    await execAsync(`systemctl daemon-reload`);
+
     interfaces.splice(index, 1);
     res.json({ message: "Deleted successfully" });
   } else {
     res.status(404).json({ error: "Not found" });
   }
 });
+
+
+
+app.post("/api/interface/start/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = interfaces.findIndex((i) => i.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Index Not found" });
+  }
+
+  const iface = interfaces[index].interface;
+  const queue = interfaces[index].queue;
+  const serviceName = `suricata-${iface}.service`;
+  const save = interfaces[index].save;
+  // try {
+
+  // Enabling iptable rules
+  if (!save) {
+    await NFQUEUEForwarding(interfaces[index], true);
+    interfaces[index].save = true;
+  }
+  // Start the service
+  await execAsync(`systemctl start ${serviceName}`);
+
+  // Check the status
+  const { stdout } = await execAsync(`systemctl is-active ${serviceName}`);
+  const status = stdout.trim();
+
+  // Update interface object
+  interfaces[index].status = status;
+
+  console.log(`suricata-${iface}.service status : ${status}`);
+  console.log(`✅ Suricata service on ${iface} on nfqueue ${queue} has started: ${status}`);
+
+  interfaces[index].enableStart=true;
+  interfaces[index].enableRestart=true;
+  interfaces[index].enableStop=false;
+  // Respond
+  res.json(interfaces);
+
+  // } catch (error) {
+  //   console.error(`❌ Error: ${error.message}`);
+  //   res.status(500).json({ error: "Failed to start service" });
+  // }
+});
+
+
+
+// For restarting a service
+app.post("/api/interface/restart/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = interfaces.findIndex((i) => i.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Index Not found" });
+  }
+
+  const iface = interfaces[index].interface;
+  const queue = interfaces[index].queue;
+  const serviceName = `suricata-${iface}.service`;
+  const save = interfaces[index].save;
+  // try {
+
+  // Enabling iptable rules
+  if (!save) {
+    await NFQUEUEForwarding(interfaces[index], true);
+    interfaces[index].save = true;
+  }
+  // Start the service
+  await execAsync(`systemctl restart ${serviceName}`);
+
+  // Check the status
+  const { stdout } = await execAsync(`systemctl is-active ${serviceName}`);
+  const status = stdout.trim();
+
+  // Update interface object
+  interfaces[index].status = status;
+
+  console.log(`suricata-${iface}.service status : ${status}`);
+  console.log(`✅ Suricata service on ${iface} on nfqueue ${queue} has restarted: ${status}`);
+
+  interfaces[index].enableStart=true;
+  interfaces[index].enableRestart=true;
+  interfaces[index].enableStop=false;
+  // Respond
+  res.json(interfaces);
+
+  // } catch (error) {
+  //   console.error(`❌ Error: ${error.message}`);
+  //   res.status(500).json({ error: "Failed to start service" });
+  // }
+});
+
+
+app.post("/api/interface/stop/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = interfaces.findIndex((i) => i.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Index Not found" });
+  }
+
+  const iface = interfaces[index].interface;
+  const queue = interfaces[index].queue;
+  const serviceName = `suricata-${iface}.service`;
+  const save = interfaces[index].save;
+
+  try {
+
+
+    // Stop the service
+    await execAsync(`systemctl stop ${serviceName}`);
+
+    let status = 'unknown';
+    try {
+      const { stdout } = await execAsync(`systemctl is-failed ${serviceName}`);
+      status = stdout.trim();
+    } catch (error) {
+      // If is-failed gives non-zero, we still want the output
+      status = error.stdout ? error.stdout.trim() : 'failed';
+    }
+
+    interfaces[index].status = status;
+
+    console.log(`suricata-${iface}.service status : ${status}`);
+    console.log(`✅ Suricata service on ${iface} on nfqueue ${queue} has stopped: ${status}`);
+
+    interfaces[index].enableStart=false;
+    interfaces[index].enableRestart=true;
+    interfaces[index].enableStop=true;
+    
+    res.json(interfaces);
+
+
+    // Disabling iptable rules
+    if (save) {
+      await NFQUEUEForwarding(interfaces[index], false);
+      interfaces[index].save = false;
+    }
+
+  } catch (error) {
+    console.error(`❌ Error stopping service: ${error.message}`);
+    res.status(500).json({ error: "Failed to stop service" });
+  }
+});
+
+
+
+// Global settings
+function scheduleProgram(startTime, intervalMinutes, commandToRun) {
+  const now = new Date();
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+
+  let firstRun = new Date(now);
+  firstRun.setHours(startHour, startMinute, 0, 0);
+
+  if (firstRun <= now) {
+    // If the time is earlier than now, schedule for the next day
+    firstRun.setDate(firstRun.getDate() + 1);
+  }
+
+  const msUntilFirstRun = firstRun - now;
+
+  console.log(`First run scheduled at ${firstRun}`);
+
+  setTimeout(() => {
+    runProgram(commandToRun);
+    setInterval(() => {
+      runProgram(commandToRun);
+    }, intervalMinutes * 60 * 1000); // interval in milliseconds
+  }, msUntilFirstRun);
+}
+
+function runProgram(command) {
+  console.log(`Running program at ${new Date().toLocaleTimeString()}`);
+  exec(command, (err, stdout, stderr) => {
+    if (err) {
+      console.error("Error running program:", err);
+      return;
+    }
+    console.log("Output:", stdout);
+    if (stderr) console.error("Stderr:", stderr);
+  });
+}
+
+app.post("/api/update-schedule", (req, res) => {
+  const startTime = req.body.updateTime;
+  const interval = req.body.updateInterval;
+  const liveupdates = req.body.liveRuleSwapUpdate;
+
+  const command1 = "suricata-update && kill -USR2 $(pidof suricata)";
+  const command2 = interfaces
+    .filter(item => item && item.interface)
+    .map(item => `suricata-update && systemctl restart suricata-${item.interface}.service`)
+    .join(' && ');
+
+  if (liveupdates) {
+    scheduleProgram(startTime, interval, command1);
+  }
+  else {
+    scheduleProgram(startTime, interval, command2);
+  }
+  res.json({ message: "Scheduler set" });
+});
+
+
 
 app.get("/api/alert_settings", (req, res) => {
   res.json(alert_settings);
@@ -642,8 +1979,8 @@ app.post("/api/block_settings", (req, res) => {
 
 function parseSuricataLogs(logLines) {
   const results = [];
-
-  const regex = /^(\d{2}\/\d{2}\/\d{4}-\d{2}:\d{2}:\d{2}\.\d+)\s+\[\*\*\]\s+\[(\d+):(\d+):(\d+)\]\s+(.*?)\s+\[\*\*\]\s+\[Classification: (.*?)\]\s+\[Priority: \d+\]\s+\{(\w+)\}\s+([\d.]+):(\d+)\s+->\s+([\d.]+):(\d+)/;
+  console.log("parsing started");
+  const regex = /^(\d{2}\/\d{2}\/\d{4}-\d{2}:\d{2}:\d{2}\.\d+)\s+\[(\w+)\]\s+\[\*\*\]\s+\[(\d+):(\d+):(\d+)\]\s+(.*?)\s+\[\*\*\]\s+\[Classification:\s+(.*?)\]\s+\[Priority:\s+(\d+)\]\s+\{(\w+)\}\s+([\d.]+):(\d+)\s+->\s+([\d.]+):(\d+)/;
 
   for (let i = 0; i < logLines.length; i++) {
     const line = logLines[i];
@@ -652,13 +1989,14 @@ function parseSuricataLogs(logLines) {
     if (match) {
       const [
         _,
-        date,
+        timestamp,
         action,
         gid,
         sid,
         rev,
         description,
         classification,
+        priority,
         protocol,
         sourceIP,
         sourcePort,
@@ -667,32 +2005,60 @@ function parseSuricataLogs(logLines) {
       ] = match;
 
       results.push({
-        date,
+        timestamp,
         action,
+        gid,
+        sid,
+        rev,
+        description,
+        classification,
+        priority,
         protocol,
         sourceIP,
         sourcePort,
         destinationIP,
-        destinationPort,
-        description: `${description} (${classification})`,
-        gidSidRev: `${gid}:${sid}:${rev}`
+        destinationPort
       });
+      // console.log({
+      //   timestamp,
+      //   action,
+      //   gid,
+      //   sid,
+      //   rev,
+      //   description,
+      //   classification,
+      //   priority,
+      //   protocol,
+      //   sourceIP,
+      //   sourcePort,
+      //   destinationIP,
+      //   destinationPort
+      // });
     } else {
-      console.warn("No match for log line:", line);
+      console.warn("No match!");
     }
   }
-
   return results;
 }
 
 
 app.get('/api/alertlogs', (req, res) => {
-  console.log("Request come");
+  console.log("request come");
   if (alert_settings !== "") {
-    const logText = fs.readFileSync('/var/log/suricata/fast.log.1', 'utf-8');
-    const lines = logText.split('\n').filter(Boolean);
-    const parsedLogs = parseSuricataLogs(lines.slice(-alert_settings.numAlertsToDisplay).reverse());
-    res.json(parsedLogs);
+    const logpath = path.join(logDirectory, `${alert_settings.alertInstanceView}`);
+    if (fs.existsSync(path.join(logpath, 'fast.log'))) {
+      console.log("before parsing started");
+      const logText = fs.readFileSync(path.join(logpath, 'fast.log'), 'utf-8');
+      const lines = logText.split('\n').filter(Boolean);
+      const parsedLogs = parseSuricataLogs(lines.slice(-alert_settings.numAlertsToDisplay).reverse());
+      res.json(parsedLogs);
+    }
+    else {
+      res.json([]);
+    }
+  }
+  else {
+    res.json([]);
   }
 });
 
@@ -708,11 +2074,9 @@ app.get('/api/blocklogs', (req, res) => {
 });
 
 
-const absolutePath = '/var/log/suricata';
 
 app.get('/api/files', (req, res) => {
-  console.log("requested");
-  fs.readdir(absolutePath, (err, files) => {
+  fs.readdir(path.join(logDirectory, `${req.query.interface}`), (err, files) => {
     if (err) return res.status(500).json({ error: 'Unable to read folder' });
     res.json(files);
   });
@@ -720,8 +2084,7 @@ app.get('/api/files', (req, res) => {
 
 // Get content of a file
 app.get('/api/file', (req, res) => {
-  const filePath = path.join(absolutePath, req.query.path);
-
+  const filePath = path.join(path.join(logDirectory, req.query.interface), req.query.filename);
   if (!filePath) {
     return res.status(400).json({ error: 'Missing file path' });
   }
@@ -733,7 +2096,6 @@ app.get('/api/file', (req, res) => {
     res.send(data);
   });
 });
-
 
 
 module.exports = app;

@@ -1,1 +1,1 @@
-sudo apt install build-essential wireguard nlohmann-json3-dev libcrypt-dev libqrencode-dev libpng-dev nodejs npm sysstat libdbus-1-dev isc-dhcp-server clamav clamav-daemon
+sudo apt install build-essential wireguard nlohmann-json3-dev libcrypt-dev libqrencode-dev libpng-dev nodejs npm sysstat libdbus-1-dev isc-dhcp-server clamav clamav-daemon suricata
