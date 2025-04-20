@@ -1,54 +1,52 @@
-const net = require('net');
 
-const SERVER_IP = "127.0.0.1";
-const SERVER_PORT = 8080;
-
-const client = new net.Socket();
-client.on('data', (data) => {
-    const responseType = data.readUint8(0);
-    if (responseType == 1) {
-        const filenameSize = data.readUInt8(1);
-        if (filenameSize == 0) {
-            console.log("Unable to scan the file");
+const startSuricata = (res) => {
+    const command = `systemctl daemon-reload && systemctl start suricata-${interfaces[index].interface}.service`;
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`❌ Error: ${error.message}`);
+            return;
         }
-        else {
-            const filename = data.slice(2, 2 + filenameSize).toString();
-            console.log(filename);
+        if (stderr) {
+            console.error(`⚠ STDERR: ${stderr}`);
+            return;
         }
-    }
-    else if (responseType == 3) {
-        const ID = data.readInt32LE(1);
-        if (ID == 0) {
-            console.log("Unable to establish the VPN connection");
-        }
-        else {
-            console.log(`ID : ${ID}`);
-        }
-    }
-});
-
-const Antivirus_request = (filename) => {
-    console.log(filename);
-    const filenameBuffer = Buffer.from(filename);
-    const filenameSize = filename.length;
-    const buffer = Buffer.alloc(2 + filenameSize);
-    buffer.writeUInt8(0);
-    buffer.writeUInt8(filenameSize, 1);
-    filenameBuffer.copy(buffer, 2);
-    console.log(buffer.toString());
-    client.write(buffer);
+    });
 }
 
-const vpn = () => {
-    const buffer = Buffer.alloc(1);
-    buffer.writeUInt8(2);
-    client.write(buffer);
-}
+// For starting a service
+app.post("/api/interface/start/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = interfaces.findIndex((i) => i.id === id);
 
+    if (index !== -1) {
+        const command = `systemctl daemon-reload && systemctl start suricata-${interfaces[index].interface}.service`;
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`❌ Error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.error(`⚠ STDERR: ${stderr}`);
+                return;
+            }
+            exec(`systemctl is-active suricata-${interfaces[index].interface}.service`, (error, stdout, stderr) => {
+                const status = stdout.trim();
+                if (error) {
+                    console.log(`suricata-${interfaces[index].interface}.service is not active or not found`);
+                    return;
+                }
+                if (stderr) {
+                    console.error(`⚠ STDERR: ${stderr}`);
+                    return;
+                }
+                interfaces[index].status = status;
+                console.log(`suricata-${interfaces[index].interface}.service status : ${status}`);
+                console.log(`✅ Suricata service on ${interfaces[index].interface} on nfqueue ${interfaces[index].queue} has started:\n${stdout}`);
+                res.json(interfaces);
+            });
 
-client.connect(SERVER_PORT, SERVER_IP, () => {
-    console.log("Connected to server");
+        });
+    } else {
+        res.status(404).json({ error: "Not found" });
+    }
 });
-
-Antivirus_request("1738654701280.png");
-vpn();
