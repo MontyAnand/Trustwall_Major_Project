@@ -19,6 +19,7 @@ import LogViewForm from "./components/suricata/logView";
 // import LogManagement from "./components/suricatalogManagement";
 // import SidManagement from "./components/suricatasidManagement";
 import DHCPConfiguration from "./pages/dhcp_configuration";
+import StaticMappingsForm from "./components/dhcp/staticMappingsForm";
 import Interface from "./pages/Interface";
 import ActiveConnections from "./pages/Active_connections";
 
@@ -46,7 +47,12 @@ function App() {
               <Route path="/cpu-info" element={<CPUInfo />} />
               <Route path="/network-traffic" element={<NetworkTrafficChart />} />
               <Route path="/terminal" element={<LinuxTerminal />} />
+
+              {/* DHCP routes for frontend */}
               <Route path="/dhcp" element={<DHCPConfiguration />} />
+              <Route path="/dhcp/static-mappings/add" element={<StaticMappingsForm/>} />
+              <Route path="/dhcp/static-mappings/edit/:id" element={<StaticMappingsForm/>} />
+
               <Route path="/firewall" element={<Firewall />} />
               <Route path="/interface" element={<Interface />} />
               <Route path="/dashboard" element={<Dashboard />} />

@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const bodyParser = require("body-parser");
+const macaddress = require('macaddress');
 const fs = require('fs');
 const crypto = require('crypto');
 const { exec } = require('child_process');
@@ -8,7 +9,8 @@ const execAsync = util.promisify(exec);
 
 const app = Router();
 
-
+let staticMappings = [];
+let nextId = 1;
 // This part is to manage DHCP configuration
 
 // Middleware to parse JSON bodies
@@ -16,7 +18,7 @@ app.use(bodyParser.json());
 
 
 // Function to generate DHCP configuration
-function generateDhcpConfig(data) {
+function generateDhcpConfig(data, staticMappings) {
     let configLines = [];
 
     configLines.push(`# dhcpd.conf
@@ -72,7 +74,7 @@ key omapi_key {
     }
 
     if (data.Deny_unknown_clients === 1) {
-        configLines.push(`# This will not allow any Unknown DHCP clients from any interface`);
+        configLines.push(`# This will not allow any Unknown DHCP clients from any staticMappings`);
         configLines.push(`deny unknown-clients;`);
         configLines.push(`\n`);
     }
@@ -142,20 +144,36 @@ key omapi_key {
 
 
 // Define the backend route
-app.post('/save', function (req, res) {
+app.post('/save', async function (req, res) {
     const data = req.body;
     // Write data to a file
     const dhcpFilePath = "/etc/dhcp/dhcpd.conf";
-    const dhcpConfig = generateDhcpConfig(data);
-    fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
-        if (err) {
-            console.error('Error writing to file:', err);
-            res.status(500).send({ message: 'Error writing to file' });
-        } else {
-            console.log('DHCP configuration Data is saved to a file location ', dhcpFilePath);
-            res.send({ message: 'DHCP Data is saved successfully.' });
-        }
-    });
+    const tempFilePath = "./temp.conf";
+    const dhcpConfig = generateDhcpConfig(data, staticMappings);
+    //Configuration Syntax check
+    try {
+        fs.writeFile(tempFilePath, dhcpConfig, function (err) {
+            if (err) {
+                console.error('Error writing to file:', err);
+                res.status(500).send({ message: 'Error writing to file' });
+            }
+        });
+        const { stderr } = await execAsync(`dhcpd -t -cf ${tempFilePath}`);
+        // Writing to file after syntaxcheck
+        fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
+            if (err) {
+                console.error('Error writing to file:', err);
+                res.status(500).send({ message: 'Error writing to file' });
+            } else {
+                console.log('DHCP configuration Data is saved to a file location ', dhcpFilePath);
+                res.send({ message: 'DHCP Data is saved successfully.' });
+            }
+        });
+    }
+    catch (err) {
+        console.error('Syntax Error', err);
+        res.status(500).send({ message: `${err}` });
+    }
 });
 
 
@@ -176,7 +194,7 @@ app.post('/status', async (req, res) => {
 
 // Executing System services by command
 app.post('/service', async (req, res) => {
-    const  action  = req.body.action;
+    const action = req.body.action;
 
     try {
         const { stdout, stderr } = await execAsync(`systemctl ${action} isc-dhcp-server`);
@@ -221,6 +239,85 @@ app.post('/generateKey', (req, res) => {
     } catch (error) {
         res.status(500).send("Error in generation of key");
     }
+});
+
+
+// Endpoint to store Static Mappings data
+
+app.get("/staticMappings", (req, res) => {
+    res.json(staticMappings);
+});
+
+app.get("/staticMappings/:id", (req, res) => {
+    const found = staticMappings.find((i) => i.id == req.params.id);
+    found ? res.json(found) : res.status(404).json({ error: "Not found" });
+});
+
+function appendHostConfig() {
+    const config = [];
+
+    if (staticMappings.length > 0) {
+        staticMappings.map((staticMap) => {
+            config.push(`\n
+host ${staticMap.hostname} {
+    hardware ethernet ${staticMap.macAddress};
+    fixed-address ${staticMap.ipAddress};
+}
+                
+`);
+        })
+    }
+    return config.join('\n');
+}
+
+app.post('/staticMappings', (req, res) => {
+    const newEntry = { ...req.body, id: nextId++ };
+    staticMappings.push(newEntry);
+    const config = appendHostConfig();
+    fs.appendFile('/etc/dhcp/dhcpd.conf', config, function (err) {
+        if (err) {
+            console.error('Error appending to file:', err);
+            res.status(500).send({ message: 'Error writing to file' });
+        }
+    });
+    res.json({ message: `staticMappings(${newEntry.staticMappings}) data is a saved.` });
+});
+
+
+app.put("/staticMappings/:id", (req, res) => {
+    const index = staticMappings.findIndex((i) => i.id == req.params.id);
+    if (index !== -1) {
+        const prestaticMapping = staticMappings[index];
+        if (JSON.stringify(req.body) !== JSON.stringify(prestaticMapping)) {
+            staticMappings[index] = { ...req.body, id: staticMappings[index].id };
+        }
+        res.json(staticMappings[index]);
+    } else {
+        res.status(404).json({ error: "Not found" });
+    }
+});
+
+app.delete("/staticMappings/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = staticMappings.findIndex((i) => i.id === id);
+    if (index !== -1) {
+        staticMappings.splice(index, 1);
+        res.json({ message: "Deleted successfully" });
+    } else {
+        res.status(404).json({ error: "Not found" });
+    }
+});
+
+app.post("/staticMappings/myMacAddress", (req, res) => {
+
+    macaddress.one((err, mac) => {
+        if (err) {
+            console.error('Error fetching MAC address:', err);
+            return res.status(500).json({ error: 'Unable to get MAC address' });
+        }
+
+        res.json({ macAddress: mac });
+    });
 });
 
 module.exports = app;
