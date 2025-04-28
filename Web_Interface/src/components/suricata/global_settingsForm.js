@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import './interfaceForm.css';
 import Navbar from "./navbar";
+import Sidebar from "../Sidebar";
 
 const GlobalSettingsForm = () => {
     const [formData, setFormData] = useState({
@@ -52,7 +53,9 @@ const GlobalSettingsForm = () => {
     };
     return (
         <>
+            <Sidebar/>
             <Navbar />
+            <div className="suricata-container">
             <form onSubmit={handleSubmit}>
                 {/* rule type settings glabally */}
                 {/* <h1>Please Choose the Type of Rules you want to download</h1>
@@ -109,7 +112,7 @@ const GlobalSettingsForm = () => {
 
                 {/* Rules Update Settings */}
                 <h1>Rules Update Settings</h1>
-                <div className="section">
+                <div className="suricata_section">
                     <label>Update Interval(in hours)&emsp;&emsp;</label>
                     <select name="updateInterval" value={formData.updateInterval} onChange={handleChange} >
                         <option value={"NEVER"}>NEVER</option>
@@ -120,13 +123,13 @@ const GlobalSettingsForm = () => {
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Please select the interval for rule updates.Choosing NEVER disables auto-updates.<span style={{ color: 'blue', fontWeight: 'bolder' }}>Hint:</span>In most cases ,every 12 hours is a good choice.</label>
                 </div>
 
-                <div className="section">
+                <div className="suricata_section">
                     <label>Update Start Time(in hours)&emsp;&emsp;</label>
                     <input type="time" name="updateTime" value={formData.updateTime} onChange={handleChange} placeholder="time format HH:MM"></input>
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Enter the rule update start time in 24-hour format (HH:MM).Default is 00:00 hours value.Rules will update at the interval chosen above starting at the time specified here.For example, using a start time of 00:08 and choosing 12 Hours for the interval,the rules will update at 00:08 and 12;08 each day.</label>
                 </div>
 
-                <div className="section">
+                <div className="suricata_section">
                     <label>Live Rule Swap on Updates&emsp;&emsp;</label>
                     <input type="checkbox" name="liveRuleSwapUpdate" checked={formData.liveRuleSwapUpdate} onChange={handleChange}  />
                     <label>&ensp;Enable "Live Swap" reload of the rules after downloading an update.Default is Not Checked&emsp;&emsp;</label>
@@ -182,11 +185,12 @@ const GlobalSettingsForm = () => {
                     <label style={{ fontSize: '0.85em', color: '#777' }}></label>
                 </div> */}
                 {/* Submit button */}
-                <div className="section">
+                <div className="suricata_section">
                     <button type="submit">Save</button>
                 </div>
 
             </form>
+            </div>
         </>
     );
 };

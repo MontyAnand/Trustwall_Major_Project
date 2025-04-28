@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from './navbar';
+import Sidebar from '../Sidebar';
 // import './interfaceForm.css';
 const AlertsViewForm = () => {
     const [formData, setFormData] = useState({
@@ -91,11 +92,13 @@ const AlertsViewForm = () => {
     };
     return (
         <>
+            <Sidebar/>
             <Navbar />
+            <div className='suricata-container'>
             <form onSubmit={handleSubmit}>
                 {/* Alert view settings */}
                 <h1>Alert Log View Settings</h1>
-                <div className='section'>
+                <div className='suricata_section'>
                     <select name="alertInstanceView" value={formData.alertInstanceView} onChange={handleChange} required>
                         <option value="">--- select a interface ---</option>
                         <option value={"WAN"}>WAN</option>
@@ -112,7 +115,7 @@ const AlertsViewForm = () => {
                     <label style={{ fontSize: '0.85em', color: '#777' }}>&emsp;Clear the currently active Alerts log file</label>
                 </div> */}
 
-                <div className='section'>
+                <div className='suricata_section'>
                     <label>Save Settings&emsp;&emsp;</label>
                     <button type='submit'>&#128190; Save</button>
                     <label style={{ fontSize: '0.85em', color: '#777' }}>&emsp;Save auto-refresh and view settings&emsp;</label>
@@ -163,6 +166,7 @@ const AlertsViewForm = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
             </div>
         </>
     );

@@ -31,9 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/VPN" element={<VPN />} />
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/antivirus" element={<Antivirus />} />
+            <Route path="/antivirus" element={<Antivirus />} />
               
                {/* Suricata routes for front-end  */}
               <Route path="/suricata" element={<Suricata />} />
@@ -53,7 +51,8 @@ function App() {
               <Route path="/interface" element={<Interface />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/active-connection" element={<ActiveConnections />} />
-            </Route>
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}></Route>
           </Routes>
         </div>
       </div>

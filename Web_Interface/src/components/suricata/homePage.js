@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./navbar";
 import "./interfaceForm.css";
-// import Sidebar from "../Sidebar";
+import Sidebar from "../Sidebar";
 
 const HomePage = () => {
   const [interfaces, setInterfaces] = useState([]);
@@ -52,11 +52,11 @@ const HomePage = () => {
   return (
 
     <>
-      {/* <Sidebar/> */}
+      <Sidebar/>
 
       <Navbar />
 
-      <div className="container">
+      <div className="suricata-container">
         <h2>Suricata Interfaces</h2>
         <table>
           <thead>

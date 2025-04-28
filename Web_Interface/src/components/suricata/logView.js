@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from './navbar';
 import './interfaceForm.css';
+import Sidebar from '../Sidebar';
 
 const LogViewForm = () => {
     const [logInstanceView, setLogInstanceView] = useState('');
@@ -43,11 +44,13 @@ const LogViewForm = () => {
 
     return (
         <>
+            <Sidebar/>
             <Navbar />
+            <div className='suricata-container'>
             <form onSubmit={handleSubmit}>
                 {/* Alert view settings */}
                 <h1>Logs Browser Selection</h1>
-                <div className='section'>
+                <div className='suricata_section'>
                     <label>Instance to View</label>
                     <select name="logInstanceView" value={logInstanceView} onChange={(e) => {
                         
@@ -73,7 +76,7 @@ const LogViewForm = () => {
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Choose which instance alerts you want to inspect</label>
                 </div>
 
-                <div className='section'>
+                <div className='suricata_section'>
 
                     <label>File to View</label>
                     <select name="logFileView" value={logFileView} onChange={(e) => setLogFileView(e.target.value)} required>
@@ -89,7 +92,7 @@ const LogViewForm = () => {
             </form >
 
             {/* Logs content */}
-            <div className='section'>
+            <div className='suricata_section'>
                 <h1>Log Contents</h1>
                 <textarea
                     rows={rows}
@@ -98,6 +101,7 @@ const LogViewForm = () => {
                     readOnly
                     style={{ fontFamily: 'monospace', whiteSpace: 'pre', width: '100%' }}
                 />
+            </div>
             </div>
         </>
     );
