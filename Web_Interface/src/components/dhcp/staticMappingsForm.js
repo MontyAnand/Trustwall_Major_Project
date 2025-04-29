@@ -69,8 +69,7 @@ const StaticMappingsForm = () => {
 
     return (
         <>
-         <Sidebar/>
-        <div style={{marginTop:'100px'}} className='suricata-container'>
+        <div className='suricata-container'>
             <form onSubmit={handleSubmit}>
                 <h1>Static DHCP Mapping on LAN</h1>
                 <div className='suricata_section'>
