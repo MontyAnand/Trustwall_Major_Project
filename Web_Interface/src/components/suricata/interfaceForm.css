@@ -40,15 +40,15 @@
   } */
 
   .suricata-container button {
-    display:block;
+    /* display:block;
     width: 20%;
-    margin:30px auto;
+    margin:30px auto; */
     background-color:#015551;
-    padding:19px 23px;
+    /* padding:19px 23px; */
     /* background-color: rgb(23, 102, 207); */
     color: white;
-    /* width: 100px;
-    height: 40px; */
+    width: 100px;
+    height: 40px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
