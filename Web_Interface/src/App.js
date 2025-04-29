@@ -58,7 +58,9 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/active-connection" element={<ActiveConnections />} />
             {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}></Route>
+            <Route element={<ProtectedRoute />}>
+            
+            </Route>
           </Routes>
         </div>
       </div>

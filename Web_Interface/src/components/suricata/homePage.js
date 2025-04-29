@@ -57,7 +57,7 @@ const HomePage = () => {
       <Navbar />
 
       <div className="suricata-container">
-        <h2>Suricata Interfaces</h2>
+        <h2 style={{textAlign:'center',marginBottom:'10px'}}>Suricata Interfaces</h2>
         <table>
           <thead>
             <tr>

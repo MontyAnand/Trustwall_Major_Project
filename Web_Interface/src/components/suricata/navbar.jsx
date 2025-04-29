@@ -6,7 +6,7 @@ const Navbar = () => {
   return (
     <>
       <div className="outside_suricata_container">
-        <h1>Suricata Configuration</h1>
+        <h1 style={{textAlign:'center'}}>Suricata Configuration</h1>
 
         <nav className="suricata-navbar">
           <ul>

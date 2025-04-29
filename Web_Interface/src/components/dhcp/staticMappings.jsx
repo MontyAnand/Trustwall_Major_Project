@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../pages/dhcp_configuration.css';
+import '../suricata/interfaceForm.css';
 
 const StaticMappings = () => {
     const navigate = useNavigate();
@@ -22,10 +23,11 @@ const StaticMappings = () => {
         });
     }, []);
 
+    // style={{ textAlign: 'left' }}
     return (
         <>
-            <div className='static-mapping-container'>
-                <h1 style={{ textAlign: 'left' }}>DHCP Static Mappings</h1>
+            <div id='static-mapping-container' className='suricata-container'>
+                <h2 style={{padding:'10px 0'}}>DHCP Static Mappings</h2>
                 <table>
                     <thead>
                         <tr>

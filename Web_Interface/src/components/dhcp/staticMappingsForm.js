@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../suricata/interfaceForm.css';
+import Sidebar from '../Sidebar';
 const StaticMappingsForm = () => {
     const navigate = useNavigate();
     const { id } = useParams(); // for edit
@@ -67,14 +68,16 @@ const StaticMappingsForm = () => {
     };
 
     return (
-        <div className='container'>
+        <>
+         <Sidebar/>
+        <div style={{marginTop:'100px'}} className='suricata-container'>
             <form onSubmit={handleSubmit}>
                 <h1>Static DHCP Mapping on LAN</h1>
-                <div className='section'>
+                <div className='suricata_section'>
                     <label><b>DHCP Backend : &emsp;&emsp;</b></label>
                     <input type="text" value={"ISC DHCP"} readOnly />
                 </div>
-                <div className="section">
+                <div className="suricata_section">
                     <label><b>MAC Address: </b>&emsp;&emsp;</label>
                     <input type="text" name="macAddress" value={formData.macAddress} onChange={handleChange} pattern='^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$' required />
                     <button type="button" onClick={fetchMyMacAddress} >Copy My MAC</button>
@@ -86,7 +89,7 @@ const StaticMappingsForm = () => {
                     <input type="text" name="clientIdentifier" value={formData.clientIdentifier} onChange={handleChange} />
                     <label style={{ fontSize: '0.85em', color: '#777' }}>&emsp;An optional identifier to match based on the value sent by the client (RFC 2132)</label>
                 </div> */}
-                <div className="section">
+                <div className="suricata_section">
                     <label><b>IP Address: </b>&emsp;&emsp;</label>
                     <input type="text" name="ipAddress" value={formData.ipAddress} onChange={handleChange} pattern='^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$' required />
                     <label style={{ fontSize: '0.85em', color: '#777' }}><p>IPv4 address to assign this client.</p><br />
@@ -94,21 +97,22 @@ const StaticMappingsForm = () => {
                         <p>The same IP address may be assigned to multiple mappings</p>
                     </label>
                 </div>
-                <div className="section">
+                <div className="suricata_section">
                     <label><b>Hostname: </b>&emsp;&emsp;</label>
                     <input type="text" name="hostname" value={formData.hostname} onChange={handleChange} required />
                     <label style={{ fontSize: '0.85em', color: '#777' }}>Name of the client host without the domain part.</label>
                 </div>
-                <div className="section">
+                <div className="suricata_section">
                     <label><b>Description: </b>&emsp;&emsp;</label>
                     <input type="text" name="description" value={formData.description} onChange={handleChange} />
                     <label style={{ fontSize: '0.85em', color: '#777' }}>A description for administrative reference (not parsed).</label>
                 </div>
-                <div className="section">
+                <div className="suricata_section">
                     <button type="submit">{id ? "Update" : "Add"}</button>
                 </div>
             </form>
         </div>
+        </>
     );
 };
 
