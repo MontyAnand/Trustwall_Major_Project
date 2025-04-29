@@ -136,7 +136,7 @@ const InterfaceForm = () => {
         {/* need some adjustments */}
         <div className="suricata_section">
           <label>Interface&emsp;&emsp;</label>
-          <select name="interfaceForm_interface" value={formData.interface} onChange={handleChange} required>
+          <select name="interface" value={formData.interface} onChange={handleChange} required>
             <option value={""}>--- select a interface ---</option>
             <option value={"WAN"}>WAN</option>
             <option value={"LAN"}>LAN</option>
