@@ -1,6 +1,7 @@
 import { Link , useLocation} from "react-router-dom";
 import "../pages/Sidebar.css";
 import { useAuth } from "../Contexts/authContex";
+import logo from "../Images/trustwall_logo.png";
 
 
 function Sidebar() {
@@ -9,7 +10,7 @@ function Sidebar() {
 
   return (
     <div className="sidebar-container">
-      <h2 className="sidebar-heading">TRUSTWALL</h2>
+      <img className="sidebar-heading" src={logo} alt="trustwall-logo"/>
       <nav className="sidebar-navbar">
         <ul className="sidebar-box">
         <li className="py-2"><Link to="/dashboard" style={{color:location.pathname === "/dashboard" ? "#007bff" :"white"}} >Dashboard</Link></li>

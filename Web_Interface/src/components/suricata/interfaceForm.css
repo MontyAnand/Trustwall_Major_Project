@@ -1,21 +1,21 @@
-body {
+* {
     font-family: Arial, sans-serif;
     margin: 20px;
   }
 
-  .section {
+  .suricata_section {
     margin-bottom: 20px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
   }
 
-  label {
+  .suricata-container label {
     /* display: block; */
     margin-bottom: 5px;
   }
 
-  input[type="text"],
+  .suricata-container input[type="text"],.suricata-container
   select {
     width: 100%;
     padding: 10px;
@@ -24,93 +24,103 @@ body {
     box-sizing: border-box;
   }
 
-  table {
+  .suricata-container table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  th,
-  td {
+  .suricata-container th,
+  .suricata-container td {
     border: 1px solid #ddd;
     padding: 8px;
   }
 
-  th {
+  /* .suricata-container th {
     background-color: #f4f4f4;
-  }
+  } */
 
-  button {
-    background-color: rgb(23, 102, 207);
+  .suricata-container button {
+    /* display:block;
+    width: 20%;
+    margin:30px auto; */
+    background-color:#015551;
+    /* padding:19px 23px; */
+    /* background-color: rgb(23, 102, 207); */
     color: white;
     width: 100px;
     height: 40px;
     border: none;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
   }
 
-  button:hover {
-    background-color: rgb(15, 84, 175);
+  .suricata-container button:hover {
+    /* background-color: rgb(15, 84, 175); */
+    background-color:#117d78;
   }
 
-  h1{
+  .suricata-container h1{
     color: white;
     background-color: black;
   }
   
 
-  .navbar {
+  .suricata-navbar {
     background-color: #fff;
     padding: 10px;
     text-align: center;
   }
   
-  .navbar ul {
+  .suricata-navbar ul {
     list-style-type: none;
     padding: 0;
   }
   
-  .navbar li {
+  .suricata-navbar li {
     display: inline;
     margin: 0 15px;
   }
   
-  .navbar a {
+  .suricata-navbar a {
     text-decoration: none;
     color: red;
     font-weight: bold;
   }
   
-  .navbar a:hover {
+  .suricata-navbar a:hover {
     text-decoration: underline;
   }
 
-  .navbar a:active{
+  .suricata-navbar a:active{
     background-color: yellow;
   }
 
 
 
-  .logs-container {
+  .suricata-container .logs-container {
     padding: 20px;
   }
   
-  table {
+  .suricata-container table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
   }
   
-  th, td {
+  .suricata-container th,.suricata-container td {
     border: 1px solid #ccc;
     padding: 8px 12px;
     text-align: left;
   }
   
-  th {
+  /* .suricata-container th {
     background-color: #f2f2f2;
-  }
-  button:disabled {
+  } */
+  .suricata-container button:disabled {
     opacity: 0.5; 
     cursor: not-allowed; 
+}
+.outside_suricata_container{
+  margin-top: 80px;
+  margin-bottom: 40px;
 }

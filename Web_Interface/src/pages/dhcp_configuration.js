@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import "./dhcp_configuration"
-import DynamicDNS from "../components/dynamicDNS";
-import MACAddressControl from "../components/MACAddressControl";
-import NTP from "../components/NTP";
-import TFTP from "../components/TFTP";
-import LDAP from "../components/LDAP";
-import NetworkBooting from "../components/NetworkBooting";
-import CustomDHCP from "../components/customDHCP";
+import "./dhcp_configuration.css";
+// import DynamicDNS from "../components/dynamicDNS";
+// import MACAddressControl from "../components/MACAddressControl";
+// import NTP from "../components/NTP";
+// import TFTP from "../components/TFTP";
+// import LDAP from "../components/LDAP";
+// import NetworkBooting from "../components/NetworkBooting";
+// import CustomDHCP from "../components/customDHCP";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
+import StaticMappings from "../components/dhcp/staticMappings";
 
 function DHCPConfiguration() {
   // useState for main blocks
@@ -48,7 +49,7 @@ function DHCPConfiguration() {
   const [domainsearchlist, setDomainSearchList] = useState("");
   const [defaultleasetime, setDefaultLeaseTime] = useState("600");
   const [maxleasetime, setMaxLeaseTime] = useState("7200");
-  const [failoverpeerip, setFailOverPeerIp] = useState("");
+  // const [failoverpeerip, setFailOverPeerIp] = useState("");
   const [enablestaticarp, setEnableStaticArp] = useState("");
   const [enablechangetimeformat, setEnableChangeTimeFormat] = useState("");
   const [enablestaticticsgraph, setEnableStaticticsGraph] = useState("");
@@ -110,7 +111,7 @@ function DHCPConfiguration() {
       Domain_search_list: domainsearchlist,
       Default_lease_time: defaultleasetime,
       Maximum_lease_time: maxleasetime,
-      Failover_peer_Ip: failoverpeerip,
+      // Failover_peer_Ip: failoverpeerip,
       Static_arp_entries_enable: enablestaticarp,
       Dhcp_lease_time_format_UTC_to_Local_enable: enablechangetimeformat,
       Dhcp_lease_monitoring_stats_enable: enablestaticticsgraph,
@@ -157,81 +158,39 @@ function DHCPConfiguration() {
       .join(".");
   }
 
-  // Function to perform bitwise AND operation on two IPs
-  function bitwiseAnd(ip1, ip2) {
-    const binaryIp1 = ipToBinary(ip1).split(".");
-    const binaryIp2 = ipToBinary(ip2).split(".");
 
-    const andResult = binaryIp1.map((octet, index) => {
-      // Perform AND operation on each octet
-      return (parseInt(octet, 2) & parseInt(binaryIp2[index], 2))
-        .toString(2)
-        .padStart(8, "0");
-    });
 
-    return andResult.join(".");
-  }
 
-  // Function to check if an IP is in a subnet
-  function isIpInSubnet(ip, subnetIp, subnetMask) {
-    const andResult = bitwiseAnd(ip, subnetMask); // Perform AND operation between IP and subnet mask
-    const networkAddress = bitwiseAnd(subnetIp, subnetMask); // Get the network address of the subnet
 
-    return andResult === networkAddress;
-  }
 
-  //' Handle key Genration
-  const handleGenerateKey = async () => {
-    if (checkkey && omapialgo) {
-      try {
-        const response = await axios.post(
-          `http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/generateKey`,
-          { omapialgo }
-        );
-        setOmapikKey(response.data.hmac_key);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
 
-  // Handle possible Subnet range
-  const calculateSubnetRange = () => {
-    function ipToLong(ip) {
-      return (
-        ip
-          .split(".")
-          .reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0
-      );
-    }
-
-    function longToIp(long) {
-      return [
-        (long >>> 24) & 255,
-        (long >>> 16) & 255,
-        (long >>> 8) & 255,
-        long & 255,
-      ].join(".");
-    }
-
-    const ipLong = ipToLong(subnet);
-    const maskLong = ipToLong(mask);
-
-    const network = ipLong & maskLong;
-    const broadcast = network | (~maskLong >>> 0);
-
-    const firstUsable = network + 1;
-    const lastUsable = broadcast - 1;
-
-    if (lastUsable <= firstUsable) {
-      return "No usable IPs in this subnet";
-    }
-
-    return `${longToIp(firstUsable)} - ${longToIp(lastUsable)}`;
-  };
 
   //useEffect for controlling submit button's functionality and rendeing the updates
   useEffect(() => {
+    // Function to perform bitwise AND operation on two IPs
+    function bitwiseAnd(ip1, ip2) {
+      const binaryIp1 = ipToBinary(ip1).split(".");
+      const binaryIp2 = ipToBinary(ip2).split(".");
+
+      const andResult = binaryIp1.map((octet, index) => {
+        // Perform AND operation on each octet
+        return (parseInt(octet, 2) & parseInt(binaryIp2[index], 2))
+          .toString(2)
+          .padStart(8, "0");
+      });
+
+      return andResult.join(".");
+    }
+
+    // Function to check if an IP is in a subnet
+    function isIpInSubnet(ip, subnetIp, subnetMask) {
+      const andResult = bitwiseAnd(ip, subnetMask); // Perform AND operation between IP and subnet mask
+      const networkAddress = bitwiseAnd(subnetIp, subnetMask); // Get the network address of the subnet
+
+      return andResult === networkAddress;
+    }
+
+
     if (interfacechecked && startIP.trim() !== "" && endIP.trim() !== "") {
       if (
         interfacechecked &&
@@ -250,6 +209,21 @@ function DHCPConfiguration() {
 
   // Handle Generate key
   useEffect(() => {
+    //' Handle key Genration
+    const handleGenerateKey = async () => {
+      if (checkkey && omapialgo) {
+        try {
+          const response = await axios.post(
+            `http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/generateKey`,
+            { omapialgo }
+          );
+          setOmapikKey(response.data.hmac_key);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
     if (checkkey && omapialgo) {
       handleGenerateKey();
     } else if (!checkkey) {
@@ -258,6 +232,21 @@ function DHCPConfiguration() {
   }, [checkkey, omapialgo]);
 
   useEffect(() => {
+
+    // Function to perform bitwise AND operation on two IPs
+    function bitwiseAnd(ip1, ip2) {
+      const binaryIp1 = ipToBinary(ip1).split(".");
+      const binaryIp2 = ipToBinary(ip2).split(".");
+
+      const andResult = binaryIp1.map((octet, index) => {
+        // Perform AND operation on each octet
+        return (parseInt(octet, 2) & parseInt(binaryIp2[index], 2))
+          .toString(2)
+          .padStart(8, "0");
+      });
+
+      return andResult.join(".");
+    }
     fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/laninfo`)
       .then((res) => res.json())
       .then((data) => {
@@ -272,6 +261,41 @@ function DHCPConfiguration() {
 
   // Recalculate subnet range when subnet or mask changes
   useEffect(() => {
+    // Handle possible Subnet range
+    const calculateSubnetRange = () => {
+      function ipToLong(ip) {
+        return (
+          ip
+            .split(".")
+            .reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0
+        );
+      }
+
+      function longToIp(long) {
+        return [
+          (long >>> 24) & 255,
+          (long >>> 16) & 255,
+          (long >>> 8) & 255,
+          long & 255,
+        ].join(".");
+      }
+
+      const ipLong = ipToLong(subnet);
+      const maskLong = ipToLong(mask);
+
+      const network = ipLong & maskLong;
+      const broadcast = network | (~maskLong >>> 0);
+
+      const firstUsable = network + 1;
+      const lastUsable = broadcast - 1;
+
+      if (lastUsable <= firstUsable) {
+        return "No usable IPs in this subnet";
+      }
+
+      return `${longToIp(firstUsable)} - ${longToIp(lastUsable)}`;
+    };
+
     if (subnet && mask) {
       const range = calculateSubnetRange(subnet, mask);
       setSubnetRange(range);
@@ -279,31 +303,31 @@ function DHCPConfiguration() {
   }, [subnet, mask]);
 
   // Ignore denied clients
-  useEffect(() => {
-    if (failoverpeerip.trim !== "" && isValid) {
-      setIsDenyClient(false);
-    }
-  }, [failoverpeerip, isValid]);
+  // useEffect(() => {
+  //   if (failoverpeerip.trim !== "" && isValid) {
+  //     setIsDenyClient(false);
+  //   }
+  // }, [failoverpeerip, isValid]);
 
 
   function handleClick(action) {
     const actionOnService = action.trim();
-  
+
     if (actionOnService !== "") {
       axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/service`, {
         action: actionOnService
       })
-      .then((res) => {
-        console.log(res.data); // Optional: Log the success message
-        serviceStatusManagement();
-      })
-      .catch((err) => {
-        console.error("Service action failed:", err.response?.data || err.message);
-        alert("❌ Failed to perform the action: " + (err.response?.data?.error || err.message));
-      });
+        .then((res) => {
+          console.log(res.data); // Optional: Log the success message
+          serviceStatusManagement();
+        })
+        .catch((err) => {
+          console.error("Service action failed:", err.response?.data || err.message);
+          alert("❌ Failed to perform the action: " + (err.response?.data?.error || err.message));
+        });
     }
   }
-  
+
 
   return (
     <>
@@ -615,10 +639,12 @@ function DHCPConfiguration() {
                   <div className="dhcp_text">
                     <label htmlFor="omapi_port">OMAPI Port</label>
                     <input
-                      type="text"
+                      type="number"
                       name="omapi_port"
                       placeholder="OMAPI Port  e.g,7911"
                       value={omapiport}
+                      min={1024}
+                      max={65555}
                       onChange={(e) => setOmapiPort(e.target.value)}
                     ></input>
                   </div>
@@ -849,6 +875,7 @@ function DHCPConfiguration() {
             Save Changes
           </button>
         </div>
+        <StaticMappings/>
       </div>
     </>
   );
