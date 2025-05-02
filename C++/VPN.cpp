@@ -65,7 +65,7 @@ bool VPN::setupServer(std::string IP, std::string netmask)
         fs::current_path(current_path);
         addFirewallRules();
     }
-    catch (fs::filesystem_error &e)
+    catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
         return false;
@@ -299,41 +299,55 @@ bool VPN::generateServerKeys()
 
 void VPN::monitorClient()
 {
-    while (running)
+    try
     {
-        std::this_thread::sleep_for(std::chrono::seconds(TIMEOUT_PERIOD));
-        std::string data;
-        std::array<char, 128> buffer;
-        FILE *pipe = popen("sudo wg show wg0", "r");
-        if (!pipe)
+        while (running)
         {
-            std::cerr << "Unable to start monitoring the VPN clients\n";
-            return;
-        }
-        while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
-        {
-            data += buffer.data();
-        }
-        std::map<std::string, int> handsakeTime;
-        parseString(data, handsakeTime);
-
-        for (auto &p : handsakeTime)
-        {
-            // std::cout << p.first << " : " << p.second << std::endl;
-            if (p.second == -1 || p.second > 240)
+            std::this_thread::sleep_for(std::chrono::seconds(TIMEOUT_PERIOD));
+            std::string data;
+            std::array<char, 128> buffer;
+            FILE *pipe = popen("sudo wg show wg0", "r");
+            if (!pipe)
             {
-                std::string command = "sudo wg set wg0 peer " + p.first + " remove";
-                system(command.c_str());
+                std::cerr << "Unable to start monitoring the VPN clients\n";
+                return;
+            }
+            while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
+            {
+                data += buffer.data();
+            }
+            pclose(pipe);
+
+            std::map<std::string, int> handsakeTime;
+            parseString(data, handsakeTime);
+
+            for (auto &p : handsakeTime)
+            {
+                if (p.second == -1 || p.second > 240)
                 {
-                    std::lock_guard<std::mutex> lock(mtx);
-                    pool->release_ip(record[p.first]);
-                    record.erase(p.first);
+                    std::string command = "sudo wg set wg0 peer " + p.first + " remove";
+                    system(command.c_str());
+                    {
+                        std::lock_guard<std::mutex> lock(mtx);
+                        pool->release_ip(record[p.first]);
+                        record.erase(p.first);
+                    }
                 }
             }
         }
     }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Exception in monitorClient: " << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Unknown exception in monitorClient" << std::endl;
+    }
+
     return;
 }
+
 
 void VPN::addFirewallRules()
 {
