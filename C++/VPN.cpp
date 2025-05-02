@@ -4,6 +4,7 @@ bool VPN::setupServer(std::string IP, std::string netmask)
 {
     try
     {
+        system("sudo wg-quick down wg0");
         pool = new IPPool(IP, netmask);
         std::pair<int, std::string> p = pool->allocate_ip();
         server_ip = p.second;
@@ -241,8 +242,9 @@ std::uint32_t VPN::acceptConnectionRequest()
 
 bool VPN::vpnInterfaceSetup()
 {
-    system("sudo wg-quick down wg0");
-    if (system("wg-quick up wg0") != 0)
+    
+    // system("sudo wg-quick up wg0");
+    if (system("sudo wg-quick up wg0") != 0)
     {
         return false;
     }
