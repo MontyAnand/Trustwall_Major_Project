@@ -201,6 +201,18 @@ input[type="number"]::-webkit-inner-spin-button {
 .dhcp_omapi_container .dhcp_checkbox p{
     display: block;
 }
+
+.dhcp_omapi_container input[type="number"]
+{
+    width: 94%;
+    padding: 12px 23px;
+    padding-left: 10px;
+    font-size: 16px;
+    margin: 12px 0;
+    border-radius: 10px;
+    /* border:1px solid black; */
+}
+
 .dhcp_container p {
     text-align: center;
 }
@@ -342,4 +354,13 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 .dhcp_delete_btn button{
     background-color: #208237;
+}
+
+.static-mapping-container{
+        th{
+            color:black;
+        }
+        button{
+            background-color: #208237;
+        }
 }

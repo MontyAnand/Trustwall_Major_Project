@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import InternalCustomDHCP from "./InternalCustomDHCP";
+import InternalCustomDHCP from "../InternalCustomDHCP";
 
 
 const CustomDHCPBtn = ()=>{
