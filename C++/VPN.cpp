@@ -357,6 +357,7 @@ VPN::VPN() : PORT(51820), TIMEOUT_PERIOD(30 * 60)
 {
     pool = NULL;
     running = true;
+    system("sudo ip link add dev wg0 type wireguard");
     // cleaner = std::thread(&VPN::monitorClient, this);
 }
 
