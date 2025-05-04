@@ -58,10 +58,10 @@ bool VPN::setupServer(std::string IP, std::string netmask)
             throw std::runtime_error("Unable to write Configuration");
         }
 
-        // if (!vpnInterfaceSetup())
-        // {
-        //     throw std::runtime_error("Unable to setup Wireguard Interface");
-        // }
+        if (!vpnInterfaceSetup())
+        {
+            throw std::runtime_error("Unable to setup Wireguard Interface");
+        }
         // system("wg-quick up wg0");
 
         fs::current_path(current_path);
@@ -357,15 +357,15 @@ VPN::VPN() : PORT(51820), TIMEOUT_PERIOD(30 * 60)
 {
     pool = NULL;
     running = true;
-    system("sudo ip link add dev wg0 type wireguard");
-    // cleaner = std::thread(&VPN::monitorClient, this);
+    system("sudo ip link add dev wg0 type wireguard && sudo ip link set up dev wg0");
+    cleaner = std::thread(&VPN::monitorClient, this);
 }
 
 VPN::~VPN()
 {
     running = false;
-    // if (cleaner.joinable())
-    // {
-    //     cleaner.join();
-    // }
+    if (cleaner.joinable())
+    {
+        cleaner.join();
+    }
 }
