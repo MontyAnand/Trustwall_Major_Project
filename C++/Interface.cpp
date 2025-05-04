@@ -13,7 +13,7 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
 {
     // Step 1: Delete the existing IP address
     std::string deleteCommand = "sudo ip addr flush dev " + interface;
-    std::cout << "Executing: " << deleteCommand << std::endl;
+    // std::cout << "Executing: " << deleteCommand << std::endl;
     if (system(deleteCommand.c_str()) != 0)
     {
         std::cerr << "Failed to remove old IP address from " << interface << std::endl;
@@ -22,7 +22,7 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
 
     // Step 2: Assign the new IP address
     std::string addCommand = "sudo ip addr add " + newIP + "/" + std::to_string(netmask) + " dev " + interface;
-    std::cout << "Executing: " << addCommand << std::endl;
+    // std::cout << "Executing: " << addCommand << std::endl;
     if (system(addCommand.c_str()) != 0)
     {
         std::cerr << "Failed to assign new IP address to " << interface << std::endl;
@@ -31,13 +31,13 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
 
     // Step 3: Bring the interface up (optional)
     std::string upCommand = "sudo ip link set " + interface + " up";
-    std::cout << "Executing: " << upCommand << std::endl;
+    // std::cout << "Executing: " << upCommand << std::endl;
     if (system(upCommand.c_str()) != 0)
     {
         std::cerr << "Failed to bring interface " << interface << " up" << std::endl;
     }
 
-    std::cout << "IP address successfully updated on " << interface << std::endl;
+    // std::cout << "IP address successfully updated on " << interface << std::endl;
 }
 
 void Interface::changeLANInterface(std::string &interface)
@@ -71,7 +71,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
     {
         if (length < 8)
         {
-            std::cout << "Bad packet : insufficient meta data\n";
+            // std::cout << "Bad packet : insufficient meta data\n";
             return;
         }
 
@@ -99,7 +99,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
         // Ensure valid data length
         if (length < 8 + nameLength)
         {
-            std::cout << "Bad packet : insufficient data\n";
+            // std::cout << "Bad packet : insufficient data\n";
             return;
         }
 
@@ -125,7 +125,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
     }
     catch (const std::exception &e)
     {
-        std::cout << "Interface Error in C++ : " << e.what() << "\n";
+        // std::cout << "Interface Error in C++ : " << e.what() << "\n";
     }
 }
 
@@ -140,7 +140,7 @@ std::string Interface::getWANInterface()
     }
     else
     {
-        std::cerr << "Failed to read variable." << std::endl;
+        // std::cerr << "Failed to read variable." << std::endl;
     }
     return value;
 }
@@ -156,7 +156,7 @@ std::string Interface::getLANInterface()
     }
     else
     {
-        std::cerr << "Failed to read variable." << std::endl;
+        // std::cerr << "Failed to read variable." << std::endl;
     }
     return value;
 }
@@ -243,7 +243,7 @@ std::string Interface::getGateway(const std::string &iface)
     std::ifstream file("/proc/net/route");
     if (!file.is_open())
     {
-        std::cerr << "Failed to open /proc/net/route" << std::endl;
+        // std::cerr << "Failed to open /proc/net/route" << std::endl;
         return "";
     }
     std::string line;
@@ -298,7 +298,7 @@ std::string Interface::getLANInterfaceDetails()
     if (ioctl(fd, SIOCGIFADDR, &ifr) == 0)
     {
         struct sockaddr_in *ip = (struct sockaddr_in *)&ifr.ifr_addr;
-        std::cout << "IP Address: " << inet_ntoa(ip->sin_addr) << std::endl;
+        // std::cout << "IP Address: " << inet_ntoa(ip->sin_addr) << std::endl;
         IP = inet_ntoa(ip->sin_addr);
     }
     else
@@ -310,7 +310,7 @@ std::string Interface::getLANInterfaceDetails()
     if (ioctl(fd, SIOCGIFNETMASK, &ifr) == 0)
     {
         struct sockaddr_in *netmask = (struct sockaddr_in *)&ifr.ifr_netmask;
-        std::cout << "Netmask: " << inet_ntoa(netmask->sin_addr) << std::endl;
+        // std::cout << "Netmask: " << inet_ntoa(netmask->sin_addr) << std::endl;
         nm = inet_ntoa(netmask->sin_addr);
     }
     else
@@ -322,7 +322,7 @@ std::string Interface::getLANInterfaceDetails()
     if (ioctl(fd, SIOCGIFBRDADDR, &ifr) == 0)
     {
         struct sockaddr_in *bcast = (struct sockaddr_in *)&ifr.ifr_broadaddr;
-        std::cout << "Broadcast IP: " << inet_ntoa(bcast->sin_addr) << std::endl;
+        // std::cout << "Broadcast IP: " << inet_ntoa(bcast->sin_addr) << std::endl;
         bip = inet_ntoa(bcast->sin_addr);
     }
     else

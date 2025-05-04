@@ -194,10 +194,12 @@ void Server::processPacket(char *buffer, int fd, int size)
     case 15:
     {
         Executor::executeCommand(buffer, fd);
+        break;
     }
     case 18:
     {
         handleInterfaceRequest(buffer, fd);
+        break;
     }
     case 20:
     {
@@ -216,25 +218,32 @@ void Server::processPacket(char *buffer, int fd, int size)
 
 void Server::setupVPNServer(int fd, char *buffer, int size)
 {
-    if (size < 3)
-        return;
-    int ipSize = (int)buffer[1];
-    int netmaskSize = (int)buffer[2];
-    if (size != (3 + ipSize + netmaskSize))
-        return;
-    std::string ip = "";
-    std::string netmask = "";
-    for (int i = 0; i < ipSize; i++)
+    try
     {
-        ip = ip + buffer[i + 3];
+        if (size < 3)
+            return;
+
+        int ipSize = static_cast<int>(buffer[1]);
+        int netmaskSize = static_cast<int>(buffer[2]);
+
+        if (size != (3 + ipSize + netmaskSize))
+            return;
+
+        std::string ip(buffer + 3, ipSize);
+        std::string netmask(buffer + 3 + ipSize, netmaskSize);
+
+        vpn.setupServer(ip, netmask);
     }
-    for (int i = 0; i < netmaskSize; i++)
+    catch (const std::exception &e)
     {
-        netmask = netmask + buffer[3 + ipSize + i];
+        std::cerr << "Exception in setupVPNServer: " << e.what() << std::endl;
     }
-    vpn.setupServer(ip, netmask);
-    return;
+    catch (...)
+    {
+        std::cerr << "Unknown error occurred in setupVPNServer" << std::endl;
+    }
 }
+
 
 void Server::sendRAMStatus()
 {

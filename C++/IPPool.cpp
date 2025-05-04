@@ -35,9 +35,9 @@ std::pair<int,std::string> IPPool::allocate_ip() {
     return std::make_pair(-1,"");
 }
 
-void IPPool::release_ip(uint32_t ip_val) {
-    if (ip_val <= network || ip_val >= broadcast) return;
-    int index = ip_val - network - 1;
+void IPPool::release_ip(uint32_t index) {
+    // if (ip_val <= network || ip_val >= broadcast) return;
+    // int index = ip_val - network - 1;
     if (index >= 0 && index < pool_size) {
         bitmap[index] = false;
     }
