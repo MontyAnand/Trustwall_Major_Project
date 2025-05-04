@@ -343,7 +343,7 @@ function DHCPConfiguration() {
           <span>DHCPv4 Server Configuration</span>
 
           {!issubmitbuttondisabled && enableButtonset && (
-            <span style={{ display: 'flex', gap: '10px' }}>
+            <span style={{ display: 'flex', gap: '80px' }}>
               <button onClick={() => handleClick('start')} disabled={disableStart}>Start</button>
               <button onClick={() => handleClick('restart')} disabled={disableRestart} >Restart</button>
               <button onClick={() => handleClick('stop')} disabled={disableStop} >Stop</button>
