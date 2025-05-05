@@ -12,138 +12,58 @@ import Sidebar from "../components/Sidebar";
 import StaticMappings from "../components/dhcp/staticMappings";
 
 function DHCPConfiguration() {
-  // useState for main blocks
-  const [content1, setContent1] = useState([false, null]);
-  const [content2, setContent2] = useState([false, null]);
-  const [content3, setContent3] = useState([false, null]);
-  const [content4, setContent4] = useState([false, null]);
-  const [content5, setContent5] = useState([false, null]);
 
-  //useState for all form elements
-  const [interfacechecked, setInterfaceChecked] = useState(true);
-  const [bootpchecked, setBootpChecked] = useState(false);
-  const [isclientaccept, setIsClientAccept] = useState(0);
-  const [isdenyclient, setIsDenyClient] = useState(false);
-  const [isignclientname, setIsIgnClientname] = useState(false);
+  const [formData, setFormData] = useState({
+    enableInterface: false,
+    enableBootp: false,
+    clientType: "0",
+    enableIgnDeniedClient: false,
+    enableIgnClientIdentfier: false,
 
-  const [subnet, setSubnet] = useState("192.168.1.0");
-  const [mask, setMask] = useState("255.255.255.0");
-  const [subnet_range, setSubnetRange] = useState("192.168.1.1-192.168.1.254");
-  const [startIP, setStartIP] = useState("");
-  const [endIP, setEndIP] = useState("");
+    subnet: "",
+    mask: "",
+    subnetRange: "",
+    rangeStart: "",
+    rangeEnd: "",
 
-  const [wins1, setWinS1] = useState("");
-  const [wins2, setWinS2] = useState("");
-  const [dns0, setDnS0] = useState("8.8.8.8");
-  const [dns1, setDnS1] = useState("");
-  const [dns2, setDnS2] = useState("");
-  const [dns3, setDnS3] = useState("");
+    wins1: "",
+    wins2: "",
+    dns1: "",
+    dns2: "",
+    dns3: "",
+    dns4: "",
 
-  const [omapiport, setOmapiPort] = useState("");
-  const [omapikey, setOmapikKey] = useState("");
-  const [checkkey, setCheckKey] = useState("");
-  const [omapialgo, setOmapiAlgo] = useState("1");
+    omapiPort: "",
+    omapiKey: "",
+    omapiAlgo: "2",
+    enableKey: false,
 
-  const [gateway, setGateway] = useState("192.168.1.1");
-  const [domainname, setDomainName] = useState("");
-  const [domainsearchlist, setDomainSearchList] = useState("");
-  const [defaultleasetime, setDefaultLeaseTime] = useState("600");
-  const [maxleasetime, setMaxLeaseTime] = useState("7200");
-  // const [failoverpeerip, setFailOverPeerIp] = useState("");
-  const [enablestaticarp, setEnableStaticArp] = useState("");
-  const [enablechangetimeformat, setEnableChangeTimeFormat] = useState("");
-  const [enablestaticticsgraph, setEnableStaticticsGraph] = useState("");
-  const [disablepingcheck, setDisablePingCheck] = useState("");
-  const [pingtimeout, setPingTimeOut] = useState("2");
+    gateway: "",
+    domainName: "",
+    domainSearchList: "",
+    defaultLeaseTime: 720,
+    maxLeaseTime: 3600,
 
-  //useState for controlling submit button's functionality
-  const [isValid, setIsValid] = useState(true);
-  const [issubmitbuttondisabled, setIsSubmitButtonDisabled] = useState(true);
+    enableStaticArp: false,
+    enableChangeTimeFormat: false,
+    enableStatisticsGraph: false,
+    disablePingCheck: false,
+    pingTimeout: 2
+  });
+
+  // useState for controlling submit button's functionality
+  const [disableSubmitButton, setDisableSubmitButton] = useState(true);
   const [enableButtonset, setEnableButtonSet] = useState(false);
   const [disableStart, setdisableStart] = useState(true);
-  const [disableRestart, setdisableRestart] = useState(false);
-  const [disableStop, setdisableStop] = useState(false);
+  const [disableRestart, setdisableRestart] = useState(true);
+  const [disableStop, setdisableStop] = useState(true);
 
-
-  function serviceStatusManagement() {
-    axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/status`).then((res) => {
-      if (res.data === "active") {
-        setdisableStart(true);
-        setdisableRestart(false);
-        setdisableStop(false);
-      } else if (res.data === "inactive") {
-        setdisableStart(false);
-        setdisableRestart(true);
-        setdisableStop(true);
-      } else {
-        setdisableStart(true);
-        setdisableRestart(false);
-        setdisableStop(true);
-      }
-    })
-  }
-
-
-
-  function handleSubmit() {
-    const data = {
-      Interface_enable: interfacechecked,
-      Bootp_enable: bootpchecked,
-      Deny_unknown_clients: isclientaccept,
-      Ignore_client_identifier: isignclientname,
-      Subnet: subnet,
-      Subnet_mask: mask,
-      // Subnet_range:subnet_range,
-      StartIP: startIP,
-      EndIP: endIP,
-      Wins1: wins1,
-      Wins2: wins2,
-      Dns0: dns0,
-      Dns1: dns1,
-      Dns2: dns2,
-      Dns3: dns3,
-      Omapi_port: omapiport,
-      Omapi_key: omapikey,
-      Omapi_enable_algo: checkkey,
-      Omapi_algorithm: omapialgo,
-      Gateway: gateway,
-      Domain_name: domainname,
-      Domain_search_list: domainsearchlist,
-      Default_lease_time: defaultleasetime,
-      Maximum_lease_time: maxleasetime,
-      // Failover_peer_Ip: failoverpeerip,
-      Static_arp_entries_enable: enablestaticarp,
-      Dhcp_lease_time_format_UTC_to_Local_enable: enablechangetimeformat,
-      Dhcp_lease_monitoring_stats_enable: enablestaticticsgraph,
-      Ping_check_disable: disablepingcheck,
-      Ping_check_timeout: pingtimeout,
-    };
-
-    //  Send data to backend using Fetch API
-    fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data);
-        alert(data.message);
-
-        // Dhcp server's Start Restart and Stop buttons will be activated heere
-        setEnableButtonSet(true);
-        serviceStatusManagement();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert(error);
-      });
-  }
 
   // Function to convert an IP address to binary
-  function ipToBinary(ip) {
+  const ipToBinary = (ip) => {
+    if (ip === '' || ip === undefined) {
+      return '';
+    }
     return ip
       .split(".")
       .map((octet) => parseInt(octet, 10).toString(2).padStart(8, "0"))
@@ -152,23 +72,67 @@ function DHCPConfiguration() {
 
   // Function to convert a binary IP back to dotted decimal format
   function binaryToIp(binaryIp) {
+    if (binaryIp === '') {
+      return '';
+    }
     return binaryIp
       .split(".")
       .map((binaryOctet) => parseInt(binaryOctet, 2))
       .join(".");
   }
+  // Fetch Stored Data from server
 
 
+  useEffect(() => {
+    axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/api/settings`).then((res) => {
+      setFormData({ ...formData, ...res.data });        
+    });
+  }, []);
 
+useEffect(()=>{
+  if(disableSubmitButton===false){
+    setEnableButtonSet(true);
+    serviceStatusManagement();
+  }
+},[disableSubmitButton]);
 
+  useEffect(() => {
+    // Function to perform bitwise AND operation on two IPs
+    function bitwiseAnd(ip1, ip2) {
+      const binaryIp1 = ipToBinary(ip1).split(".");
+      const binaryIp2 = ipToBinary(ip2).split(".");
 
+      const andResult = binaryIp1.map((octet, index) => {
+        // Perform AND operation on each octet
+        return (parseInt(octet, 2) & parseInt(binaryIp2[index], 2))
+          .toString(2)
+          .padStart(8, "0");
+      });
 
+      return andResult.join(".");
+    }
 
+    axios.get(`http://${process.env.REACT_APP_SERVER_IP}:5000/laninfo`)
+      .then((res) => {
+        setFormData(prevData => ({
+          ...prevData,
+          subnet: binaryToIp(bitwiseAnd(res.data.ip, res.data.nm)),
+          mask: res.data.nm,
+          gateway: res.data.gip
+        }));
+      })
+      .catch((err) => {
+        console.error("Failed to fetch network info:", err);
+      });
+  }, []);
 
   //useEffect for controlling submit button's functionality and rendeing the updates
   useEffect(() => {
     // Function to perform bitwise AND operation on two IPs
     function bitwiseAnd(ip1, ip2) {
+      if (ip1 === '' || ip2 === '') {
+        return '';
+      }
       const binaryIp1 = ipToBinary(ip1).split(".");
       const binaryIp2 = ipToBinary(ip2).split(".");
 
@@ -184,6 +148,9 @@ function DHCPConfiguration() {
 
     // Function to check if an IP is in a subnet
     function isIpInSubnet(ip, subnetIp, subnetMask) {
+      if (ip === '') {
+        return false;
+      }
       const andResult = bitwiseAnd(ip, subnetMask); // Perform AND operation between IP and subnet mask
       const networkAddress = bitwiseAnd(subnetIp, subnetMask); // Get the network address of the subnet
 
@@ -191,73 +158,16 @@ function DHCPConfiguration() {
     }
 
 
-    if (interfacechecked && startIP.trim() !== "" && endIP.trim() !== "") {
-      if (
-        interfacechecked &&
-        isValid &&
-        isIpInSubnet(startIP, subnet, mask) &&
-        isIpInSubnet(endIP, subnet, mask)
-      ) {
-        setIsSubmitButtonDisabled(false);
+    if (formData.enableInterface) {
+      if (isIpInSubnet(formData.rangeStart, formData.subnet, formData.mask) && isIpInSubnet(formData.rangeEnd, formData.subnet, formData.mask)) {
+        setDisableSubmitButton(false);
       } else {
-        setIsSubmitButtonDisabled(true);
+        setDisableSubmitButton(true);
       }
     } else {
-      setIsSubmitButtonDisabled(true);
+      setDisableSubmitButton(true);
     }
-  }, [interfacechecked, startIP, endIP, subnet, mask, isValid]);
-
-  // Handle Generate key
-  useEffect(() => {
-    //' Handle key Genration
-    const handleGenerateKey = async () => {
-      if (checkkey && omapialgo) {
-        try {
-          const response = await axios.post(
-            `http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/generateKey`,
-            { omapialgo }
-          );
-          setOmapikKey(response.data.hmac_key);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-
-    if (checkkey && omapialgo) {
-      handleGenerateKey();
-    } else if (!checkkey) {
-      setOmapikKey("");
-    }
-  }, [checkkey, omapialgo]);
-
-  useEffect(() => {
-
-    // Function to perform bitwise AND operation on two IPs
-    function bitwiseAnd(ip1, ip2) {
-      const binaryIp1 = ipToBinary(ip1).split(".");
-      const binaryIp2 = ipToBinary(ip2).split(".");
-
-      const andResult = binaryIp1.map((octet, index) => {
-        // Perform AND operation on each octet
-        return (parseInt(octet, 2) & parseInt(binaryIp2[index], 2))
-          .toString(2)
-          .padStart(8, "0");
-      });
-
-      return andResult.join(".");
-    }
-    fetch(`http://${process.env.REACT_APP_SERVER_IP}:5000/laninfo`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSubnet(binaryToIp(bitwiseAnd(data.ip, data.nm)));
-        setMask(data.nm);
-        setGateway(data.gip);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch network info:", err);
-      });
-  }, []);
+  }, [formData.enableInterface, formData.rangeStart, formData.rangeEnd, formData.subnet, formData.mask]);
 
   // Recalculate subnet range when subnet or mask changes
   useEffect(() => {
@@ -280,8 +190,8 @@ function DHCPConfiguration() {
         ].join(".");
       }
 
-      const ipLong = ipToLong(subnet);
-      const maskLong = ipToLong(mask);
+      const ipLong = ipToLong(formData.subnet);
+      const maskLong = ipToLong(formData.mask);
 
       const network = ipLong & maskLong;
       const broadcast = network | (~maskLong >>> 0);
@@ -296,21 +206,89 @@ function DHCPConfiguration() {
       return `${longToIp(firstUsable)} - ${longToIp(lastUsable)}`;
     };
 
-    if (subnet && mask) {
-      const range = calculateSubnetRange(subnet, mask);
-      setSubnetRange(range);
+    if (formData.subnet && formData.mask) {
+      const range = calculateSubnetRange();
+      setFormData(prevData => ({
+        ...prevData,
+        subnetRange: range
+      }));
     }
-  }, [subnet, mask]);
+  }, [formData.subnet, formData.mask]);
 
-  // Ignore denied clients
-  // useEffect(() => {
-  //   if (failoverpeerip.trim !== "" && isValid) {
-  //     setIsDenyClient(false);
-  //   }
-  // }, [failoverpeerip, isValid]);
+  // Handle Generate key
+  useEffect(() => {
+    //' Handle key Genration
+    const handleGenerateKey = async () => {
+      if (formData.enableKey && formData.omapiAlgo) {
+        try {
+          const response = await axios.post(
+            `http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/generateKey`,
+            { omapialgo: formData.omapiAlgo }
+          );
+          setFormData(prevData => ({
+            ...prevData,
+            omapiKey: response.data.hmac_key
+          }));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
+    if (formData.enableKey && formData.omapiAlgo) {
+      handleGenerateKey();
+    } else if (!formData.enableKey) {
+      setFormData(prevData => ({
+        ...prevData,
+        omapiKey: ""
+      }));
+    }
+  }, [formData.enableKey, formData.omapiAlgo]);
 
 
-  function handleClick(action) {
+  const serviceStatusManagement = () => {
+    axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/status`).then((res) => {
+      if (res.data === "active") {
+        setdisableStart(true);
+        setdisableRestart(false);
+        setdisableStop(false);
+      } else if (res.data === "inactive") {
+        setdisableStart(false);
+        setdisableRestart(true);
+        setdisableStop(true);
+      } else {
+        setdisableStart(true);
+        setdisableRestart(false);
+        setdisableStop(true);
+      }
+    })
+  };
+
+
+
+  const handleChange = (e) => {
+    const { name, type, value, checked, files } = e.target;
+
+    let newValue;
+
+    switch (type) {
+      case 'checkbox':
+        newValue = checked;
+        break;
+      case 'file':
+        newValue = files; // Or files[0] if single file
+        break;
+      default:
+        newValue = value;
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: newValue,
+    }));
+  };
+
+  const handleClick = (action) => {
     const actionOnService = action.trim();
 
     if (actionOnService !== "") {
@@ -328,6 +306,20 @@ function DHCPConfiguration() {
     }
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    axios.post(`http://${process.env.REACT_APP_SERVER_IP}:5000/dhcp/save`, formData)
+      .then((res) => {
+        alert(res.data.message);
+        setEnableButtonSet(true);
+        serviceStatusManagement();
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+        alert(err);
+      });
+  }
 
   return (
     <>
@@ -336,13 +328,13 @@ function DHCPConfiguration() {
 
         <h1 style={{
           display: 'flex',
-          justifyContent: !issubmitbuttondisabled ? 'space-between' : 'center',
+          justifyContent: !disableSubmitButton ? 'space-between' : 'center',
           alignItems: 'center',
           gap: '20px'
         }}>
           <span>DHCPv4 Server Configuration</span>
 
-          {!issubmitbuttondisabled && enableButtonset && (
+          {!disableSubmitButton && enableButtonset && (
             <span style={{ display: 'flex', gap: '80px' }}>
               <button onClick={() => handleClick('start')} disabled={disableStart}>Start</button>
               <button onClick={() => handleClick('restart')} disabled={disableRestart} >Restart</button>
@@ -351,415 +343,247 @@ function DHCPConfiguration() {
           )}
         </h1>
 
-        {/* General setting */}
-        <h2
-          onClick={() => setContent1((prevContent) => [!prevContent[0], null])}
-        >
-          General DHCP Options
-        </h2>
-        {content1[0] ? (
-          <>
-            {
-              <div className="dhcp_internal_container">
-                <div className="dhcp_general_container">
-                  <div className="dhcp_text">
-                    <label htmlFor="dhcp_vendor">DHCP Backend:</label>
-                    <input
-                      type="text"
-                      name="dhcp_vendor"
-                      placeholder="DHCP vendor"
-                      value="ISC DHCP"
-                      readOnly
-                    ></input>
-                  </div>
+        <form onSubmit={handleSubmit}>
+          {/* General setting */}
+          <h2>General DHCP Settings</h2>
 
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="interface">Enable</label>
-                      <input
-                        type="checkbox"
-                        name="interface"
-                        checked={interfacechecked}
-                        onChange={(e) => setInterfaceChecked(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>Enable DHCP server on LAN interface</p>
-                  </div>
+          <div className="dhcp_internal_container">
+            <div className="dhcp_general_container">
 
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="bootp">BOOTP</label>
-                      <input
-                        type="checkbox"
-                        name="bootp"
-                        checked={bootpchecked}
-                        onChange={(e) => setBootpChecked(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>Ignore BOOTP queries</p>
-                  </div>
-
-                  <div className="dhcp_select">
-                    <label htmlFor="client_accept">Deny Unknown Clients:</label>
-                    <select
-                      name="client_accept"
-                      value={isclientaccept}
-                      onChange={(e) => setIsClientAccept(e.target.value)}
-                    >
-                      <option value="0">Allow all clients</option>
-                      <option value="1">
-                        Allow known clients from any interface
-                      </option>
-                      <option value="2">
-                        Allow known clients from only this interface
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="deny_client">Ignore Denied Clients</label>
-                      <input
-                        type="checkbox"
-                        name="deny_client"
-                        checked={isdenyclient}
-                        onChange={(e) => setIsDenyClient(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>Ignore denied clients rather than reject</p>
-                  </div>
-
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="ign_client_name">
-                        Ignored Client Identifiers
-                      </label>
-                      <input
-                        type="checkbox"
-                        name="ign_client_name"
-                        checked={isignclientname}
-                        onChange={(e) => setIsIgnClientname(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>
-                      Do not record a unique identifier (UID) in client{" "}
-                      <br></br>
-                      lease data if present in client DHCP request
-                    </p>
-                  </div>
-                </div>
+              {/* DHCP Server Vendor Details */}
+              <div className="dhcp_text">
+                <label htmlFor="dhcpVendor">DHCP Backend:</label>
+                <input
+                  type="text"
+                  name="dhcpVendor"
+                  placeholder="DHCP vendor"
+                  value="ISC DHCP"
+                  readOnly
+                ></input>
               </div>
-            }
-          </>
-        ) : (
-          <></>
-        )}
-        {/* Primary address pool */}
-        <h2
-          onClick={() => setContent2((prevContent) => [!prevContent[0], null])}
-        >
-          Primary Address Pool
-        </h2>
-        {content2[0] ? (
-          <>
-            {
-              <div className="dhcp_internal_container">
-                <div className="dhcp_primary_container">
-                  <div className="dhcp_text">
-                    <label htmlFor="subnet">Subnet: </label>
-                    <input
-                      type="text"
-                      name="subnet"
-                      value={subnet}
-                      onChange={(e) => setSubnet(e.target.value)}
-                    ></input>
-                  </div>
 
-                  <div className="dhcp_text">
-                    <label htmlFor="mask">Subnet Mask: </label>
-                    <input
-                      type="text"
-                      name="mask"
-                      value={mask}
-                      onChange={(e) => setMask(e.target.value)}
-                    ></input>
-                  </div>
-
-                  <div className="dhcp_text">
-                    <label htmlFor="subnet_range">Subnet Range: </label>
-                    <input
-                      type="text"
-                      name="subnet_range"
-                      value={subnet_range}
-                      onChange={(e) => setSubnetRange(e.target.value)}
-                      readOnly
-                    ></input>
-                  </div>
-
-                  <div className="dhcp_text">
-                    <label className="dhcp_special_text">
-                      Address pool range:
-                    </label>
-                    <br></br>
-                    <br></br>
-                    <label htmlFor="startIP">From</label>
-                    <br></br>
-                    <input
-                      type="text"
-                      name="startIP"
-                      value={startIP}
-                      onChange={(e) => {
-                        const pattern =
-                          /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
-                        setStartIP(e.target.value);
-                        setIsValid(
-                          (pattern.test(e.target.value) &&
-                            e.target.value.trim() !== "") ||
-                          e.target.value.trim() === ""
-                        );
-                      }}
-                    ></input>
-
-                    <br></br>
-                    <br></br>
-                    <label htmlFor="endIP">To</label>
-                    <br></br>
-                    <input
-                      type="text"
-                      name="endIP"
-                      value={endIP}
-                      onChange={(e) => {
-                        const pattern =
-                          /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
-                        setEndIP(e.target.value);
-                        setIsValid(
-                          pattern.test(e.target.value) &&
-                          e.target.value.trim() !== ""
-                        );
-                      }}
-                    ></input>
-                  </div>
-
-                  {/* <div className="dhcp_add_btn">
-                    <label htmlFor="additional_pool">Additional Pools</label>
-                    <button
-                      onClick={() => {
-                        // Write a custom function to add more address pool if someone click this button
-                      }}
-                    >
-                      <span>&#43;</span> Add Address Pool
-                    </button>
-                  </div> */}
+              {/* Enable DHCP Server on LAN Interface */}
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableInterface">Enable</label>
+                  <input type="checkbox" name="enableInterface" checked={formData.enableInterface} onChange={handleChange} required />
                 </div>
+                <p>Enable DHCP server on LAN interface</p>
               </div>
-            }
-          </>
-        ) : (
-          <></>
-        )}
-        {/* Server setting */}
-        <h2
-          onClick={() => setContent3((prevContent) => [!prevContent[0], null])}
-        >
-          Server Options
-        </h2>
-        {content3[0] ? (
-          <>
-            {
-              <div className="dhcp_internal_container">
-                <div className="dhcp_server_container">
-                  <div className="dhcp_text">
-                    <label htmlFor="wins_servers">WINS Servers</label>
-                    <input
-                      type="text"
-                      name="wins1"
-                      placeholder="WINS Server 1"
-                      value={wins1}
-                      onChange={(e) => setWinS1(e.target.value)}
-                    ></input>
-                    <input
-                      type="text"
-                      name="wins2"
-                      placeholder="WINS Server 2"
-                      value={wins2}
-                      onChange={(e) => setWinS2(e.target.value)}
-                    ></input>
-                  </div>
 
-                  <div className="dhcp_text">
-                    <label htmlFor="dns_servers">DNS Servers</label>
-                    <input
-                      type="text"
-                      name="gateway"
-                      value={dns0}
-                      onChange={(e) => setDnS0(e.target.value)}
-                      readOnly
-                    ></input>
-                    <input
-                      type="text"
-                      name="dns1"
-                      placeholder="DNS Server 1"
-                      value={dns1}
-                      onChange={(e) => setDnS1(e.target.value)}
-                    ></input>
-                    <input
-                      type="text"
-                      name="dns2"
-                      placeholder="DNS Server 2"
-                      value={dns2}
-                      onChange={(e) => setDnS2(e.target.value)}
-                    ></input>
-                    <input
-                      type="text"
-                      name="dns3"
-                      placeholder="DNS Server 3"
-                      value={dns3}
-                      onChange={(e) => setDnS3(e.target.value)}
-                    ></input>
-                  </div>
+              {/* Enable Bootp Queries to be ignored */}
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableBootp">BOOTP</label>
+                  <input type="checkbox" name="enableBootp" checked={formData.enableBootp} onChange={handleChange} />
                 </div>
+                <p>Ignore BOOTP queries</p>
               </div>
-            }
-          </>
-        ) : (
-          <></>
-        )}
 
-        {/* OMAPI */}
-        <h2
-          onClick={() => setContent4((prevContent) => [!prevContent[0], null])}
-        >
-          OMAPI
-        </h2>
-        {content4[0] ? (
-          <>
-            {
-              <div className="dhcp_internal_container">
-                <div className="dhcp_omapi_container">
-                  <div className="dhcp_text">
-                    <label htmlFor="omapi_port">OMAPI Port</label>
-                    <input
-                      type="number"
-                      name="omapi_port"
-                      placeholder="OMAPI Port  e.g,7911"
-                      value={omapiport}
-                      min={1024}
-                      max={65555}
-                      onChange={(e) => setOmapiPort(e.target.value)}
-                    ></input>
-                  </div>
+              {/* Type of Client DHCP request to  process */}
+              <div className="dhcp_select">
+                <label htmlFor="clientType">Deny Unknown Clients:</label>
+                <select name="clientType" value={formData.clientType} onChange={handleChange}>
+                  <option value="0">Allow all clients</option>
+                  <option value="1">
+                    Allow known clients from any interface
+                  </option>
+                  <option value="2">
+                    Allow known clients from only this interface
+                  </option>
+                </select>
+              </div>
 
-                  <div className="dhcp_text">
-                    <label htmlFor="omapi_key">OMAPI Key</label>
-                    <input
-                      type="text"
-                      name="omapi_key"
-                      placeholder="OMAPI Key"
-                      value={omapikey}
-                      onChange={(e) => setOmapikKey(e.target.value)}
-                    ></input>
-                    <div className="dhcp_checkbox">
-                      <label htmlFor="algo_key">Generate New Key</label>
-                      <input
-                        type="checkbox"
-                        name="algo_key"
-                        checked={checkkey}
-                        onChange={(e) => setCheckKey(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>Generate a new key based one selected algorithm</p>
-                  </div>
+              {/* Enable Ignore denied Client Request */}
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableIgnDeniedClient">Ignore Denied Clients</label>
+                  <input
+                    type="checkbox"
+                    name="enableIgnDeniedClient"
+                    checked={formData.enableIgnDeniedClient}
+                    onChange={handleChange}
+                  />
+                </div>
+                <p>Ignore denied clients rather than reject</p>
+              </div>
 
-                  <div className="dhcp_select">
-                    <label htmlFor="Algorithm_names">Key Algorithm</label>
-                    <select
-                      name="Algorithm_names"
-                      value={omapialgo}
-                      onChange={(e) => setOmapiAlgo(e.target.value)}
-                    >
-                      <option value="1">HMAC-MD5 (legacy default)</option>
-                      <option value="2">HMAC-SHA1</option>
-                      {/* <option value="3">HAMC-SHA224</option>
+              {/* Enable ignore Client Identifier in client's lease database */}
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableIgnClientIdentfier">
+                    Ignore Client Identifiers
+                  </label>
+                  <input type="checkbox" name="enableIgnClientIdentfier" checked={formData.enableIgnClientIdentfier} onChange={handleChange} />
+                </div>
+                <p>
+                  Do not record a unique identifier (UID) in client lease database if present in client DHCP request
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+          {/* Primary address pool */}
+          <h2>Primary Address Pool</h2>
+
+          <div className="dhcp_internal_container">
+            <div className="dhcp_primary_container">
+
+              {/* Subnet of LAN Network */}
+              <div className="dhcp_text">
+                <label htmlFor="subnet">Subnet: </label>
+                <input type="text" name="subnet" value={formData.subnet} onChange={handleChange} required />
+              </div>
+
+              {/* Mask of the LAN Network */}
+              <div className="dhcp_text">
+                <label htmlFor="mask">Subnet Mask: </label>
+                <input type="text" name="mask" value={formData.mask} onChange={handleChange} required />
+              </div>
+
+              {/* Range of available IP address in LAN subnet */}
+              <div className="dhcp_text">
+                <label htmlFor="subnetRange">Subnet Range: </label>
+                <input type="text" name="subnetRange" value={formData.subnetRange} onChange={handleChange} readOnly />
+              </div>
+
+              {/* Range of IP address from starting to ending for Primary Pool range  */}
+              <div className="dhcp_text">
+                <label className="dhcp_special_text">Address pool range:</label>
+                <br></br>
+                <br></br>
+                <label htmlFor="rangesStart">From</label>
+                <br></br>
+                <input type="text" name="rangeStart" value={formData.rangeStart} onChange={handleChange}
+                  pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
+                  required
+                ></input>
+                <br></br>
+                <br></br>
+                <label htmlFor="rangeEnd">To</label>
+                <br></br>
+                <input type="text" name="rangeEnd" value={formData.rangeEnd} onChange={handleChange}
+                  pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
+                  required
+                ></input>
+              </div>
+
+              {/* For addition IP pool  */}
+              {/* <div className="dhcp_add_btn">
+                <label htmlFor="additional_pool">Additional Pools</label>
+                <button
+                  onClick={() => {
+                    // Write a custom function to add more address pool if someone click this button
+                  }}
+                >
+                  <span>&#43;</span> Add Address Pool
+                </button>
+              </div> */}
+            </div>
+          </div>
+
+
+          {/* Server setting */}
+          <h2>Server Settings</h2>
+          <div className="dhcp_internal_container">
+            <div className="dhcp_server_container">
+
+              {/* Netbios server options for Seamless Communication  and Booting over Internet*/}
+              <div className="dhcp_text">
+                <label htmlFor="wins1">WINS Servers</label>
+                <input type="text" name="wins1" placeholder="WINS Server 1" value={formData.wins1} onChange={handleChange} ></input>
+                <input type="text" name="wins2" placeholder="WINS Server 2" value={formData.wins2} onChange={handleChange}   ></input>
+              </div>
+
+              {/* Domain Name Resolving server address Global or Local  */}
+              <div className="dhcp_text">
+                <label htmlFor="dns1">DNS Servers</label>
+                <input type="text" name="dns1" placeholder="DNS Server 1" value={formData.dns1} onChange={handleChange} pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$" />
+                <input type="text" name="dns2" placeholder="DNS Server 2" value={formData.dns2} onChange={handleChange} pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$" />
+                <input type="text" name="dns3" placeholder="DNS Server 3" value={formData.dns3} onChange={handleChange} pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$" />
+                <input type="text" name="dns4" placeholder="DNS Server 4" value={formData.dns4} onChange={handleChange} pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$" />
+              </div>
+            </div>
+          </div>
+
+
+          {/* OMAPI */}
+          <h2>   OMAPI</h2>
+
+          <div className="dhcp_internal_container">
+            <div className="dhcp_omapi_container">
+
+              {/* OMAPI Port  */}
+              <div className="dhcp_text">
+                <label htmlFor="omapiPort">OMAPI Port</label>
+                <input type="number" name="omapiPort" placeholder="OMAPI Port  e.g,7911" value={formData.omapiPort} min={1024} max={65555} onChange={handleChange} />
+              </div>
+
+              {/* OMAPI Key  */}
+              <div className="dhcp_text">
+                <label htmlFor="omapiKey">OMAPI Key</label>
+                <input type="text" name="omapiKey" placeholder="OMAPI Key" value={formData.omapiKey} onChange={handleChange} />
+                <div className="dhcp_checkbox">
+                  <label htmlFor="enableKey">Generate New Key</label>
+                  <input type="checkbox" name="enableKey" checked={formData.enableKey} onChange={handleChange} />
+                </div>
+                <p>Generate a new key based one selected algorithm</p>
+              </div>
+
+              {/* For selecting an algorithm for key generation */}
+              <div className="dhcp_select">
+                <label htmlFor="omapiAlgo">Key Algorithm</label>
+                <select name="omapiAlgo" value={formData.omapiAlgo} onChange={handleChange}     >
+                  <option value="1">HMAC-MD5 (legacy default)</option>
+                  <option value="2">HMAC-SHA1</option>
+                  {/* <option value="3">HAMC-SHA224</option>
                       <option value="4">HAMC-SHA224</option>
-                      <option value="5">
-                        HAMC-SHA256 (current bind9 default)
-                      </option>
+                      <option value="5">HAMC-SHA256 (current bind9 default)  </option>
                       <option value="6">HAMC-SHA384</option>
                       <option value="7">HAMC-SHA512</option> */}
-                    </select>
-                  </div>
-                </div>
+                </select>
               </div>
-            }
-          </>
-        ) : (
-          <></>
-        )}
+            </div>
+          </div>
 
-        {/* Other DHCP options */}
-        <h2
-          onClick={() => setContent5((prevContent) => [!prevContent[0], null])}
-        >
-          Other DHCP Options
-        </h2>
-        {content5[0] ? (
-          <>
-            {
-              <div className="dhcp_internal_container">
-                <div className="dhcp_other_container">
-                  <div className="dhcp_text">
-                    <label htmlFor="gateway">Gateway:</label>
-                    <input
-                      type="text"
-                      name="gateway"
-                      value={gateway}
-                      onChange={(e) => setGateway(e.target.value)}
-                    ></input>
-                  </div>
 
-                  <div className="dhcp_text">
-                    <label htmlFor="domainName">Domain Name:</label>
-                    <input
-                      type="text"
-                      name="domainName"
-                      placeholder="home arpa"
-                      value={domainname}
-                      onChange={(e) => setDomainName(e.target.value)}
-                    ></input>
-                  </div>
+          {/* Other DHCP Settings */}
+          <h2>
+            Other DHCP Settings</h2>
 
-                  <div className="dhcp_text">
-                    <label htmlFor="domain_search">Domain Search List:</label>
-                    <input
-                      type="text"
-                      name="domain_search"
-                      placeholder="example.com"
-                      value={domainsearchlist}
-                      onChange={(e) => setDomainSearchList(e.target.value)}
-                    ></input>
-                  </div>
+          <div className="dhcp_internal_container">
+            <div className="dhcp_other_container">
 
-                  <div className="dhcp_number">
-                    <label htmlFor="lease_time">Default Lease Time:</label>
-                    <input
-                      type="number"
-                      name="lease_time"
-                      value={defaultleasetime}
-                      onChange={(e) => setDefaultLeaseTime(e.target.value)}
-                    ></input>
-                  </div>
+              {/* Gateway  */}
+              <div className="dhcp_text">
+                <label htmlFor="gateway">Gateway:</label>
+                <input type="text" name="gateway" value={formData.gateway} onChange={handleChange} />
+              </div>
 
-                  <div className="dhcp_number">
-                    <label htmlFor="max_lease_time">Maximum Lease Time:</label>
-                    <input
-                      type="number"
-                      name="max_lease_time"
-                      value={maxleasetime}
-                      onChange={(e) => setMaxLeaseTime(e.target.value)}
-                    ></input>
-                  </div>
+              {/* Domain Name  */}
+              <div className="dhcp_text">
+                <label htmlFor="domainName">Domain Name:</label>
+                <input type="text" name="domainName" placeholder="Domain Name " value={formData.domainName} onChange={handleChange} />
+              </div>
 
-                  {/* <div className="dhcp_text">
+              {/* Domain Search List  */}
+              <div className="dhcp_text">
+                <label htmlFor="domainSearchList">Domain Search List:</label>
+                <input type="text" name="domainSearchList" placeholder="example.com" value={formData.domainSearchList} onChange={handleChange} />
+              </div>
+
+              <div className="dhcp_number">
+                <label htmlFor="defaultLeaseTime">Default Lease Time:</label>
+                <input type="number" name="defaultLeaseTime" value={formData.defaultLeaseTime} onChange={handleChange} />
+              </div>
+
+              <div className="dhcp_number">
+                <label htmlFor="maxLeaseTime">Maximum Lease Time:</label>
+                <input type="number" name="maxLeaseTime" value={formData.maxLeaseTime} onChange={handleChange} />
+              </div>
+
+              {/* <div className="dhcp_text">
                     <label htmlFor="failover_ip">Failover peer IP:</label>
                     <input
                       type="text"
@@ -779,104 +603,100 @@ function DHCPConfiguration() {
                     ></input>
                   </div> */}
 
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="enable_static_arp">Static ARP:</label>
-                      <input
-                        type="checkbox"
-                        name="enable_static_arp"
-                        checked={enablestaticarp}
-                        onChange={(e) => setEnableStaticArp(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>Enable Static ARP enteries</p>
-                  </div>
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableStaticArp">Static ARP:</label>
+                  <input
+                    type="checkbox"
+                    name="enableStaticArp"
+                    checked={formData.enableStaticArp}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <p>Enable Static ARP enteries</p>
+              </div>
 
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="time_format">Time Format Change:</label>
-                      <input
-                        type="checkbox"
-                        name="time_format"
-                        checked={enablechangetimeformat}
-                        onChange={(e) =>
-                          setEnableChangeTimeFormat(e.target.checked)
-                        }
-                      ></input>
-                    </div>
-                    <p>Change DHCP display lease time from UTC to local time</p>
-                  </div>
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableChangeTimeFormat">Time Format Change:</label>
+                  <input
+                    type="checkbox"
+                    name="enableChangeTimeFormat"
+                    checked={formData.enableChangeTimeFormat}
+                    onChange={handleChange}
+                  />
+                  <p>Change DHCP display lease time from UTC to local time</p>
+                </div>
+              </div>
 
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="enable_stats">Statistics graphs:</label>
-                      <input
-                        type="checkbox"
-                        name="enable_stats"
-                        checked={enablestaticticsgraph}
-                        onChange={(e) =>
-                          setEnableStaticticsGraph(e.target.checked)
-                        }
-                      ></input>
-                    </div>
-                    <p>Enable monitoring graphs for DHCP lease statistics</p>
-                  </div>
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="enableStatisticsGraph">Statistics graphs:</label>
+                  <input
+                    type="checkbox"
+                    name="enableStatisticsGraph"
+                    checked={formData.enableStatisticsGraph}
+                    onChange={handleChange}
+                  />
+                </div>
+                <p>Enable monitoring graphs for DHCP lease statistics</p>
+              </div>
 
-                  <div className="dhcp_checkbox">
-                    <div>
-                      <label htmlFor="ping_check">Ping check:</label>
-                      <input
-                        type="checkbox"
-                        name="ping_check"
-                        checked={disablepingcheck}
-                        onChange={(e) => setDisablePingCheck(e.target.checked)}
-                      ></input>
-                    </div>
-                    <p>Disable ping check</p>
-                  </div>
+              <div className="dhcp_checkbox">
+                <div>
+                  <label htmlFor="disablePingCheck">Ping check:</label>
+                  <input
+                    type="checkbox"
+                    name="disablePingCheck"
+                    checked={formData.disablePingCheck}
+                    onChange={handleChange}
+                  />
+                </div>
+                <p>Disable ping check</p>
+              </div>
 
-                  {disablepingcheck ? (
-                    <div className="dhcp_text">
-                      <div>
-                        <label htmlFor="ping_timeout">Ping Timeout:</label>
-                        <input
-                          type="number"
-                          name="ping_timeout"
-                          placeholder="value in seconds"
-                          value={pingtimeout}
-                          onChange={(e) => setPingTimeOut(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {/* <DynamicDNS />
+              {formData.disablePingCheck ? (
+                <div className="dhcp_text">
+                  <div>
+                    <label htmlFor="pingTimeout">Ping Timeout:</label>
+                    <input
+                      type="number"
+                      name="pingTimeout"
+                      placeholder="value in seconds"
+                      value={formData.pingTimeout}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+              ) : (
+                <></>
+              )}
+
+
+              {/* <DynamicDNS />
                   <MACAddressControl />
                   <NTP />
                   <TFTP />
                   <LDAP />
                   <NetworkBooting />
                   <CustomDHCP /> */}
-                </div>
-              </div>
-            }
-          </>
-        ) : (
-          <></>
-        )}
-        <div className="dhcp_btn_container">
-          <button
-            type="button"
-            disabled={issubmitbuttondisabled}
-            onClick={handleSubmit}
-            className="dhcp_save_btn"
-          >
-            Save Changes
-          </button>
-        </div>
-        <StaticMappings/>
+            </div>
+          </div>
+
+
+          <div className="dhcp_btn_container">
+            <button
+              type="submit"
+              disabled={disableSubmitButton}
+              className="dhcp_save_btn"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
+      <StaticMappings/>
     </>
   );
 }
