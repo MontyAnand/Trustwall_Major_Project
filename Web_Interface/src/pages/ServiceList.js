@@ -59,7 +59,7 @@ const ServiceTable = () => {
     <div className="table-container">
       <table className="table">
         <thead>
-          <tr>
+          <tr className="service-table-heading">
             <th>Service</th>
             <th>Active</th>
             <th>Status</th>
