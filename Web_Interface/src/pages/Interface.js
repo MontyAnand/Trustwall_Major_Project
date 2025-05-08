@@ -12,6 +12,7 @@ const InterfaceTable = () => {
     if: "",
     ip: "",
     netmask: "",
+    gateway:"",
     type: "",
   });
 
@@ -95,6 +96,7 @@ const InterfaceTable = () => {
     const data = {
       if: formData.if,
       ip: ipToBigEndian(formData.ip),
+      gatewayIP: ipToBigEndian(formData.gateway),
       netmask: countBits(formData.netmask),
       type: Number(formData.type),
     };
@@ -117,7 +119,7 @@ const InterfaceTable = () => {
       dataIndex: "type",
       key: "type",
       render: (type) =>
-        type === 0 ? "LAN" : type === 1 ? "WAN" : "Not Active",
+        type === 0 ? "LAN" : type === 1 ? "WAN" : "Not Assigned",
     },
     {
       title: "Edit Interface",
@@ -133,7 +135,7 @@ const InterfaceTable = () => {
   return (
     <>
       <Sidebar />
-      <div style={{ padding: 20 , marginTop:'80px'}}>
+      <div style={{ padding: 20, marginTop: '80px' }}>
         <h2>Network Interfaces</h2>
         <Table
           dataSource={interfaces}
@@ -157,13 +159,23 @@ const InterfaceTable = () => {
           <Input
             value={formData.ip}
             onChange={(e) => handleChange("ip", e.target.value)}
+            pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
           />
 
           <label>Netmask:</label>
           <Input
             value={formData.netmask}
             onChange={(e) => handleChange("netmask", e.target.value)}
+            pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
           />
+
+          <label>Gateway Address:</label>
+          <Input
+            value={formData.gateway}
+            onChange={(e) => handleChange("gateway", e.target.value)}
+            pattern="^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
+          />
+
 
           <label>Interface Type:</label>
           <Select

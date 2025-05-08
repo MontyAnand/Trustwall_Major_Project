@@ -23,7 +23,8 @@ function VPN() {
     }
 
     const updateImageURL = (data) => {
-        setImageURL(prevURL => prevURL + data); // Ensure state updates correctly
+        alert(data);
+        setImageURL(data); // Ensure state updates correctly
     };
 
     const showQR = () => {

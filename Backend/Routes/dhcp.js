@@ -156,6 +156,44 @@ host ${staticMapping.hostname} {
 }
 
 
+
+
+const getInterface = (iface) => {
+    const path = `/tmp/${iface}`;
+    try {
+        return fs.readFileSync(path, 'utf8');
+    }
+    catch (err) {
+        console.log(err);
+        return "";
+    }
+};
+
+
+function generateDefaultConfig(){
+    const iface=getInterface("LAN");
+    return `# Defaults for isc-dhcp-server (sourced by /etc/init.d/isc-dhcp-server)
+
+# Path to dhcpd's config file (default: /etc/dhcp/dhcpd.conf).
+#DHCPDv4_CONF=/etc/dhcp/check.conf
+#DHCPDv6_CONF=/etc/dhcp/dhcpd6.conf
+
+# Path to dhcpd's PID file (default: /var/run/dhcpd.pid).
+#DHCPDv4_PID=/var/run/dhcpd.pid
+#DHCPDv6_PID=/var/run/dhcpd6.pid
+
+# Additional options to start dhcpd with.
+#       Don't use options -cf or -pf here; use DHCPD_CONF/ DHCPD_PID instead
+#OPTIONS=""
+
+# On what interfaces should the DHCP server (dhcpd) serve DHCP requests?
+#       Separate multiple interfaces with spaces, e.g. "eth0 eth1".
+INTERFACESv4="${iface}"
+#INTERFACESv6=""
+
+`;
+}
+
 app.get("/api/settings", (req, res) => {
     res.json(dhcpSettings);
 });
@@ -175,6 +213,7 @@ app.post('/save', async function (req, res) {
     const dhcpFilePath = "/etc/dhcp/dhcpd.conf";
     const tempFilePath = "./temp.conf";
     const dhcpConfig = generateDhcpConfig();
+    const defaultConfig=generateDefaultConfig();
     //Configuration Syntax check
     try {
         fs.writeFile(tempFilePath, dhcpConfig, function (err) {
@@ -190,6 +229,12 @@ app.post('/save', async function (req, res) {
                 console.error('Error writing to file:', err);
                 res.status(500).send({ message: 'Error writing to file' });
             } else {
+                fs.writeFile('/etc/default/isc-dhcp-server',defaultConfig,function(err){
+                    if(err){
+                        console.error('Error writing to file:', err);
+                        res.status(500).send({ message: 'Error writing to file' });
+                    }
+                })
                 console.log('DHCP configuration Data is saved to a file location ', dhcpFilePath);
                 res.send({ message: 'DHCP Data is saved successfully.' });
             }
