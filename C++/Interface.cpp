@@ -6,10 +6,11 @@ struct InterfaceData
     uint8_t type;
     uint8_t netmask;
     uint32_t ip;
+    uint32_t gip;
     std::string interfaceName;
 };
 
-void Interface::changeIPAddress(const std::string &interface, const std::string &newIP, int netmask)
+void Interface::changeIPAddress(const std::string &interface, const std::string &newIP, int netmask, std::string & gatewayIP)
 {
     // Step 1: Delete the existing IP address
     std::string deleteCommand = "sudo ip addr flush dev " + interface;
@@ -35,6 +36,13 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
     if (system(upCommand.c_str()) != 0)
     {
         std::cerr << "Failed to bring interface " << interface << " up" << std::endl;
+    }
+
+    std::string addGatewayCommand = "sudo ip route add default via " + gatewayIP +" dev " + interface;
+
+    if (system(addGatewayCommand.c_str()) != 0)
+    {
+        std::cerr << "Failed to assign gateway IP " << interface << " " << gatewayIP<< std::endl;
     }
 
     // std::cout << "IP address successfully updated on " << interface << std::endl;
@@ -69,7 +77,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
 {
     try
     {
-        if (length < 8)
+        if (length < 12)
         {
             // std::cout << "Bad packet : insufficient meta data\n";
             return;
@@ -93,6 +101,11 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
         result.ip = ntohl(ipBigEndian); // Convert to host order
         offset += sizeof(uint32_t);
 
+        // Extract Gateway IP (4 bytes) - Big Endian to Host Order
+        std::memcpy(&ipBigEndian, &data[offset], sizeof(uint32_t));
+        result.gip = ntohl(ipBigEndian); // Convert to host order
+        offset += sizeof(uint32_t);
+
         // Extract interface name length (1 byte)
         uint8_t nameLength = static_cast<uint8_t>(data[offset++]);
 
@@ -112,7 +125,13 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
                          std::to_string((result.ip >> 8) & 0xFF) + "." +
                          std::to_string(result.ip & 0xFF);
 
-        changeIPAddress(result.interfaceName, ip, result.netmask);
+        // Convert GIP to string format
+        std::string gip = std::to_string((result.gip >> 24) & 0xFF) + "." +
+                         std::to_string((result.gip >> 16) & 0xFF) + "." +
+                         std::to_string((result.gip >> 8) & 0xFF) + "." +
+                         std::to_string(result.gip & 0xFF);
+        std::cout << gip << "\n";
+        changeIPAddress(result.interfaceName, ip, result.netmask, gip);
 
         // Change interface type accordingly
         if (result.type == 0)

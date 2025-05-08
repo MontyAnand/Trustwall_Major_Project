@@ -5,26 +5,34 @@
     overflow-x: auto;
 }
 
-/* Style the table */
+/* Style the table*/
 .table {
     width: 100%;
     border-collapse: collapse;
+    position: relative;
     font-family: Arial, sans-serif;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     overflow: hidden;
+    
+
 }
 
 /* Style table header */
 .table th {
-    /* background-color: #4CAF50; */
     background-color: #3E5879;
     color: white;
     padding: 12px;
     text-align: left;
     font-size: 16px;
+
 }
 
+/* Styling thead  */
+.table thead tr{
+    position: sticky;
+    top:0;
+}
 /* Style table cells */
 .table td {
     padding: 10px;
@@ -87,3 +95,9 @@
     background-color: #e0a800;
     transform: scale(1.05);
 }
+
+/* Table body changing */
+.table tbody{
+    overflow:scroll;
+} 
+

@@ -11,7 +11,6 @@ const execAsync = util.promisify(exec);
 
 const app = Router();
 
-
 let interfaces = [];
 let nextId = 1;
 

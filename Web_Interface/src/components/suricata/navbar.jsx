@@ -1,9 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link ,useLocation} from "react-router-dom";
 // import "./interfaceForm.css";
 
 const Navbar = () => {
+  const location=useLocation();
   return (
+
     <>
       <div className="outside_suricata_container">
         <h1 style={{textAlign:'center'}}>Suricata Configuration</h1>
@@ -11,16 +13,16 @@ const Navbar = () => {
         <nav className="suricata-navbar">
           <ul>
             <li>
-              <Link to="/suricata">Interfaces</Link>
+              <Link to="/suricata" style={{textDecoration:location.pathname==='/suricata'?"underline":'none'}}>Interfaces</Link>
             </li>
             <li>
-              <Link to="/suricata/global-settings">Global Settings</Link>
+              <Link to="/suricata/global-settings" style={{textDecoration:location.pathname==='/suricata/global-settings'?"underline":'none'}}>Global Settings</Link>
             </li>
             {/* <li>
       <Link to="/updates">Updates</Link>
     </li> */}
             <li>
-              <Link to="/suricata/alerts">Alerts</Link>
+              <Link to="/suricata/alerts" style={{textDecoration:location.pathname==='/suricata/alerts'?"underline":'none'}}>Alerts</Link>
             </li>
             {/* <li>
       <Link to="/blocks">Blocks</Link>
@@ -35,7 +37,7 @@ const Navbar = () => {
       <Link to="/suppress">Suppress</Link>
     </li> */}
             <li>
-              <Link to="/suricata/logs-view">Logs View</Link>
+              <Link to="/suricata/logs-view" style={{textDecoration:location.pathname==='/suricata/logs-view'?"underline":'none'}}>Logs View</Link>
             </li>
             {/* <li>
       <Link to="/logs-mgmt">Logs Mgmt</Link>

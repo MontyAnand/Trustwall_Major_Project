@@ -24,9 +24,9 @@ function Sidebar() {
             </div>
           </li> */}
           <li className="dropdown_comp">
-            <p style={{color:location.pathname === "/suricata"|location.pathname === "/dhcp"|location.pathname === "/services" ? "#007bff" :"white"}}>Services<span style={{color:"white"}}>&#11206;</span></p>
+            <p style={{color:location.pathname === "/suricata"|location.pathname === "/dhcp"|location.pathname === "/services"||location.pathname==='/suricata/logs-view'|location.pathname==='/suricata/alerts'|location.pathname==='/suricata/global-settings'? "#007bff" :"white"}}>Services<span style={{color:"white"}}>&#11206;</span></p>
             <div className="dropdown_menu">
-            <Link to="/suricata" style={{fontSize: '15px',color:location.pathname === "/suricata" ? "#007bff" :"white"}} >Suricata</Link>
+            <Link to="/suricata" style={{fontSize: '15px',color:location.pathname === "/suricata" |location.pathname==='/suricata/logs-view'|location.pathname==='/suricata/alerts'|location.pathname==='/suricata/global-settings'? "#007bff" :"white"}} >Suricata</Link>
             <Link to="/dhcp" style={{fontSize: '15px',color:location.pathname === "/dhcp" ? "#007bff" :"white"}}  >DHCP Server</Link>
             <Link to="/services" style={{fontSize: '15px',color:location.pathname === "/services" ? "#007bff" :"white"}}  >Services Table</Link>
             </div>

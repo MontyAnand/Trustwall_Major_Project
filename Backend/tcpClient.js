@@ -206,21 +206,22 @@ module.exports.client = class TcpClient extends EventEmitter {
     }
 
     changeInterfaceConfiguration(data) {
-        if (!data.if || !data.ip || !data.netmask || data.type == null) {
+        if (!data.if || !data.ip || !data.netmask || !data.gatewayIP || data.type == null) {
             console.log("Invalid Data");
             return;
         }
 
         try {
             const interfaceNameLength = Buffer.byteLength(data.if);
-            const bufferSize = 8 + interfaceNameLength; // Corrected calculation
+            const bufferSize = 12 + interfaceNameLength; // Corrected calculation
             const buffer = Buffer.alloc(bufferSize);
             buffer.writeUInt8(20, 0); // First byte (flag)
             buffer.writeUInt8(data.type, 1); // Second byte (interface type)
             buffer.writeUInt8(data.netmask, 2); // Correct field access
             buffer.writeUInt32BE(data.ip >>> 0, 3); // Ensure IP is unsigned
-            buffer.writeUInt8(interfaceNameLength, 7); // Interface name length
-            buffer.write(data.if, 8, interfaceNameLength, "utf8"); // Interface name
+            buffer.writeUInt32BE(data.gatewayIP >>> 0, 7);
+            buffer.writeUInt8(interfaceNameLength, 11); // Interface name length
+            buffer.write(data.if, 12, interfaceNameLength, "utf8"); // Interface name
             this.client.write(buffer);
         } catch (error) {
             console.log("Error in Interface Configuration: ", error);
