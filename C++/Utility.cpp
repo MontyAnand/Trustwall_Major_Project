@@ -39,7 +39,6 @@ std::string Utility::getPublicInterface()
     pclose(pipe);
 
     interface.erase(interface.find_last_not_of(" \n\r\t") + 1);
-
     return interface;
 }
 
@@ -55,7 +54,6 @@ std::string Utility::getEndPoint()
     struct ifreq ifr;
     std::strncpy(ifr.ifr_name, publicInterface.c_str(), IFNAMSIZ - 1);
     ifr.ifr_name[IFNAMSIZ - 1] = '\0'; // Ensure null termination
-
     // Fetch IP address
     if (ioctl(fd, SIOCGIFADDR, &ifr) < 0)
     {

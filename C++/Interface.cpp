@@ -38,8 +38,7 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
         std::cerr << "Failed to bring interface " << interface << " up" << std::endl;
     }
 
-    std::string addGatewayCommand = "sudo ip route add default via " + gatewayIP + " dev " + interface;
-
+    std::string addGatewayCommand = "sudo ip route add " + newIP+"/"+ std::to_string(netmask)+" via " + gatewayIP + " dev " + interface;
     if (system(addGatewayCommand.c_str()) != 0)
     {
         std::cerr << "Failed to assign gateway IP " << interface << " " << gatewayIP << std::endl;
