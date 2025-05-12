@@ -44,6 +44,7 @@
 #include <shadow.h>
 #include <crypt.h>
 #include <dbus/dbus.h>
+#include <grp.h> 
 
 #include <thread>
 #include <mutex>
