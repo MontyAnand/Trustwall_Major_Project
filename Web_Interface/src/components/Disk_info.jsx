@@ -51,7 +51,7 @@ const DiskInfo = () => {
     return (
         <div id="Disk_container" className='Disk_container'>
             <h1>Disk Information</h1>
-            <div className='Disk_inner_container'>
+            <div style={{width:'100%'}} className='Disk_inner_container'>
                 {diskName.map((row, rowIndex) => (
                     data = [
                         ["disk_usage", "space"],

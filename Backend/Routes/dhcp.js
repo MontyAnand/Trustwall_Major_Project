@@ -9,8 +9,10 @@ const execAsync = util.promisify(exec);
 
 const app = Router();
 
+let dhcpSettings = '';
+// let dhnextID = 1;
 let staticMappings = [];
-let nextId = 1;
+let stnextId = 1;
 // This part is to manage DHCP configuration
 
 // Middleware to parse JSON bodies
@@ -18,7 +20,7 @@ app.use(bodyParser.json());
 
 
 // Function to generate DHCP configuration
-function generateDhcpConfig(data, staticMappings) {
+function generateDhcpConfig() {
     let configLines = [];
 
     configLines.push(`# dhcpd.conf
@@ -47,109 +49,171 @@ ddns-update-style none;
 # have to hack syslog.conf to complete the redirection).
 #log-facility local7;\n`);
 
-    if (data.Omapi_port && data.Omapi_key) {
+    if (dhcpSettings.omapiPort && dhcpSettings.omapiKey) {
         configLines.push(`
-# Enable OMAPI on port ${data.Omapi_port}
-omapi-port ${data.Omapi_port};
+# Enable OMAPI on port ${dhcpSettings.omapiPort}
+omapi-port ${dhcpSettings.omapiPort};
 
 # Optional: Secure with authentication key
 key omapi_key {
     algorithm HMAC-MD5;
-    secret "${data.Omapi_key}";
+    secret "${dhcpSettings.omapiKey}";
 };
 
 `);
     }
 
-    if (data.Dhcp_lease_time_format_UTC_to_Local_enable === true) {
+    if (dhcpSettings.enableChangeTimeFormat === true) {
         configLines.push(`# This will change time format from UTC to Local in DHCP lease file`);
         configLines.push(`db-time-format local;`);
         configLines.push(`\n`);
     }
 
-    if (data.Bootp_enable === true) {
+    if (dhcpSettings.enableBootp === true) {
         configLines.push(`# This will ignore all BOOTP queries coming to the server`);
         configLines.push(`ignore bootp;`);
         configLines.push(`\n`);
     }
 
-    if (data.Deny_unknown_clients === 1) {
+    if (dhcpSettings.clientType === 1) {
         configLines.push(`# This will not allow any Unknown DHCP clients from any staticMappings`);
         configLines.push(`deny unknown-clients;`);
         configLines.push(`\n`);
     }
 
-    if (data.Ignore_client_identifier === true) {
+    if (dhcpSettings.enableIgnClientIdentifier === true) {
         configLines.push(`# This will not record any UID for a specific client, only record MAC address in client's lease data`);
         configLines.push(`ignore client-updates;`);
         configLines.push(`\n`);
     }
 
-    if (data.Static_arp_entries_enable === true) {
+    if (dhcpSettings.enableStaticArp === true) {
         configLines.push(`# This will force the system to keep static ARP entries.Clients must mactch ARP entries to get a IP`);
         configLines.push(`option arp-cache-timeout 0;`);
         configLines.push(`\n`);
     }
 
-    if (data.Ping_check_disable === true) {
+    if (dhcpSettings.enablePingCheck === true) {
         configLines.push(`# This will disable ping check for a  IP address `);
         configLines.push(`ping-check false;`);
-        configLines.push(`ping-timeout ${data.Ping_check_timeout};`);
+        configLines.push(`ping-timeout ${dhcpSettings.pingTimeout};`);
     }
 
-    if (data.Subnet && data.Subnet_mask) {
+    if (dhcpSettings.subnet && dhcpSettings.mask) {
         configLines.push(`\n
 # Subnet Specific Configuration
 `);
 
-        configLines.push(`subnet ${data.Subnet} netmask ${data.Subnet_mask} {`);
+        configLines.push(`subnet ${dhcpSettings.subnet} netmask ${dhcpSettings.mask} {`);
 
-        if (data.StartIP && data.EndIP) {
-            configLines.push(`  range ${data.StartIP} ${data.EndIP};`);
+        if (dhcpSettings.rangeStart && dhcpSettings.rangeEnd) {
+            configLines.push(`  range ${dhcpSettings.rangeStart} ${dhcpSettings.rangeEnd};`);
         }
-        if (data.Dns0 || data.Dns1 || data.Dns2 | data.Dns3) {
-            configLines.push(`  option domain-name-servers ${data.Dns0 ? data.Dns0 : ''} ${data.Dns1 ? ', ' + data.Dns1 : ''} ${data.Dns2 ? ', ' + data.Dns2 : ''} ${data.Dns3 ? ', ' + data.Dns3 : ''};`);
-        }
-
-        if (data.Domain_name) {
-            configLines.push(`  option domain-name "${data.Domain_name}";`);
+        if (dhcpSettings.dns0 || dhcpSettings.dns1 || dhcpSettings.dns2 | dhcpSettings.dns3) {
+            configLines.push(`  option domain-name-servers ${dhcpSettings.dns0 ? dhcpSettings.dns0 : ''} ${dhcpSettings.dns1 ? ', ' + dhcpSettings.dns1 : ''} ${staticMappings.dns2 ? ', ' + staticMappings.dns2 : ''} ${staticMappings.dns3 ? ', ' + staticMappings.dns3 : ''};`);
         }
 
-        if (data.Domain_search_list) {
-            configLines.push(`  option domain-search "${data.Domain_search_list}";`);
+        if (dhcpSettings.domainName) {
+            configLines.push(`  option domain-name "${dhcpSettings.domainName}";`);
         }
 
-        if (data.Gateway) {
-            configLines.push(`  option routers ${data.Gateway};`);
+        if (dhcpSettings.domainSearchList) {
+            configLines.push(`  option domain-search "${dhcpSettings.domainSearchList}";`);
         }
 
-        if (data.Wins1 || data.Wins2) {
-            configLines.push(`  option netbios-name-servers ${data.Wins1 ? data.Wins1 : ''} ${data.Wins2 ? ', ' + data.Wins2 : ''};`);
+        if (dhcpSettings.gateway) {
+            configLines.push(`  option routers ${dhcpSettings.gateway};`);
+        }
+
+        if (dhcpSettings.wins1 || dhcpSettings.wins2) {
+            configLines.push(`  option netbios-name-servers ${dhcpSettings.wins1 ? dhcpSettings.wins1 : ''} ${dhcpSettings.wins2 ? ', ' + dhcpSettings.wins2 : ''};`);
         }
 
 
-        if (data.Default_lease_time) {
-            configLines.push(`  default-lease-time ${data.Default_lease_time};`);
+        if (dhcpSettings.defaultLeaseTime) {
+            configLines.push(`  default-lease-time ${dhcpSettings.defaultLeaseTime};`);
         }
 
-        if (data.Maximum_lease_time) {
-            configLines.push(`  max-lease-time ${data.Maximum_lease_time};`);
+        if (dhcpSettings.maxLeaseTime) {
+            configLines.push(`  max-lease-time ${dhcpSettings.maxLeaseTime};`);
         }
 
         configLines.push("}"); // Close subnet block
     }
 
+    if (staticMappings.length > 0) {
+        staticMappings.map((staticMapping) => {
+            configLines.push(`
+
+host ${staticMapping.hostname} {
+  hardware ethernet ${staticMapping.macAddress} ;
+  fixed-address ${staticMapping.ipAddress};
+}
+`);
+        });
+    }
     return configLines.join("\n");
 }
 
 
+
+
+const getInterface = (iface) => {
+    const path = `/tmp/${iface}`;
+    try {
+        return fs.readFileSync(path, 'utf8');
+    }
+    catch (err) {
+        console.log(err);
+        return "";
+    }
+};
+
+
+function generateDefaultConfig(){
+    const iface=getInterface("LAN");
+    return `# Defaults for isc-dhcp-server (sourced by /etc/init.d/isc-dhcp-server)
+
+# Path to dhcpd's config file (default: /etc/dhcp/dhcpd.conf).
+#DHCPDv4_CONF=/etc/dhcp/check.conf
+#DHCPDv6_CONF=/etc/dhcp/dhcpd6.conf
+
+# Path to dhcpd's PID file (default: /var/run/dhcpd.pid).
+#DHCPDv4_PID=/var/run/dhcpd.pid
+#DHCPDv6_PID=/var/run/dhcpd6.pid
+
+# Additional options to start dhcpd with.
+#       Don't use options -cf or -pf here; use DHCPD_CONF/ DHCPD_PID instead
+#OPTIONS=""
+
+# On what interfaces should the DHCP server (dhcpd) serve DHCP requests?
+#       Separate multiple interfaces with spaces, e.g. "eth0 eth1".
+INTERFACESv4="${iface}"
+#INTERFACESv6=""
+
+`;
+}
+
+app.get("/api/settings", (req, res) => {
+    res.json(dhcpSettings);
+});
+
+app.get("/api/settings/:id", (req, res) => {
+    const found = interfaces.find((i) => i.id == req.params.id);
+    found ? res.json(found) : res.status(404).json({ error: "Not found" });
+});
+
+
 // Define the backend route
 app.post('/save', async function (req, res) {
-    const data = req.body;
+    // const newEntry = { ...req.body, id: dhnextID++ };
+    // dhcp_settings.push(newEntry);
+    dhcpSettings = req.body;
     // Write data to a file
     const dhcpFilePath = "/etc/dhcp/dhcpd.conf";
     const tempFilePath = "./temp.conf";
-    const dhcpConfig = generateDhcpConfig(data, staticMappings);
+    const dhcpConfig = generateDhcpConfig();
+    const defaultConfig=generateDefaultConfig();
     //Configuration Syntax check
     try {
         fs.writeFile(tempFilePath, dhcpConfig, function (err) {
@@ -165,6 +229,12 @@ app.post('/save', async function (req, res) {
                 console.error('Error writing to file:', err);
                 res.status(500).send({ message: 'Error writing to file' });
             } else {
+                fs.writeFile('/etc/default/isc-dhcp-server',defaultConfig,function(err){
+                    if(err){
+                        console.error('Error writing to file:', err);
+                        res.status(500).send({ message: 'Error writing to file' });
+                    }
+                })
                 console.log('DHCP configuration Data is saved to a file location ', dhcpFilePath);
                 res.send({ message: 'DHCP Data is saved successfully.' });
             }
@@ -175,6 +245,18 @@ app.post('/save', async function (req, res) {
         res.status(500).send({ message: `${err}` });
     }
 });
+
+app.delete("/api/settings/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = interfaces.findIndex((i) => i.id === id);
+    if (index !== -1) {
+        interfaces.splice(index, 1);
+        res.json({ message: "Deleted successfully" });
+    } else {
+        res.status(404).json({ error: "Not found" });
+    }
+});
+
 
 
 // Checking backend service's status
@@ -270,26 +352,74 @@ host ${staticMap.hostname} {
     return config.join('\n');
 }
 
-app.post('/staticMappings', (req, res) => {
-    const newEntry = { ...req.body, id: nextId++ };
+app.post('/staticMappings', async (req, res) => {
+    const newEntry = { ...req.body, id: stnextId++ };
     staticMappings.push(newEntry);
-    const config = appendHostConfig();
-    fs.appendFile('/etc/dhcp/dhcpd.conf', config, function (err) {
-        if (err) {
-            console.error('Error appending to file:', err);
-            res.status(500).send({ message: 'Error writing to file' });
-        }
-    });
-    res.json({ message: `staticMappings(${newEntry.staticMappings}) data is a saved.` });
+    // Write data to a file
+    const dhcpFilePath = "/etc/dhcp/dhcpd.conf";
+    const tempFilePath = "./temp.conf";
+    const dhcpConfig = generateDhcpConfig();
+    //Configuration Syntax check
+    try {
+        fs.writeFile(tempFilePath, dhcpConfig, function (err) {
+            if (err) {
+                console.error('Error writing to file:', err);
+                res.status(500).send({ message: 'Error writing to file' });
+            }
+        });
+        const { stderr } = await execAsync(`dhcpd -t -cf ${tempFilePath}`);
+        // Writing to file after syntaxcheck
+        fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
+            if (err) {
+                console.error('Error writing to file:', err);
+                res.status(500).send({ message: 'Error writing to file' });
+            } else {
+                console.log('DHCP configuration Data is saved to a file location ', dhcpFilePath);
+                res.send({ message: 'DHCP Data is saved successfully.' });
+            }
+        });
+    }
+    catch (err) {
+        console.error('Syntax Error', err);
+        res.status(500).send({ message: `${err}` });
+    }
 });
 
 
-app.put("/staticMappings/:id", (req, res) => {
+app.put("/staticMappings/:id", async (req, res) => {
     const index = staticMappings.findIndex((i) => i.id == req.params.id);
     if (index !== -1) {
         const prestaticMapping = staticMappings[index];
         if (JSON.stringify(req.body) !== JSON.stringify(prestaticMapping)) {
             staticMappings[index] = { ...req.body, id: staticMappings[index].id };
+            // Write data to a file
+            const dhcpFilePath = "/etc/dhcp/dhcpd.conf";
+            const tempFilePath = "./temp.conf";
+            const dhcpConfig = generateDhcpConfig();
+            //Configuration Syntax check
+            try {
+                fs.writeFile(tempFilePath, dhcpConfig, function (err) {
+                    if (err) {
+                        console.error('Error writing to file:', err);
+                        res.status(500).send({ message: 'Error writing to file' });
+                    }
+                });
+                const { stderr } = await execAsync(`dhcpd -t -cf ${tempFilePath}`);
+                // Writing to file after syntaxcheck
+                fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
+                    if (err) {
+                        console.error('Error writing to file:', err);
+                        res.status(500).send({ message: 'Error writing to file' });
+                    } else {
+                        console.log('DHCP configuration Data is saved to a file location ', dhcpFilePath);
+                        res.send({ message: 'DHCP Data is saved successfully.' });
+                    }
+                });
+            }
+            catch (err) {
+                console.error('Syntax Error', err);
+                res.status(500).send({ message: `${err}` });
+            }
         }
         res.json(staticMappings[index]);
     } else {

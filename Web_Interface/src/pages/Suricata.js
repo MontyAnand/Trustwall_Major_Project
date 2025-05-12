@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
 import "./Suricata.css";
@@ -98,10 +98,10 @@ function App() {
               <Link to="/">Interfaces</Link>
             </li>
             <li>
-              <Link to="/global-settings">Global Settings</Link>
+              <Link  to="/global-settings">Global Settings</Link>
             </li>
             <li>
-              <Link to="/updates">Updates</Link>
+              <Link  to="/updates">Updates</Link>
             </li>
             <li>
               <Link to="/alerts">Alerts</Link>
