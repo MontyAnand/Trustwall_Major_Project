@@ -568,6 +568,7 @@ Server::Server() : running(true)
     }
     Firewall::initializeRuleset();
     WANSetup(Utility::getPublicInterface());
+    Interface::initLANInterface();
     epollFd = epoll_create1(0);
     if (epollFd == -1)
     {

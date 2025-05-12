@@ -166,6 +166,7 @@ public:
     static void changeLANInterface(std::string &);
     static void changeWANInterface(std::string &);
     static void changeIPAddress(const std::string &, const std::string &, int, std::string &);
+    static void initLANInterface ();
 };
 
 class Firewall

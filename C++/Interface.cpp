@@ -10,7 +10,7 @@ struct InterfaceData
     std::string interfaceName;
 };
 
-void Interface::changeIPAddress(const std::string &interface, const std::string &newIP, int netmask, std::string & gatewayIP)
+void Interface::changeIPAddress(const std::string &interface, const std::string &newIP, int netmask, std::string &gatewayIP)
 {
     // Step 1: Delete the existing IP address
     std::string deleteCommand = "sudo ip addr flush dev " + interface;
@@ -38,11 +38,11 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
         std::cerr << "Failed to bring interface " << interface << " up" << std::endl;
     }
 
-    std::string addGatewayCommand = "sudo ip route add default via " + gatewayIP +" dev " + interface;
+    std::string addGatewayCommand = "sudo ip route add default via " + gatewayIP + " dev " + interface;
 
     if (system(addGatewayCommand.c_str()) != 0)
     {
-        std::cerr << "Failed to assign gateway IP " << interface << " " << gatewayIP<< std::endl;
+        std::cerr << "Failed to assign gateway IP " << interface << " " << gatewayIP << std::endl;
     }
 
     // std::cout << "IP address successfully updated on " << interface << std::endl;
@@ -127,9 +127,9 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
 
         // Convert GIP to string format
         std::string gip = std::to_string((result.gip >> 24) & 0xFF) + "." +
-                         std::to_string((result.gip >> 16) & 0xFF) + "." +
-                         std::to_string((result.gip >> 8) & 0xFF) + "." +
-                         std::to_string(result.gip & 0xFF);
+                          std::to_string((result.gip >> 16) & 0xFF) + "." +
+                          std::to_string((result.gip >> 8) & 0xFF) + "." +
+                          std::to_string(result.gip & 0xFF);
         std::cout << gip << "\n";
         changeIPAddress(result.interfaceName, ip, result.netmask, gip);
 
@@ -255,6 +255,36 @@ std::string Interface::getInterfaceListJSON()
 
     freeifaddrs(ifaddr); // Free allocated memory
     return data.dump();  // Pretty-print JSON output
+}
+
+void Interface::initLANInterface()
+{
+    std::string wanInterface = getWANInterface();
+    struct ifaddrs *ifaddr, *ifa;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        perror("getifaddrs");
+        return ;
+    }
+    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == nullptr)
+            continue;
+
+        std::string interface = ifa->ifa_name;
+        if (interface == "lo") // Skip loopback
+            continue;
+        if(interface == wanInterface){
+            continue;
+        }
+        changeLANInterface(interface);
+        std::string newIP = "172.16.0.1";
+        std::string gatewayIP = "172.16.0.1";
+        changeIPAddress(interface,newIP,24,gatewayIP);
+        return;
+    }
+    freeifaddrs(ifaddr); // Free allocated memory
 }
 
 std::string Interface::getGateway(const std::string &iface)
