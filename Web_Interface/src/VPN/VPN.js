@@ -1,36 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
 import { useSocket } from "../Contexts/socketContex";
-import "./VPN.css"
+import "./VPN.css";
 
 function VPN() {
     const [imageURL, setImageURL] = useState('');
-    const { socket, socketID } = useSocket();
+    const bufferRef = useRef(''); // buffer to accumulate data
+    const { socket } = useSocket();
 
     const sendRequest = () => {
         if (!socket) {
             alert("Socket not connected");
             return;
         }
+
         setImageURL('');
+        bufferRef.current = ''; // reset buffer
+
         socket.emit('newVPNConnection');
+
         setContent(
             <div className="vpn_container_3">
                 <div className="loader"></div>
-                <button className="qr_btn_3">Generate QR Code</button>
-            </div>
-        );
-    }
-
-    const updateImageURL = (newData) => {
-        setImageURL((prevState) => prevState + newData); // Ensure state updates correctly
-    };
-
-    const showQR = () => {
-        setContent(
-            <div className="vpn_container_1">
-                <img className="vpn_img" src={imageURL} alt="Generated QR Code" />
-                <button className="qr_btn_1">Generate QR Code</button>
+                <button className="qr_btn_3" disabled>
+                    Generating...
+                </button>
             </div>
         );
     };
@@ -42,6 +36,23 @@ function VPN() {
             </button>
         </div>
     );
+
+
+    const updateImageURL = (chunk) => {
+        bufferRef.current += chunk;
+    };
+
+    const showQR = () => {
+        const fullImage = bufferRef.current;
+        setImageURL(fullImage);
+
+        setContent(
+            <div className="vpn_container_1">
+                <img className="vpn_img" src={fullImage} alt="Generated QR Code" />
+                <button className="qr_btn_1" onClick={sendRequest}>Generate QR Code</button>
+            </div>
+        );
+    };
 
     useEffect(() => {
         if (!socket) return;
@@ -58,14 +69,12 @@ function VPN() {
             socket.off('vpn-data-completed', showQR);
             socket.off('vpn-connection-error');
         };
-    }, [socket, imageURL, content]); // Added imageURL as dependency to always get the latest value
+    }, [socket]);
 
     return (
-        <>
-            <div className="outside_container">
-                {content}
-            </div>
-        </>
+        <div className="outside_container">
+            {content}
+        </div>
     );
 }
 

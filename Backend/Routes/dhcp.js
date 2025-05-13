@@ -138,7 +138,7 @@ key omapi_key {
             configLines.push(`  max-lease-time ${dhcpSettings.maxLeaseTime};`);
         }
 
-        configLines.push("}"); // Close subnet block
+        configLines.push("}\n\n"); // Close subnet block
     }
 
     if (staticMappings.length > 0) {
@@ -211,7 +211,7 @@ app.post('/save', async function (req, res) {
     dhcpSettings = req.body;
     // Write data to a file
     const dhcpFilePath = "/etc/dhcp/dhcpd.conf";
-    const tempFilePath = "./temp.conf";
+    const tempFilePath = "/etc/dhcp/temp.conf";
     const dhcpConfig = generateDhcpConfig();
     const defaultConfig=generateDefaultConfig();
     //Configuration Syntax check
@@ -222,7 +222,7 @@ app.post('/save', async function (req, res) {
                 res.status(500).send({ message: 'Error writing to file' });
             }
         });
-        const { stderr } = await execAsync(`dhcpd -t -cf ${tempFilePath}`);
+        const { stderr } = await execAsync(`dhcpd -t -cf ${tempFilePath} && rm ${tempFilePath}`);
         // Writing to file after syntaxcheck
         fs.writeFile(dhcpFilePath, dhcpConfig, function (err) {
             if (err) {
