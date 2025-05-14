@@ -71,7 +71,7 @@ std::string Utility::getEndPoint()
 
 void Utility::setEnvironmentVariable(std::string key, std::string value)
 {
-    const std::string filepath = "/etc/environment";
+    const std::string filepath = "/srv/Trustwall_ENV.txt";
     std::ifstream infile(filepath);
     std::vector<std::string> lines;
     std::string line;
