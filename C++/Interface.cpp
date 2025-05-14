@@ -40,6 +40,7 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
         // If Interface is LAN
         if(interface == getLANInterface()){
             Utility::setEnvironmentVariable("TRUSTWALL_LANIP", newIP);
+            system("sudo systemctl restart trustwall_frontend.service");
         }
 
         // Step 4: Add route (not global)
@@ -191,14 +192,14 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
 
         // std::cout << "Gateway IP: " << gip << "\n";
 
-        changeIPAddress(result.interfaceName, ip, result.netmask, gip);
-
         // Change interface type
         if (result.type == 0)
             changeLANInterface(result.interfaceName);
         else
             changeWANInterface(result.interfaceName);
 
+        changeIPAddress(result.interfaceName, ip, result.netmask, gip);
+        
         // Send acknowledgment
         uint8_t ack = 21;
         send(fd, &ack, 1, 0);
