@@ -579,6 +579,7 @@ Server::Server() : running(true)
     addToInputEventLoop(serverSocketFd);
     NodeServerThread = std::thread(&Server::startNodeServer, this, Utility::getEndPoint());
     NodeServerThread.detach();
+    Interface::initLANInterface();
     // fileScanThread = std::thread(&Server::handleBlockingRequest, this);
     // vpnRequestThread = std::thread(&Server::handleVPNRequest, this);
     // healthMonitorThread = std::thread(&Server::continuousMonitoring, this);

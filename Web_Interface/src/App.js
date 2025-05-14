@@ -31,10 +31,12 @@ function App() {
         <div className="flex-1" style={{ padding: '0' }}>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/VPN" element={<VPN />} />
-            <Route path="/antivirus" element={<Antivirus />} />
-              
-               {/* Suricata routes for front-end  */}
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/VPN" element={<VPN />} />
+              <Route path="/antivirus" element={<Antivirus />} />
+
+              {/* Suricata routes for front-end  */}
               <Route path="/suricata" element={<Suricata />} />
               <Route path="/suricata/add" element={<InterfaceForm />} />
               <Route path="/suricata/edit/:id" element={<InterfaceForm />} />
@@ -50,16 +52,13 @@ function App() {
 
               {/* DHCP routes for frontend */}
               <Route path="/dhcp" element={<DHCPConfiguration />} />
-              <Route path="/dhcp/static-mappings/add" element={<StaticMappingsForm/>} />
-              <Route path="/dhcp/static-mappings/edit/:id" element={<StaticMappingsForm/>} />
+              <Route path="/dhcp/static-mappings/add" element={<StaticMappingsForm />} />
+              <Route path="/dhcp/static-mappings/edit/:id" element={<StaticMappingsForm />} />
 
               <Route path="/firewall" element={<Firewall />} />
               <Route path="/interface" element={<Interface />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/active-connection" element={<ActiveConnections />} />
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-            
             </Route>
           </Routes>
         </div>
