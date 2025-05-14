@@ -37,6 +37,11 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
             std::cerr << "Failed to bring interface " << interface << " up" << std::endl;
         }
 
+        // If Interface is LAN
+        if(interface == getLANInterface()){
+            Utility::setEnvironmentVariable("TRUSTWALL_LANIP", newIP);
+        }
+
         // Step 4: Add route (not global)
         if (gatewayIP.length() != 0)
         {

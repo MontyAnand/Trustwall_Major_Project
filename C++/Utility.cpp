@@ -23,7 +23,7 @@ std::string Utility::getPublicInterface()
     std::array<char, 128> buffer;
     std::string interface;
 
-    FILE *pipe = popen(command.c_str(), "r");
+    FILE *pipe = popen(command.c_str(), "r"); //
 
     if (!pipe)
     {
@@ -67,4 +67,40 @@ std::string Utility::getEndPoint()
     // Convert to readable format
     struct sockaddr_in *ipaddr = (struct sockaddr_in *)&ifr.ifr_addr;
     return inet_ntoa(ipaddr->sin_addr);
+}
+
+void Utility::setEnvironmentVariable(std::string key, std::string value)
+{
+    const std::string filepath = "/etc/environment";
+    std::ifstream infile(filepath);
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+
+    // Read all lines and check for existing key
+    while (std::getline(infile, line))
+    {
+        if (line.find(key + "=") == 0)
+        {
+            line = key + "=\"" + value + "\"";
+            found = true;
+        }
+        lines.push_back(line);
+    }
+    infile.close();
+
+    // If not found, add new line
+    if (!found)
+    {
+        lines.push_back(key + "=\"" + value + "\"");
+    }
+
+    // Write back to the file
+    std::ofstream outfile(filepath, std::ios::trunc);
+    for (const auto &l : lines)
+    {
+        outfile << l << std::endl;
+    }
+    outfile.close();
+    return;
 }
