@@ -39,7 +39,8 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
 
         // If Interface is LAN
         if(interface == getLANInterface()){
-            Utility::setEnvironmentVariable("TRUSTWALL_LANIP", newIP);
+            Utility::setEnvironmentVariable("HOST", newIP);
+            Utility::setEnvironmentVariable("PORT", "3000");
             system("sudo systemctl restart trustwall_frontend.service");
         }
 

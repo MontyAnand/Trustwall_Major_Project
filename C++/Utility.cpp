@@ -82,7 +82,7 @@ void Utility::setEnvironmentVariable(std::string key, std::string value)
     {
         if (line.find(key + "=") == 0)
         {
-            line = key + "=\"" + value + "\"";
+            line = key + "=" + value;
             found = true;
         }
         lines.push_back(line);
@@ -92,7 +92,7 @@ void Utility::setEnvironmentVariable(std::string key, std::string value)
     // If not found, add new line
     if (!found)
     {
-        lines.push_back(key + "=\"" + value + "\"");
+        lines.push_back(key + "=" + value);
     }
 
     // Write back to the file
