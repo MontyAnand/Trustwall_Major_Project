@@ -577,7 +577,7 @@ Server::Server() : running(true)
     prev_traffic = HealthMonitor::getNetworkStats();
     serverSocketFd = createServerSocket();
     addToInputEventLoop(serverSocketFd);
-    NodeServerThread = std::thread(&Server::startNodeServer, this, Utility::getEndPoint());
+    NodeServerThread = std::thread(&Server::startNodeServer, this, "127.0.0.1");
     NodeServerThread.detach();
     Interface::initLANInterface();
     // fileScanThread = std::thread(&Server::handleBlockingRequest, this);

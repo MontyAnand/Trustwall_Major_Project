@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <memory>
 #include <bitset>
+#include <algorithm>
 
 #include <nlohmann/json.hpp>
 
@@ -230,6 +231,7 @@ class Utility{
         static std::string getEndPoint();
         static std::string getPublicInterface();
         static bool checkConnectivity();
+        static void setEnvironmentVariable (std::string , std::string);
 };
 
 class Server
