@@ -1,82 +1,100 @@
-#include <iostream>
-#include <vector>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <string>
-#include <arpa/inet.h>
 #include <iostream>
+#include <netinet/in.h>  
+#include <arpa/inet.h>  
 
-class IPPool {
-private:
-    uint32_t network;
-    uint32_t broadcast;
-    int pool_size;
-    std::vector<bool> bitmap;
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
-    uint32_t ip_to_int(const std::string& ip) {
-        struct in_addr addr;
-        inet_pton(AF_INET, ip.c_str(), &addr);
-        return ntohl(addr.s_addr);
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+std::vector<std::string> getInterfaceDetails(const std::string &iface) {
+    std::string ipAddr = "";
+    std::string netmask = "";
+    std::string broadcast = "";
+
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        perror("Socket error");
+        return {ipAddr, netmask, broadcast};
     }
 
-    std::string int_to_ip(uint32_t ip) {
-        struct in_addr addr;
-        addr.s_addr = htonl(ip);
-        char buf[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &addr, buf, INET_ADDRSTRLEN);
-        return std::string(buf);
+    struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    strncpy(ifr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
+
+    // IP address
+    if (ioctl(fd, SIOCGIFADDR, &ifr) == 0) {
+        struct sockaddr_in *ip = reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_addr);
+        ipAddr = inet_ntoa(ip->sin_addr);
     }
 
-public:
-    IPPool(const std::string& base_ip, const std::string& netmask) {
-        uint32_t base = ip_to_int(base_ip);
-        uint32_t mask = ip_to_int(netmask);
-        network = base & mask;
-        broadcast = network | ~mask;
-        pool_size = broadcast - network - 1;
-        bitmap.resize(pool_size, false);  // false = available
+    // Netmask
+    if (ioctl(fd, SIOCGIFNETMASK, &ifr) == 0) {
+        struct sockaddr_in *nm = reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_netmask);
+        netmask = inet_ntoa(nm->sin_addr);
     }
 
-    std::string allocate_ip() {
-        for (int i = 0; i < pool_size; ++i) {
-            if (!bitmap[i]) {
-                bitmap[i] = true;
-                return int_to_ip(network + 1 + i);
-            }
-        }
-        return "No IPs available";
+    // Broadcast address
+    if (ioctl(fd, SIOCGIFBRDADDR, &ifr) == 0) {
+        struct sockaddr_in *brd = reinterpret_cast<struct sockaddr_in *>(&ifr.ifr_broadaddr);
+        broadcast = inet_ntoa(brd->sin_addr);
     }
 
-    void release_ip(const std::string& ip) {
-        uint32_t ip_val = ip_to_int(ip);
-        if (ip_val <= network || ip_val >= broadcast) return;
+    close(fd);
+    return {ipAddr, netmask, broadcast};
+}
 
-        int index = ip_val - network - 1;
-        if (index >= 0 && index < pool_size) {
-            bitmap[index] = false;
-        }
-    }
-};
 
 int main(){
-    std::string bip;
-    std::string netmask;
-    std::cout << "enter Base IP\n";
-    std::cin>>bip;
-    std::cout << "Rnter Netmask\n";
-    std::cin >> netmask;
-    IPPool x(bip,netmask);
-    int z;
-    while(true){
-        std::cin >> z;
-        if(z == 1){
-            std::cout<<x.allocate_ip()<<"\n";
-            continue;
-        }
-        if(z == 2){
-            std::string ip;
-            std::cin>>ip;
-            x.release_ip(ip);
-            continue;
-        }
-        break;
+    FILE *fp;
+    char path[1035];
+
+    // Command to list interface names
+    const char *cmd = "awk -F: '/:/ {print $1}' /proc/net/dev | sed 's/^[ \t]*//'";
+
+    // Open the command for reading.
+    fp = popen(cmd, "r");
+    if (fp == NULL) {
+        perror("popen failed");
+        return 1;
     }
+
+    // Read the output line by line and print
+    printf("Network Interfaces:\n");
+    while (fgets(path, sizeof(path), fp) != NULL) {
+        std::string interface = path;
+        interface.erase(interface.find_last_not_of("\n\r") + 1);
+        if(interface == "lo")continue;
+        std::cout << interface << "\n";
+        std::vector<std::string> p = getInterfaceDetails (interface);
+        std::cout << p[0] << " " << p[1] << " " << p[2] << std::endl; 
+    }
+
+    // Close
+    pclose(fp);
+    return 0;
 }
