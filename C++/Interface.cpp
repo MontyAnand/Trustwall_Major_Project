@@ -125,7 +125,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
     {
         if (length < 12)
         {
-            std::cerr << "Bad packet: insufficient meta data\n";
+            // std::cerr << "Bad packet: insufficient meta data\n";
             return;
         }
 
@@ -161,7 +161,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
         // Validate data length
         if (length < offset + nameLength)
         {
-            std::cerr << "Bad packet: insufficient data for interface name\n";
+            // std::cerr << "Bad packet: insufficient data for interface name\n";
             return;
         }
 
@@ -179,7 +179,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
                           std::to_string((result.gip >> 8) & 0xFF) + "." +
                           std::to_string(result.gip & 0xFF);
 
-        std::cout << "Gateway IP: " << gip << "\n";
+        // std::cout << "Gateway IP: " << gip << "\n";
 
         changeIPAddress(result.interfaceName, ip, result.netmask, gip);
 
@@ -195,7 +195,7 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Interface Error in C++: " << e.what() << "\n";
+        // std::cerr << "Interface Error in C++: " << e.what() << "\n";
     }
     catch (...)
     {
@@ -532,3 +532,6 @@ std::string Interface::getLANInterfaceDetails()
         {"gip", ""}};
     return errorData.dump();
 }
+
+
+
