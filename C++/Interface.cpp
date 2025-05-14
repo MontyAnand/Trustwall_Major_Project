@@ -38,21 +38,24 @@ void Interface::changeIPAddress(const std::string &interface, const std::string 
         }
 
         // Step 4: Add route (not global)
-        std::string addGatewayCommand = "sudo ip route add " + newIP + "/" + std::to_string(netmask) + 
-                                        " via " + gatewayIP + " dev " + interface;
-        if (system(addGatewayCommand.c_str()) != 0)
+        if (gatewayIP.length() != 0)
         {
-            std::cerr << "Failed to assign gateway IP to " << interface << " via " << gatewayIP << std::endl;
+            std::string addGatewayCommand = "sudo ip route add " + newIP + "/" + std::to_string(netmask) +
+                                            " via " + gatewayIP + " dev " + interface;
+            if (system(addGatewayCommand.c_str()) != 0)
+            {
+                std::cerr << "Failed to assign gateway IP to " << interface << " via " << gatewayIP << std::endl;
+            }
         }
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Exception occurred while changing IP address on interface " 
+        std::cerr << "Exception occurred while changing IP address on interface "
                   << interface << ": " << e.what() << std::endl;
     }
     catch (...)
     {
-        std::cerr << "Unknown error occurred while changing IP address on interface " 
+        std::cerr << "Unknown error occurred while changing IP address on interface "
                   << interface << std::endl;
     }
 }
@@ -83,7 +86,6 @@ void Interface::changeLANInterface(std::string &interface)
         std::cerr << "Unknown error occurred in changeLANInterface." << std::endl;
     }
 }
-
 
 void Interface::changeWANInterface(std::string &interface)
 {
@@ -142,20 +144,23 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
         result.netmask = static_cast<uint8_t>(data[offset++]);
 
         // Extract IP
-        if (offset + 4 > length) throw std::runtime_error("Packet too short for IP");
+        if (offset + 4 > length)
+            throw std::runtime_error("Packet too short for IP");
         uint32_t ipBigEndian;
         std::memcpy(&ipBigEndian, &data[offset], sizeof(uint32_t));
         result.ip = ntohl(ipBigEndian);
         offset += sizeof(uint32_t);
 
         // Extract Gateway IP
-        if (offset + 4 > length) throw std::runtime_error("Packet too short for Gateway IP");
+        if (offset + 4 > length)
+            throw std::runtime_error("Packet too short for Gateway IP");
         std::memcpy(&ipBigEndian, &data[offset], sizeof(uint32_t));
         result.gip = ntohl(ipBigEndian);
         offset += sizeof(uint32_t);
 
         // Extract interface name length
-        if (offset + 1 > length) throw std::runtime_error("Packet too short for interface name length");
+        if (offset + 1 > length)
+            throw std::runtime_error("Packet too short for interface name length");
         uint8_t nameLength = static_cast<uint8_t>(data[offset++]);
 
         // Validate data length
@@ -203,7 +208,6 @@ void Interface::changeInterfaceConfiguration(const char *data, int length, int f
     }
 }
 
-
 std::string Interface::getWANInterface()
 {
     std::string value;
@@ -233,7 +237,6 @@ std::string Interface::getWANInterface()
     return value;
 }
 
-
 std::string Interface::getLANInterface()
 {
     std::string value;
@@ -262,7 +265,6 @@ std::string Interface::getLANInterface()
 
     return value;
 }
-
 
 std::string Interface::getInterfaceListJSON()
 {
@@ -304,7 +306,8 @@ std::string Interface::getInterfaceListJSON()
             inet_ntop(AF_INET, &addr->sin_addr, ip, INET_ADDRSTRLEN);
             inet_ntop(AF_INET, &mask->sin_addr, netmask, INET_ADDRSTRLEN);
 
-            int type = (interface == lanInterface) ? 0 : (interface == wanInterface) ? 1 : -1;
+            int type = (interface == lanInterface) ? 0 : (interface == wanInterface) ? 1
+                                                                                     : -1;
 
             data.push_back({{"if", interface},
                             {"ip", ip},
@@ -327,7 +330,8 @@ std::string Interface::getInterfaceListJSON()
             if (processedInterfaces.find(interface) != processedInterfaces.end())
                 continue;
 
-            int type = (interface == lanInterface) ? 0 : (interface == wanInterface) ? 1 : -1;
+            int type = (interface == lanInterface) ? 0 : (interface == wanInterface) ? 1
+                                                                                     : -1;
 
             data.push_back({{"if", interface},
                             {"ip", ""},
@@ -352,7 +356,6 @@ std::string Interface::getInterfaceListJSON()
 
     return data.dump();
 }
-
 
 void Interface::initLANInterface()
 {
@@ -380,7 +383,7 @@ void Interface::initLANInterface()
 
             changeLANInterface(interface);
             std::string newIP = "172.16.0.1";
-            std::string gatewayIP = "172.16.0.1";
+            std::string gatewayIP = "";
             changeIPAddress(interface, newIP, 24, gatewayIP);
 
             freeifaddrs(ifaddr); // Free before returning
@@ -398,7 +401,6 @@ void Interface::initLANInterface()
         std::cerr << "Unknown exception in initLANInterface." << std::endl;
     }
 }
-
 
 std::string Interface::getGateway(const std::string &iface)
 {
@@ -444,7 +446,6 @@ std::string Interface::getGateway(const std::string &iface)
 
     return "";
 }
-
 
 std::string Interface::getLANInterfaceDetails()
 {
@@ -532,6 +533,3 @@ std::string Interface::getLANInterfaceDetails()
         {"gip", ""}};
     return errorData.dump();
 }
-
-
-
