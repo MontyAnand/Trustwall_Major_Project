@@ -125,7 +125,7 @@ const InterfaceTable = () => {
       title: "Edit Interface",
       key: "edit",
       render: (_, record) => (
-        <Button type="primary" onClick={() => showModal(record)}>
+        <Button type="primary" onClick={() => showModal(record)} disabled>
           Edit
         </Button>
       ),
