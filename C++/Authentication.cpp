@@ -8,6 +8,36 @@ std::string Authentication::authenticateUser(std::string & userID, std::string &
         return Authentication::authResponseJSON(0,"User does not exixts",userID);
     }
 
+    // Check if user is root or belongs to 'sudo' group
+    if (pwd->pw_uid != 0) {
+        struct group *sudoGroup = getgrnam("sudo");
+        if (!sudoGroup) {
+            std::cerr << "Failed to retrieve sudo group.\n";
+            return Authentication::authResponseJSON(0, "Server side error", userID);
+        }
+
+        bool isSudoUser = false;
+
+        // Check if user's primary group matches sudo group's GID
+        if (pwd->pw_gid == sudoGroup->gr_gid) {
+            isSudoUser = true;
+        } else {
+            // Check if user is listed explicitly in sudo group's member list
+            for (char **members = sudoGroup->gr_mem; *members != NULL; ++members) {
+                if (userID == *members) {
+                    isSudoUser = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isSudoUser) {
+            std::cerr << "User is not in sudo group.\n";
+            return Authentication::authResponseJSON(0, "User is not privileged", userID);
+        }
+    }
+
+
     struct spwd *sp = getspnam(userID.c_str());
 
     if(! sp){
