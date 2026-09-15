@@ -4,3 +4,4 @@ a.out
 **/*.conf
 qrcode.png
 Firewall.db
+package-lock.json
